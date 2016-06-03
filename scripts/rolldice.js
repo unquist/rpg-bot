@@ -54,14 +54,14 @@
 			
 			      if(advantage.indexOf("dis") != -1)
 			      {
-			        result += " with disadvantage\n\nFirst rolls: ";
+			        result += " with disadvantage\n\nFirst result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n\Second rolls: ";
+		          result += "\n\Second result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -82,14 +82,14 @@
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
-			        result += " with advantage\n\nFirst rolls: ";
+			        result += " with advantage\n\nFirst result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n\Second rolls: ";
+		          result += "\n\Second result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
