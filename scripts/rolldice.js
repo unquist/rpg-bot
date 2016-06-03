@@ -13,7 +13,7 @@
 //   None
 //
 // Commands:
-//   hubot roll 2d6[+/-#][adv,advantage,dis,disadvantage]
+//   hubot roll XdY[+/-#] [adv,advantage,dis,disadvantage] -  rolls X dice with Y sides. Optional `+` or `-` adds/subtracts bonuses, and the [adv,advantage,dis,disadvantage] keywords roll advantage or disadvantage (note the space between the dice syntax and the adv keywords)
 //
 // Author:
 //   unquist
