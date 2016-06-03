@@ -32,25 +32,41 @@
             return results;
         };
 
-        robot.respond(/roll\s?(?:([0-9]+)?d([0-9]+)?)?(?:\s?(.*))?/i, function(msg) {
-            var num = msg.match[1] || 1;
-            var sides = msg.match[2] || 6;
-            var comment = msg.match[3] || "";
+        robot.respond(/(roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}/i, function(msg) {
+            var num = msg.match[2] || 1;
+            var sides = msg.match[4] || 6;
+            var bonusType = msg.match[5] || "NAN";
+			var bonus = msg.match[6] || 0;
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
-            var result = "rolled " + num + "d" + sides + " " + comment + "\n\nResult: ";
+			if(Number(bonus) > 0)
+			{
+				rollsTotal += Number(bonus);
+			}
+			var result = "rolled " + num + "d" + sides;
+			if(bonusType.indexOf("+") != -1)
+			{
+				result += "+" + bonus;
+			}
+			else if(bonusType.indexOf("-") != -1)
+			{
+				result += "-" + bonus;
+			}
+			
+			result += "\n\nResult: ";
 
             for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
-            }
+		    }
 
-            if (rolls.length > 1) {
+            if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) {
                 for (var k = 0; k < rolls.length; k++) {
                     rollsTotal += rolls[k];
                 }
+
                 result += "\n\nTotal: `" + rollsTotal + "`";
             }
-
+	
             return msg.reply(result);
         });
     };
