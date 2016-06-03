@@ -76,10 +76,9 @@
       		    {
       			  	rollsTotal += Number(bonus);
       			  }
-		          if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
-              {
-                result += "\n\nTotal of lowest rolls: `" + rollsTotal + "`";
-              }
+		          
+		          result += "\n\nTotal of lowest rolls: `" + rollsTotal + "`";
+              
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
@@ -105,10 +104,9 @@
       		    {
       			  	rollsTotal += Number(bonus);
       			  }
-		          if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
-              {
-                result += "\n\nTotal of highest rolls: `" + rollsTotal + "`";
-              }
+		          
+              result += "\n\nTotal of highest rolls: `" + rollsTotal + "`";
+              
 			      }
 			      else
 			      {
