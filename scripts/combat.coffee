@@ -1,14 +1,39 @@
 # Description:
-#   Example scripts for you to examine and try out.
+#   Rolls dice!
 #
-# Notes:
-#   They are commented out by default, because most of them are pretty silly and
-#   wouldn't be useful and amusing enough for day to day huboting.
-#   Uncomment the ones you want to try and experiment with.
+# Dependencies:
+#   None
+# Description:
+#   Rolls dice!
 #
-#   These are from the scripting documentation: https://github.com/github/hubot/blob/master/docs/scripting.md
+# Dependencies:
+#   None
+#
+# Configuration:
+#   None
+#
+# Commands:
+#
+#
+# Author:
+#   unquist
 
+    robot.respond /\/combat/i, (res) ->
+     combat_started = robot.brain.get('combat_flag') or 0
+  
+      if combat_started == 0 
+        robot.brain.set 'combat_flag', 1
+        res.reply "Beginning Combat!"
+  
+      else if combat_started == 1
+        robot.brain.set 'combat_flag', 0
+        res.reply 'Ending Combat!'
+      else
+       robot.brain.set 'combat_flag', 0
+       res.reply 'Unknown combat status; reseting to [no combat]!'
 
+  
+  
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
