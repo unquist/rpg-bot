@@ -72,19 +72,43 @@
 		          {
 		            rollsTotal = secondRollsTotal;
 		          }
-		          result += "\n\nResult: ";
 		          if(Number(bonus) > 0)
       		    {
       			  	rollsTotal += Number(bonus);
       			  }
 		          if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
               {
-                result += "\n\nTotal: `" + rollsTotal + "`";
+                result += "\n\nTotal of lowest rolls: `" + rollsTotal + "`";
               }
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
-			        result += " with advantage\n\nResult: ";
+			        result += " with advantage\n\nFirst rolls: ";
+			        var secondRollsTotal = rollsTotal;
+			        
+			        for (var j = 0; j < rolls.length; j++) {
+                result += "`" + rolls[j] + "` ";
+                rollsTotal += rolls[j];
+		          }
+		          result += "\n\Second rolls: ";
+		          rolls = rolldice(sides, num);
+		          for (var j = 0; j < rolls.length; j++) {
+                result += "`" + rolls[j] + "` ";
+                secondRollsTotal += rolls[j];
+		          }
+		          
+		          if(secondRollsTotal > rollsTotal)
+		          {
+		            rollsTotal = secondRollsTotal;
+		          }
+		          if(Number(bonus) > 0)
+      		    {
+      			  	rollsTotal += Number(bonus);
+      			  }
+		          if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
+              {
+                result += "\n\nTotal of highest rolls: `" + rollsTotal + "`";
+              }
 			      }
 			      else
 			      {
