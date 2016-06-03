@@ -18,11 +18,13 @@ You can test your hubot by running the following, however some plugins will not
 behave as expected unless the [environment variables](#configuration) they rely
 upon have been set.
 
-You can start rpg-bot locally by running:
+Clone this repo to a local directory. From within the directory, run
 
-    % bin/hubot
+    ./bin/hubot
 
-You'll see some start up output and a prompt:
+to run the app. This will also install the node modules so may take longer the first time.
+
+You'll see some startup output and a prompt:
 
     [Sat Feb 28 2015 12:38:27 GMT+0000 (GMT)] INFO Using default redis on localhost:6379
     rpg-bot>
