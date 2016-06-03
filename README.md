@@ -27,7 +27,7 @@ You'll see some start up output and a prompt:
     [Sat Feb 28 2015 12:38:27 GMT+0000 (GMT)] INFO Using default redis on localhost:6379
     rpg-bot>
 
-Then you can interact with conan-bot by typing `rpg-bot help`.
+Then you can interact with rpg-bot by typing `rpg-bot help`.
 
     rpg-bot> rpg-bot help
     rpg-bot animate me <query> - The same thing as `image me`, except adds [snip]
