@@ -17,7 +17,7 @@
 #
 # Author:
 #   unquist
-  
+  module.exports = (robot) -> 
     robot.respond /combat/i, (res) ->
       combat_started = robot.brain.get('combat_flag') or 0
   
