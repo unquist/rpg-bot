@@ -42,11 +42,6 @@
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
       			
-      			if(Number(bonus) > 0)
-      			{
-      				rollsTotal += Number(bonus);
-      			}
-      			
       			var result = "rolled " + num + "d" + sides;
       			if(bonusType.indexOf("+") != -1)
       			{
@@ -59,27 +54,59 @@
 			
 			      if(advantage.indexOf("dis") != -1)
 			      {
-			        result += "\n\nResult: ";
+			        result += " with disadvantage\n\nFirst rolls: ";
+			        var secondRollsTotal = rollsTotal;
+			        
+			        for (var j = 0; j < rolls.length; j++) {
+                result += "`" + rolls[j] + "` ";
+                rollsTotal += rolls[j];
+		          }
+		          result += "\n\Second rolls: ";
+		          rolls = rolldice(sides, num);
+		          for (var j = 0; j < rolls.length; j++) {
+                result += "`" + rolls[j] + "` ";
+                secondRollsTotal += rolls[j];
+		          }
+		          
+		          if(secondRollsTotal < rollsTotal)
+		          {
+		            rollsTotal = secondRollsTotal;
+		          }
+		          result += "\n\nResult: ";
+		          if(Number(bonus) > 0)
+      		    {
+      			  	rollsTotal += Number(bonus);
+      			  }
+		          if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
+              {
+                result += "\n\nTotal: `" + rollsTotal + "`";
+              }
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
-			        result += "\n\nResult: ";
+			        result += " with advantage\n\nResult: ";
 			      }
 			      else
 			      {
+			        if(Number(bonus) > 0)
+      		    {
+      			  	rollsTotal += Number(bonus);
+      			  }
+			        
 			        result += "\n\nResult: ";
+			        for (var j = 0; j < rolls.length; j++) {
+                result += "`" + rolls[j] + "` ";
+                rollsTotal += rolls[j];
+		          }
+
+              if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
+              {
+                result += "\n\nTotal: `" + rollsTotal + "`";
+              }
 			      }
 			      
 
-            for (var j = 0; j < rolls.length; j++) {
-                result += "`" + rolls[j] + "` ";
-                rollsTotal += rolls[j];
-		        }
-            
-            if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
-            {
-                result += "\n\nTotal: `" + rollsTotal + "`";
-            }
+
 	
             return msg.reply(result);
         });
