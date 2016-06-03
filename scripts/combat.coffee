@@ -18,7 +18,7 @@
 # Author:
 #   unquist
 
-    robot.respond /\/combat/i, (res) ->
+    robot.respond /combat/i, (res) ->
      combat_started = robot.brain.get('combat_flag') or 0
   
       if combat_started == 0 
