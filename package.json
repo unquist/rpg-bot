@@ -1,9 +1,9 @@
 {
-  "name": "conan-bot",
+  "name": "rpg-bot",
   "version": "0.0.0",
   "private": true,
-  "author": "Peter Guarnieri <peter.guarnieri@gmail.com>",
-  "description": "A simple robot for the Unready",
+  "author": "unquist@gmail.com",
+  "description": "A simple robot for playing D&D on slack.",
   "dependencies": {
     "hubot": "^2.19.0",
     "hubot-diagnostics": "0.0.1",
