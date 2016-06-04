@@ -35,26 +35,17 @@
         robot.respond(/combat\s*(\d)*/i, function(msg) {
            
 		   var combat_started = robot.brain.get('combat_flag');
-		   if(!combat_started)
+		   if(combat_started == 0 || !combat_started)
 		   {
-				combat_started = 1;
-				robot.brain.set('combat_flag', 1);
-				return msg.reply(">No flag found; Combat started");
-		   }
-		   else if(combat_started == 1)
-		   {
-				//combat needs to end
-				robot.brain.set('combat_flag', 0);
-				//TODO: any other cleanup work (like removing persistent variables)
-				return msg.reply(">Combat over");
-		   }
-		   else if(combat_started == 0)
-		   {
+				//combat_started = 1;
 				robot.brain.set('combat_flag', 1);
 				return msg.reply(">Combat started");
-		   }
-		   else
-		   {
+		   } else if(combat_started == 1) {
+				//combat needs to end
+				//robot.brain.set('combat_flag', 0);
+				//TODO: any other cleanup work (like removing persistent variables)
+				return msg.reply(">Combat over");
+		   } else {
 				return msg.reply(">Unknown flag");
 		   }
 		   
