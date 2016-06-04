@@ -17,21 +17,22 @@
 #
 # Author:
 #   unquist
-  module.exports = (robot) -> 
-    robot.respond /combat/i, (res) ->
-      combat_started = robot.brain.get('combat_flag') or 0
-  
-      if combat_started == 0 
-        robot.brain.set 'combat_flag', 1
-        res.reply "Beginning Combat!"
-  
-      else if combat_started == 1
-        robot.brain.set 'combat_flag', 0
-        res.reply 'Ending Combat!'
-      else
-       robot.brain.set 'combat_flag', 0
-       res.reply 'Unknown combat status; reseting to [no combat]!'
-
+#  module.exports = (robot) -> 
+#    robot.respond /combat/i, (res) ->
+#      combat_started = robot.brain.get('combat_flag') or 0
+#  
+#      if combat_started == 0 
+#        robot.brain.set 'combat_flag', 1
+#        res.reply "Beginning Combat!"
+#
+#  
+#      else if combat_started == 1
+#        robot.brain.set 'combat_flag', 0
+#        res.reply 'Ending Combat!'
+#      else
+#       robot.brain.set 'combat_flag', 0
+#       res.reply 'Unknown combat status; reseting to [no combat]!'
+#
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #

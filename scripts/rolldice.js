@@ -36,8 +36,8 @@
             var num = msg.match[2] || 1;
             var sides = msg.match[4] || 6;
             var bonusType = msg.match[5] || "NAN";
-			      var bonus = msg.match[6] || 0;
-			      var advantage = msg.match[7] || "";
+			var bonus = msg.match[6] || 0;
+			var advantage = msg.match[7] || "";
             
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
