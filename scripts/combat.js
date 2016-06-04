@@ -38,6 +38,8 @@
 		   if(!combat_started)
 		   {
 				combat_started = 1;
+				robot.brain.set('combat_flag', 1);
+				return msg.reply(">No flag found; Combat started");
 		   }
 		   else if(combat_started == 1)
 		   {
@@ -50,6 +52,10 @@
 		   {
 				robot.brain.set('combat_flag', 1);
 				return msg.reply(">Combat started");
+		   }
+		   else
+		   {
+				return msg.reply(">Unknown flag");
 		   }
 		   
 		   
