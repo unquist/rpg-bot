@@ -32,24 +32,25 @@
             return results;
         };
 
-        robot.respond(/combat\s*(\d)*/i, function(msg) {
+        robot.respond(/(foo\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
            
-		   var combat_started = robot.brain.get('combat_flag');
+ 		   var combat_started = robot.brain.get('combat_flag');
 		   if(combat_started == 0 || !combat_started)
 		   {
 				//combat_started = 1;
+				robot.logger.debug("Evaluating first if");
 				robot.brain.set('combat_flag', 1);
-				return msg.reply(">Combat started");
+				return msg.reply(">foo started");
 		   } else if(combat_started == 1) {
 				//combat needs to end
 				//robot.brain.set('combat_flag', 0);
 				//TODO: any other cleanup work (like removing persistent variables)
-				return msg.reply(">Combat over");
+				robot.logger.debug("Evaluating second else if");
+				return msg.reply(">foo over");
 		   } else {
+			   robot.logger.debug("Evaluating else");
 				return msg.reply(">Unknown flag");
 		   }
-		   
-		   
 		   var numCombatants = msg.match[1] || 0;
 		   if(numCombatants < 2)
 		   {
@@ -60,7 +61,7 @@
 		   {
 				var reply = "Combat started? [" + combat_started + "]";
 				return msg.reply(reply);
-		   }
+		   } 
 		   
         });
     };

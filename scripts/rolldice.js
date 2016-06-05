@@ -32,7 +32,7 @@
             return results;
         };
 
-        robot.respond(/(roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
+        robot.hear(/(roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
             var num = msg.match[2] || 1;
             var sides = msg.match[4] || 6;
             var bonusType = msg.match[5] || "NAN";
@@ -42,7 +42,7 @@
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
       			
-      			var result = "rolled " + num + "d" + sides;
+      			var result = ">rolled " + num + "d" + sides;
       			if(bonusType.indexOf("+") != -1)
       			{
       				result += "+" + bonus;
@@ -54,14 +54,14 @@
 			
 			      if(advantage.indexOf("dis") != -1)
 			      {
-			        result += " with disadvantage\n\nFirst result: ";
+			        result += " with disadvantage\n\n>First result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n\Second result: ";
+		          result += "\n\n>Second result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -77,19 +77,19 @@
       			  	rollsTotal += Number(bonus);
       			  }
 		          
-		          result += "\n\nTotal of lowest rolls: `" + rollsTotal + "`";
+		          result += "\n\n>Total of lowest rolls: `" + rollsTotal + "`";
               
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
-			        result += " with advantage\n\nFirst result: ";
+			        result += " with advantage\n\n>First result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n\Second result: ";
+		          result += "\n\n>Second result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -105,7 +105,7 @@
       			  	rollsTotal += Number(bonus);
       			  }
 		          
-              result += "\n\nTotal of highest rolls: `" + rollsTotal + "`";
+              result += "\n\n>Total of highest rolls: `" + rollsTotal + "`";
               
 			      }
 			      else
@@ -115,7 +115,7 @@
       			  	rollsTotal += Number(bonus);
       			  }
 			        
-			        result += "\n\nResult: ";
+			        result += "\n\n>Result: ";
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
@@ -123,7 +123,7 @@
 
               if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
               {
-                result += "\n\nTotal: `" + rollsTotal + "`";
+                result += "\n\n>Total: `" + rollsTotal + "`";
               }
 			      }
 			      
