@@ -54,10 +54,8 @@
 			   return msg.reply(">Unknown combat flag["+combat_started+"]");
 		   }  
 	
-		   
 		   //Combat has started. First step is to check the number of participants
 		   
-	
 		   if(numCombatants < 2)
 		   {
 				var reply = ">Need at least two to tango! Usage `combat [num participants]` where [num participants] is 2 or more.\n";
