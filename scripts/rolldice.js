@@ -32,7 +32,7 @@
             return results;
         };
 
-        robot.hear(/(roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
+        robot.hear(/(\/roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
             var num = msg.match[2] || 1;
             var sides = msg.match[4] || 6;
             var bonusType = msg.match[5] || "NAN";
