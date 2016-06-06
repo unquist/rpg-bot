@@ -42,7 +42,7 @@
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
       			
-      			var result = ">rolled " + num + "d" + sides;
+      			var result = ">" + msg.message.user.name +" rolled " + num + "d" + sides;
       			if(bonusType.indexOf("+") != -1)
       			{
       				result += "+" + bonus;
