@@ -166,6 +166,7 @@
 			//var callerName = msg.message.user.name;
 			//for debug only:
 			var callerName = msg.message.user.name + " " + getRandomInsult();
+			
 			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
