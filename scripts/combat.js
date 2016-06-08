@@ -219,15 +219,11 @@
 			  {
 				  return ">This combat is full up @"+callerName+".";
 		  	}
-			
-  			// 
-  			//this check is commented out because it seems likely that players will forget to put their
-  			// init bonus in, and will need to reroll
-  			//else if(robot.brain.get(callerName+"_initScore") != null)
-  			//{
-  			//	return msg.reply(">@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies.");
-  			//}
-  			//
+			  else if(robot.brain.get(callerName+"_initScore") != null)
+  			{
+  				return ">@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use `combat setinit [init]` to manually fix your initiative up until the start of combat.";
+  			}
+  			
   			
   			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
   			
@@ -357,6 +353,62 @@
 				return msg.reply(">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+" for " + numMonsters + " " + monsterName + ".\n>Still waiting on "+stillNeeded+" combatants."); 
 			}
         });
+		
+		var combatSetinit = function (callerName, newInit)
+		{
+		  var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return ">No combat started @"+callerName+". Begin with `/combat start`";
+			}  
+			else if(combat_started == 0)
+			{
+				return ">Don't get trigger happy @"+callerName+". Need to start combat before you set initiative...";
+			}
+			else if(numTotalCombatants == numRegisteredCombatants)
+			{
+				return ">You cannot set your initiative once the combat has started @"+callerName+".";
+			}
+			
+			robot.logger.debug("Manual init request from " + callerName + " with init of [" + newInit + "]");
+  		
+  		
+  		var oldInit = robot.brain.get(callerName+"_initScore");
+  		robot.brain.set(callerName+"_initScore",newInit)
+  		
+  		for(var k = 0; k < combatantsArray.length; k++)
+  		{
+  		  if(combatantsArray[k].name == callerName)
+  		  {
+  		    combatantsArray[k].init = newInit;
+  		  }
+  		}
+  		
+  		robot.brain.set('combatantsArray',combatantsArray);
+  		numRegisteredCombatants += 1;
+  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+  		
+  		return ">Manually changed @"+callerName+"'s initiative score from `" +oldInit+ "` to `"+newInit+"`.";
+		};
+		
+		robot.hear(/(combat setinit (\d+))/i, function(msg) {
+			var callerName = msg.message.user.name;		
+			var init = msg.match[2] || 0;
+			init = Number(init);
+			
+			var reply = combatSetInit(callerName,init);
+			 
+			return msg.reply(reply);
+		};
+		
 		
 		robot.hear(/(combat status)/i, function(msg) {
 			var callerName = msg.message.user.name;			
