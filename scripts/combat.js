@@ -146,43 +146,6 @@
 		
 		robot.hear(/(combat end)/i, function(msg) {
 			var callerName = msg.message.user.name;
-			/*
-			var combat_started = robot.brain.get('combat_flag');
-			
-			if(combat_started != 0 && combat_started != 1)
-			{
-			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			   clearAll();
-			   robot.brain.set('combat_flag', 0);
-			   return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
-		  
-			}  
-		    if(combat_started == 0)
-			{
-			   return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
-			}
-			//combat needs to end
-			
-			robot.brain.set('combat_flag', 0);
-			//TODO: any other cleanup work (like removing persistent variables)
-			delete robot.brain.data._private['numRegisteredCombatants'];
-			delete robot.brain.data._private['numTotalCombatants'];
-			delete robot.brain.data._private['currentTurnIndex'];
-			
-			var combatantsArray = robot.brain.get('combatantsArray');
-			if(combatantsArray != null)
-			{
-				for(var k = 0; k < combatantsArray.length; k++)
-				{
-					var key = combatantsArray[k].name + "_initScore";
-					delete robot.brain.data._private[key];
-				}
-			}
-			delete robot.brain.data._private['combatantsArray'];
-			
-			robot.logger.debug("Ending combat.");
-			return msg.reply(">@"+callerName+" is taking the low road. Ending Combat (all combat data cleared).");
-			*/
 			var reply = combatEnd(callerName);
 			return msg.reply(reply);
 		});
@@ -281,7 +244,7 @@
   			//ready to start combat?
   			if(numRegisteredCombatants == numTotalCombatants)
   			{
-  				var reply = ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".";
+  				var reply = ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
   				reply += "\n>All Combatants accounted for.";
   				reply += "\n>Here is the combat order:";
   				
@@ -299,90 +262,20 @@
   			else
   			{
   				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
-  				return ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".\n>Still waiting on "+stillNeeded+" combatants."; 
+  				return ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.\n>Still waiting on "+stillNeeded+" combatants."; 
   			}
 		  
 		  };
 		  
 	    robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
-			var callerName = msg.message.user.name;
-			var bonus = msg.match[2] || 0;
-			bonus = Number(bonus);
+			  var callerName = msg.message.user.name;
+		  	var bonus = msg.match[2] || 0;
+			  bonus = Number(bonus);
 			
-			var reply = combatInit(callerName,bonus);
-			return msg.reply(reply);
-			/*
-			//for debug only:
-			//var callerName = msg.message.user.name + " " + getRandomInsult();
-			
-			var combat_started = robot.brain.get('combat_flag');
-			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
-			//array of players
-			var combatantsArray = robot.brain.get('combatantsArray');
-			var numTotalCombatants = robot.brain.get('numTotalCombatants');
-			
-			
-			if(combat_started != 0 && combat_started != 1)
-			{
-				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				robot.brain.set('combat_flag', 0);
-				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
-			}  
-			if(combat_started == 0)
-			{
-				return msg.reply(">Don't get trigger happy @"+callerName+". Need to start combat before you roll initiative...");
-			}
-			else if(numTotalCombatants == numRegisteredCombatants)
-			{
-				return msg.reply(">This combat is full up @"+callerName+".");
-			}
-			
-			// 
-			//this check is commented out because it seems likely that players will forget to put their
-			// init bonus in, and will need to reroll
-			//else if(robot.brain.get(callerName+"_initScore") != null)
-			//{
-			//	return msg.reply(">@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies.");
-			//}
-			//
-			var bonus = msg.match[2] || 0;
-			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
-			
-			var initRoll = rolldie(20);
-			var initScore = initRoll + Number(bonus);
-			var newCombatant = new Combatant(callerName,initScore);
-			robot.brain.set(callerName+"_initScore",initScore);
-			
-			combatantsArray.push(newCombatant);
-			robot.brain.set('combatantsArray',combatantsArray);
-			numRegisteredCombatants += 1;
-			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-			
-			//ready to start combat?
-			if(numRegisteredCombatants == numTotalCombatants)
-			{
-				var reply = ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".";
-				reply += "\n>All Combatants accounted for.";
-				reply += "\n>Here is the combat order:";
-				
-				combatantsArray = combatantsArray.sort(combatantSortByInit);
-				robot.brain.set('combatantsArray',combatantsArray);
-				robot.brain.set('currentTurnIndex',0);
-				for(var k = 0; k < combatantsArray.length; k++)
-				{
-					var order = k + 1;
-					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
-				}
-				reply += "\n>*Let the bloodletting begin!*";
-				return msg.reply(reply); 
-			}
-			else
-			{
-				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
-				return msg.reply(">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".\n>Still waiting on "+stillNeeded+" combatants."); 
-			}
-			*/
-        });
+			  var reply = combatInit(callerName,bonus);
+			  return msg.reply(reply);
+		
+      });
 		
 		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
 			//var callerName = msg.message.user.name;
