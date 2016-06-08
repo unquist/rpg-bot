@@ -42,7 +42,7 @@
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
       			
-      			var result = ">you rolled " + num + "d" + sides;
+      			var result = "you rolled " + num + "d" + sides;
       			if(bonusType.indexOf("+") != -1)
       			{
       				result += "+" + bonus;
@@ -54,14 +54,14 @@
 			
 			      if(advantage.indexOf("dis") != -1)
 			      {
-			        result += " with disadvantage\n\n>First result: ";
+			        result += " with disadvantage\n>First result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n\n>Second result: ";
+		          result += "\n>Second result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -77,19 +77,19 @@
       			  	rollsTotal += Number(bonus);
       			  }
 		          
-		          result += "\n\n>Total of lowest rolls: `" + rollsTotal + "`";
+		          result += "\n>*Total of lowest rolls: `" + rollsTotal + "`*";
               
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
-			        result += " with advantage\n\n>First result: ";
+			        result += " with advantage\n>First result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n\n>Second result: ";
+		          result += "\n>Second result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -105,7 +105,7 @@
       			  	rollsTotal += Number(bonus);
       			  }
 		          
-              result += "\n\n>Total of highest rolls: `" + rollsTotal + "`";
+              result += "\n>*Total of highest rolls: `" + rollsTotal + "`*";
               
 			      }
 			      else
@@ -115,7 +115,7 @@
       			  	rollsTotal += Number(bonus);
       			  }
 			        
-			        result += "\n\n>Result: ";
+			        result += "\n>Result: ";
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
@@ -123,7 +123,7 @@
 
               if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
               {
-                result += "\n\n>Total: `" + rollsTotal + "`";
+                result += "\n>*Total: `" + rollsTotal + "`*";
               }
 			      }
 			      

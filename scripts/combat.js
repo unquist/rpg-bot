@@ -20,7 +20,10 @@
 
 (function() {
     module.exports = function(robot) {
-        var insults = ['artless','bawdy','beslubbering','bootless','churlish','cockered','clouted','craven','currish','dankish','dissembling','droning','errant','fawning','fobbing','froward','frothy','gleeking','goatish','gorbellied','impertinent','infectious','jarring','loggerheaded','lumpish','mammering','mangled','mewling','paunchy','pribbling','puking','puny','qualling','rank','reeky','roguish','ruttish','saucy','spleeny','spongy','surly','tottering','unmuzzled','vain','venomed','villainous','warped','wayward','weedy','yeasty','cullionly','fusty','caluminous','wimpled','burly-boned','misbegotten','odiferous','poisonous','fishified','Wart-necked','base-court','bat-fowling','beef-witted','beetle-headed','boil-brained','clapper-clawed','clay-brained','common-kissing','crook-pated','dismal-dreaming','dizzy-eyed','doghearted','dread-bolted','earth-vexing','elf-skinned','fat-kidneyed','fen-sucked','flap-mouthed','fly-bitten','folly-fallen','fool-born','full-gorged','guts-griping','half-faced','hasty-witted','hedge-born','hell-hated','idle-headed','ill-breeding','ill-nurtured','knotty-pated','milk-livered','motley-minded','onion-eyed','plume-plucked','pottle-deep','pox-marked','reeling-ripe','rough-hewn','rude-growing','rump-fed','shard-borne','sheep-biting','spur-galled','swag-bellied','tardy-gaited','tickle-brained','toad-spotted','unchin-snouted','weather-bitten','whoreson','malmsey-nosed','rampallian','lily-livered','scurvy-valiant','brazen-faced','unwashed','bunch-backed','leaden-footed','muddy-mettled','pigeon-livered','scale-sided','apple-john','baggage','barnacle','bladder','boar-pig','bugbear','bum-bailey','canker-blossom','clack-dish','clotpole','coxcomb','codpiece','death-token','dewberry','flap-dragon','flax-wench','flirt-gill','foot-licker','fustilarian','giglet','gudgeon','haggard','harpy','hedge-pig','horn-beast','hugger-mugger','joithead','lewdster','lout','maggot-pie','malt-worm','mammet','measle','minnow','miscreant','moldwarp','mumble-news','nut-hook','pigeon-egg','pignut','puttock','pumpion','ratsbane','scut','skainsmate','strumpet','varlot','vassal','whey-face','wagtail','knave','blind-worm','popinjay','scullian','jolt-head','malcontent','devil-monk','toad','rascal','basket-cockle'];
+        var util = require("util");
+		var hasProp = {}.hasOwnProperty;
+		
+		var insults = ['artless','bawdy','beslubbering','bootless','churlish','cockered','clouted','craven','currish','dankish','dissembling','droning','errant','fawning','fobbing','froward','frothy','gleeking','goatish','gorbellied','impertinent','infectious','jarring','loggerheaded','lumpish','mammering','mangled','mewling','paunchy','pribbling','puking','puny','qualling','rank','reeky','roguish','ruttish','saucy','spleeny','spongy','surly','tottering','unmuzzled','vain','venomed','villainous','warped','wayward','weedy','yeasty','cullionly','fusty','caluminous','wimpled','burly-boned','misbegotten','odiferous','poisonous','fishified','Wart-necked','base-court','bat-fowling','beef-witted','beetle-headed','boil-brained','clapper-clawed','clay-brained','common-kissing','crook-pated','dismal-dreaming','dizzy-eyed','doghearted','dread-bolted','earth-vexing','elf-skinned','fat-kidneyed','fen-sucked','flap-mouthed','fly-bitten','folly-fallen','fool-born','full-gorged','guts-griping','half-faced','hasty-witted','hedge-born','hell-hated','idle-headed','ill-breeding','ill-nurtured','knotty-pated','milk-livered','motley-minded','onion-eyed','plume-plucked','pottle-deep','pox-marked','reeling-ripe','rough-hewn','rude-growing','rump-fed','shard-borne','sheep-biting','spur-galled','swag-bellied','tardy-gaited','tickle-brained','toad-spotted','unchin-snouted','weather-bitten','whoreson','malmsey-nosed','rampallian','lily-livered','scurvy-valiant','brazen-faced','unwashed','bunch-backed','leaden-footed','muddy-mettled','pigeon-livered','scale-sided','apple-john','baggage','barnacle','bladder','boar-pig','bugbear','bum-bailey','canker-blossom','clack-dish','clotpole','coxcomb','codpiece','death-token','dewberry','flap-dragon','flax-wench','flirt-gill','foot-licker','fustilarian','giglet','gudgeon','haggard','harpy','hedge-pig','horn-beast','hugger-mugger','joithead','lewdster','lout','maggot-pie','malt-worm','mammet','measle','minnow','miscreant','moldwarp','mumble-news','nut-hook','pigeon-egg','pignut','puttock','pumpion','ratsbane','scut','skainsmate','strumpet','varlot','vassal','whey-face','wagtail','knave','blind-worm','popinjay','scullian','jolt-head','malcontent','devil-monk','toad','rascal','basket-cockle'];
 
 		var getRandomInsult = function() {
 			var index = randint(insults.length) - 1;
@@ -58,8 +61,8 @@
 		};
 		
 		var combatantSortByName = function(a,b) {
-			var nameA=a.getName().toLowerCase();
-			var nameB=b.getName().toLowerCase();
+			var nameA=a.name.toLowerCase();
+			var nameB=b.name.toLowerCase();
 			if (nameA < nameB) //sort string ascending
 				return -1 
 			if (nameA > nameB)
@@ -68,8 +71,8 @@
 		};
 		
 		var combatantSortByInit = function(a,b) {
-			var initA=a.getInit();
-			var initB=b.getInit();
+			var initA=a.init;
+			var initB=b.init;
 			if (initA < initB) //sort int descending
 				return 1 
 			if (initA > initB)
@@ -77,16 +80,42 @@
 			return 0 //default return value (no sorting) 
 		};
 		
-		robot.hear(/(\/combat end)/i, function(msg) {
+		var clearAll = function() {
+			delete robot.brain.data._private['combat_flag'];
+			delete robot.brain.data._private['numRegisteredCombatants'];
+			delete robot.brain.data._private['numTotalCombatants'];
+			delete robot.brain.data._private['combatantsArray'];
+			delete robot.brain.data._private['currentTurnIndex'];
+			var key;
+			for (key in robot.brain.data._private) 
+			{
+				if(!hasProp.call(robot.brain.data._private, key)) continue;
+				robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+				if(key.indexOf("_initScore") != -1)
+				{
+					delete robot.brain.data._private[key];
+				}
+			}	
+			robot.logger.debug("Clearing all combat data.");
+		};
+		
+		robot.hear(/(combat clearall)/i, function(msg) {
+			var callerName = msg.message.user.name;			
+			clearAll();
+			return msg.reply(">@"+callerName+" cleared all current combat data.");
+		});
+			
+		robot.hear(/(combat end)/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var combat_started = robot.brain.get('combat_flag');
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			   clearAll();
 			   robot.brain.set('combat_flag', 0);
-			   return msg.reply(">Unknown combat flag["+combat_started+"]");
-			   
+			   return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
+		  
 			}  
 		    if(combat_started == 0)
 			{
@@ -96,11 +125,26 @@
 			
 			robot.brain.set('combat_flag', 0);
 			//TODO: any other cleanup work (like removing persistent variables)
+			delete robot.brain.data._private['numRegisteredCombatants'];
+			delete robot.brain.data._private['numTotalCombatants'];
+			delete robot.brain.data._private['currentTurnIndex'];
+			
+			var combatantsArray = robot.brain.get('combatantsArray');
+			if(combatantsArray != null)
+			{
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					var key = combatantsArray[k].name + "_initScore";
+					delete robot.brain.data._private[key];
+				}
+			}
+			delete robot.brain.data._private['combatantsArray'];
+			
 			robot.logger.debug("Ending combat.");
-			return msg.reply(">@"+callerName+" is taking the low road. Ending Combat.");
+			return msg.reply(">@"+callerName+" is taking the low road. Ending Combat (all combat data cleared).");
 		});
 		
-        robot.hear(/(\/combat start )(\d+)/i, function(msg) {
+        robot.hear(/(combat start )(\d+)/i, function(msg) {
            var callerName = msg.message.user.name;
 		   var combat_started = robot.brain.get('combat_flag');
 		   var numCombatants = msg.match[2] || -1;
@@ -109,10 +153,9 @@
 		   if(combat_started != 0 && combat_started != 1)
 		   {
 			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			   robot.brain.set('combat_flag', 0);
-			   return msg.reply(">Unknown combat flag["+combat_started+"]");
-		   }  
-			if(combat_started == 1)
+			   robot.brain.set('combat_flag', 1);
+		    }  
+			else if(combat_started == 1)
 			{
 				return msg.reply(">Combat already started @"+callerName+". End with `/combat end`");
 			}
@@ -124,21 +167,7 @@
 				return msg.reply(reply);
 		   }
 
-		   
-		   
-		   /*
-		   var combatant1 = new Combatant("Alice",5);
-		   var combatant2 = new Combatant("Bob",10);
-		   var combatant3 = new Combatant("Charles",1);
-		   
-		   var combatants = [combatant2, combatant3, combatant1];
-		   robot.logger.debug("Before sort");
-		   robot.logger.debug(combatants);
-		   combatants = combatants.sort(combatantSortByName);
-		   robot.logger.debug("After sort");
-		   robot.logger.debug(combatants);
-		   */
-		   
+				   
 		   //how many players have rolled for initiative? zero so far
 		   var numRegisteredCombatants = 0;
 		   robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
@@ -155,14 +184,14 @@
 		   
         });
 		
-		robot.hear(/\/combat start$/i, function(msg) {
+		robot.hear(/combat start$/i, function(msg) {
             var callerName = msg.message.user.name;
 			var reply = ">Need at least two to tango @"+callerName+"! Usage `combat start [num participants]` where [num participants] is 2 or more.\n";
 			return msg.reply(reply);
 	
         });
 		
-	    robot.hear(/\/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
+	    robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
 			//var callerName = msg.message.user.name;
 			//for debug only:
 			var callerName = msg.message.user.name + " " + getRandomInsult();
@@ -178,7 +207,7 @@
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
 				robot.brain.set('combat_flag', 0);
-				return msg.reply(">Unknown combat flag["+combat_started+"]");
+				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
 			}  
 			if(combat_started == 0)
 			{
@@ -188,11 +217,14 @@
 			{
 				return msg.reply(">This combat is full up @"+callerName+".");
 			}
+			/* 
+			//this check is commented out because it seems likely that players will forget to put their
+			// init bonus in, and will need to reroll
 			else if(robot.brain.get(callerName+"_initScore") != null)
 			{
 				return msg.reply(">@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies.");
 			}
-			
+			*/
 			var bonus = msg.match[2] || 0;
 			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
 			
@@ -210,26 +242,206 @@
 			if(numRegisteredCombatants == numTotalCombatants)
 			{
 				var reply = ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".";
-				reply += "\n\n>All Combatants accounted for.";
-				reply += "\n\n>Here is the combat order:";
+				reply += "\n>All Combatants accounted for.";
+				reply += "\n>Here is the combat order:";
 				
 				combatantsArray = combatantsArray.sort(combatantSortByInit);
 				robot.brain.set('combatantsArray',combatantsArray);
-
+				robot.brain.set('currentTurnIndex',0);
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
-					reply += "\n>["+order+"] @" + combatantsArray[k].getName() + " the " + getRandomInsult();
+					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
 				}
-				reply += "\n\n>*Let the bloodletting begin!*";
+				reply += "\n>*Let the bloodletting begin!*";
 				return msg.reply(reply); 
 			}
 			else
 			{
 				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
-				return msg.reply(">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".\n\n>Still waiting on "+stillNeeded+" combatants."); 
+				return msg.reply(">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+".\n>Still waiting on "+stillNeeded+" combatants."); 
 			}
         });
+		
+		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
+			//var callerName = msg.message.user.name;
+			//for debug only:
+			var callerName = msg.message.user.name;
+			
+			var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
+			}  
+			if(combat_started == 0)
+			{
+				return msg.reply(">Don't get trigger happy @"+callerName+". Need to start combat before you roll initiative...");
+			}
+			else if(numTotalCombatants == numRegisteredCombatants)
+			{
+				return msg.reply(">This combat is full up @"+callerName+". Add your self to the fight with `combat add [initiative bonus]`");
+			}
+			
+			var bonus = msg.match[2] || 0;
+			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
+			
+			var numMonsters = Number(msg.match[4]) || 1;
+			robot.logger.debug("Adding [" + numMonsters + "] to the combat");
+			robot.logger.debug("Number of registered = " + numRegisteredCombatants);
+			robot.logger.debug("Total number of combatants = " + numTotalCombatants);
+						
+			if((numRegisteredCombatants + numMonsters) > numTotalCombatants)
+			{
+				return msg.reply(">That's too many monsters for this combat @"+callerName+". I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots.");
+			}
+			
+			var monsterName = msg.match[6] || "Nameless Monster";
+			
+			var initRoll = rolldie(20);
+			var initScore = initRoll + Number(bonus);
+			for(var k = 0; k < numMonsters; k++)
+			{
+				var index = k + 1;
+				var thisMonsterName = monsterName+"["+index+"]";
+				var newCombatant = new Combatant(thisMonsterName,initScore);
+				combatantsArray.push(newCombatant);
+			}
+			
+			robot.brain.set('combatantsArray',combatantsArray);
+			numRegisteredCombatants += numMonsters;
+			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			
+			//ready to start combat?
+			if(numRegisteredCombatants == numTotalCombatants)
+			{
+				var reply = ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
+				reply += "\n>All Combatants accounted for.";
+				reply += "\n>Here is the combat order:";
+				
+				combatantsArray = combatantsArray.sort(combatantSortByInit);
+				robot.brain.set('combatantsArray',combatantsArray);
+				robot.brain.set('currentTurnIndex',0);
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					var order = k + 1;
+					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+				}
+				reply += "\n>*Let the bloodletting begin!*";
+				return msg.reply(reply); 
+			}
+			else
+			{
+				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
+				return msg.reply(">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+" for " + numMonsters + " " + monsterName + ".\n>Still waiting on "+stillNeeded+" combatants."); 
+			}
+        });
+		
+		robot.hear(/(combat status)/i, function(msg) {
+			var callerName = msg.message.user.name;			
+				
+			var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
+			}  
+			else if(combat_started == 0)
+			{
+				return msg.reply(">The status is, there's no status @"+callerName+". Need to start combat first.");
+			}
+			else if(numRegisteredCombatants < numTotalCombatants)
+			{
+				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
+				var reply = ">Still waiting on "+stillNeeded+" combatants before starting."; 
+				reply += "\n>Here is who has already rolled:";
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					reply += "\n>@" + combatantsArray[k].name + " the " + getRandomInsult();
+				}
+				return msg.reply(reply);
+				
+			}
+			var currentTurnIndex = robot.brain.get('currentTurnIndex');
+			
+			var reply = ">Here is the current order, with current combatant highlighted:"; 
+			for(var k = 0; k < combatantsArray.length; k++)
+			{
+				var order = k + 1;
+				
+				if(currentTurnIndex == k)
+				{
+					reply += "\n>("+order+") *_@" + combatantsArray[k].name + " the " + getRandomInsult()+"_*";
+				}
+				else
+				{
+					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+				}
+				
+				
+			}
+			return msg.reply(reply);
+		});
+		
+		robot.hear(/(combat next)/i, function(msg) {
+			var callerName = msg.message.user.name;			
+				
+			var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
+			}  
+			else if(combat_started == 0)
+			{
+				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
+			}
+			else if(numRegisteredCombatants < numTotalCombatants)
+			{
+				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
+				var reply = ">Still waiting on "+stillNeeded+" combatants before starting."; 
+				reply += "\n>Here is who has already rolled:";
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					var order = k + 1;
+					reply += "\n>@" + combatantsArray[k].name + " the " + getRandomInsult() + "(initiative of " + combatantsArray[k].init + ")";
+				}
+				return msg.reply(reply);
+				
+			}
+			var currentTurnIndex = robot.brain.get('currentTurnIndex');
+			currentTurnIndex += 1;
+			if(currentTurnIndex >= combatantsArray.length)
+			{
+				currentTurnIndex = 0;
+			}
+			robot.brain.set('currentTurnIndex',currentTurnIndex);
+			
+			var reply = ">Next turn started. @" +combatantsArray[currentTurnIndex].name+" is up!";
+
+			return msg.reply(reply);
+		});
+		
+		//end function definitions
     };
 
 })();
