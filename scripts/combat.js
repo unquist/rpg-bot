@@ -407,7 +407,7 @@
 			var reply = combatSetInit(callerName,init);
 			 
 			return msg.reply(reply);
-		};
+		});
 		
 		
 		robot.hear(/(combat status)/i, function(msg) {
