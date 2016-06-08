@@ -192,9 +192,9 @@
         });
 		
 	    robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
-			//var callerName = msg.message.user.name;
+			var callerName = msg.message.user.name;
 			//for debug only:
-			var callerName = msg.message.user.name + " " + getRandomInsult();
+			//var callerName = msg.message.user.name + " " + getRandomInsult();
 			
 			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
