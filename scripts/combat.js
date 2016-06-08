@@ -104,9 +104,49 @@
 			clearAll();
 			return msg.reply(">@"+callerName+" cleared all current combat data.");
 		});
+		
+		var combatEnd = function (callerName) {
+		  
+			var combat_started = robot.brain.get('combat_flag');
 			
+			if(combat_started != 0 && combat_started != 1)
+			{
+			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			   clearAll();
+			   robot.brain.set('combat_flag', 0);
+			   return ">No combat started @"+callerName+". Begin with `/combat start`";
+			}  
+		  if(combat_started == 0)
+			{
+			   return ">No combat started @"+callerName+". Begin with `/combat start`";
+			}
+			//combat needs to end
+			
+			robot.brain.set('combat_flag', 0);
+			//TODO: any other cleanup work (like removing persistent variables)
+			delete robot.brain.data._private['numRegisteredCombatants'];
+			delete robot.brain.data._private['numTotalCombatants'];
+			delete robot.brain.data._private['currentTurnIndex'];
+			
+			var combatantsArray = robot.brain.get('combatantsArray');
+			if(combatantsArray != null)
+			{
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					var key = combatantsArray[k].name + "_initScore";
+					delete robot.brain.data._private[key];
+				}
+			}
+			delete robot.brain.data._private['combatantsArray'];
+			
+			robot.logger.debug("Ending combat.");
+			return ">@"+callerName+" is taking the low road. Ending Combat (all combat data cleared).";
+		};
+		
+		
 		robot.hear(/(combat end)/i, function(msg) {
 			var callerName = msg.message.user.name;
+			/*
 			var combat_started = robot.brain.get('combat_flag');
 			
 			if(combat_started != 0 && combat_started != 1)
@@ -142,13 +182,16 @@
 			
 			robot.logger.debug("Ending combat.");
 			return msg.reply(">@"+callerName+" is taking the low road. Ending Combat (all combat data cleared).");
+			*/
+			var reply = combatEnd(callerName);
+			return msg.reply(reply);
 		});
 		
-        robot.hear(/(combat start )(\d+)/i, function(msg) {
-           var callerName = msg.message.user.name;
-		   var combat_started = robot.brain.get('combat_flag');
-		   var numCombatants = msg.match[2] || -1;
-		   robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
+    robot.hear(/(combat start )(\d+)/i, function(msg) {
+      var callerName = msg.message.user.name;
+		  var combat_started = robot.brain.get('combat_flag');
+		  var numCombatants = msg.match[2] || -1;
+		  robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
 
 		   if(combat_started != 0 && combat_started != 1)
 		   {
