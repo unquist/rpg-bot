@@ -545,9 +545,9 @@
           }
         ]
       };
-
+      robot.logger.debug("msgData formatted, now sending");
       robot.adapter.customMessage(msgData);
-			
+			robot.logger.debug("msgData sent, now returning");
 			return;
 		});
 		
