@@ -531,16 +531,16 @@
 			
       var msgData = {
         channel: msg.message.room,
-        text: "Test Attachments",
+        /*text: "Test Attachments",*/
         attachments: [
           {
             fallback: "This is the fallback field text",
-            pretext: "This is pretext text",
+            pretext: "Combat command executed",
             color: "#cc3300",
             title: "This is a test title",
             title_link: "https://www.google.com",
-            text: "This is the body of text in the message",
-            image_url: "https://a.fsdn.com/allura/p/kdicegen/icon",
+            text: "You rolled *`20`*",
+            thumb_url: "https://a.fsdn.com/allura/p/kdicegen/icon",
             mrkdwn_in: ["text"]
           }
         ]
