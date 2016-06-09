@@ -150,45 +150,50 @@
 			return msg.reply(reply);
 		});
 		
-    robot.hear(/(combat start )(\d+)/i, function(msg) {
-      var callerName = msg.message.user.name;
-		  var combat_started = robot.brain.get('combat_flag');
-		  var numCombatants = msg.match[2] || -1;
-		  robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
+		var combatStart = function(callerName,numCombatants) {
+			var combat_started = robot.brain.get('combat_flag');
+			robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
 
-		   if(combat_started != 0 && combat_started != 1)
+			if(combat_started != 0 && combat_started != 1)
 		   {
 			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
 			   robot.brain.set('combat_flag', 1);
-		    }  
+			}  
 			else if(combat_started == 1)
 			{
-				return msg.reply(">Combat already started @"+callerName+". End with `/combat end`");
+				return ">Combat already started @"+callerName+". End with `/combat end`";
 			}
 		   //Combat has started. First step is to check the number of participants
 		   
 		   if(numCombatants < 2)
 		   {
 				var reply = ">Need at least two to tango @"+callerName+"! Usage `combat start [num participants]` where [num participants] is 2 or more.\n";
-				return msg.reply(reply);
+				return reply;
 		   }
 
-				   
-		   //how many players have rolled for initiative? zero so far
-		   var numRegisteredCombatants = 0;
-		   robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-		   //array of players. currently empty
-		   var combatantsArray = [];
-		   robot.brain.set('combatantsArray',combatantsArray);
-		   //who is in the fight?
-		   var numTotalCombatants = numCombatants;
-		   robot.brain.set('numTotalCombatants',numTotalCombatants);
-		   
-		   
-		   robot.brain.set('combat_flag', 1);
-		   return msg.reply(">@"+callerName+" started combat with " + numCombatants + " belligerents. Everyone roll for initiative!");
-		   
-        });
+					   
+			   //how many players have rolled for initiative? zero so far
+			   var numRegisteredCombatants = 0;
+			   robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			   //array of players. currently empty
+			   var combatantsArray = [];
+			   robot.brain.set('combatantsArray',combatantsArray);
+			   //who is in the fight?
+			   var numTotalCombatants = numCombatants;
+			   robot.brain.set('numTotalCombatants',numTotalCombatants);
+			   
+			   
+			   robot.brain.set('combat_flag', 1);
+			   return ">@"+callerName+" started combat with " + numCombatants + " belligerents. Everyone roll for initiative!";
+			   
+		};
+		
+		robot.hear(/(combat start )(\d+)/i, function(msg) {
+			var callerName = msg.message.user.name;
+			var numCombatants = msg.match[2] || -1;
+			var reply = combatStart(callerName,numCombatants);
+			return msg.reply(reply);
+		});
 		
 		robot.hear(/combat start$/i, function(msg) {
             var callerName = msg.message.user.name;
@@ -265,19 +270,15 @@
 		  
 	    robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
 			  var callerName = msg.message.user.name;
-		  	var bonus = msg.match[2] || 0;
+				var bonus = msg.match[2] || 0;
 			  bonus = Number(bonus);
 			
 			  var reply = combatInit(callerName,bonus);
 			  return msg.reply(reply);
 		
       });
-		
-		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
-			//var callerName = msg.message.user.name;
-			//for debug only:
-			var callerName = msg.message.user.name;
-			
+		var initdm = function(callerName,bonus,numMonsters,monsterName) {
+			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
 			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
@@ -289,31 +290,28 @@
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
 				robot.brain.set('combat_flag', 0);
-				return msg.reply(">No combat started @"+callerName+". Begin with `/combat start`");
+				return ">No combat started @"+callerName+". Begin with `/combat start`";
 			}  
 			if(combat_started == 0)
 			{
-				return msg.reply(">Don't get trigger happy @"+callerName+". Need to start combat before you roll initiative...");
+				return ">Don't get trigger happy @"+callerName+". Need to start combat before you roll initiative...";
 			}
 			else if(numTotalCombatants == numRegisteredCombatants)
 			{
-				return msg.reply(">This combat is full up @"+callerName+". Add your self to the fight with `combat add [initiative bonus]`");
+				return ">This combat is full up @"+callerName+". Add your self to the fight with `combat add [initiative bonus]`";
 			}
 			
-			var bonus = msg.match[2] || 0;
-			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
 			
-			var numMonsters = Number(msg.match[4]) || 1;
 			robot.logger.debug("Adding [" + numMonsters + "] to the combat");
 			robot.logger.debug("Number of registered = " + numRegisteredCombatants);
 			robot.logger.debug("Total number of combatants = " + numTotalCombatants);
 						
 			if((numRegisteredCombatants + numMonsters) > numTotalCombatants)
 			{
-				return msg.reply(">That's too many monsters for this combat @"+callerName+". I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots.");
+				return ">That's too many monsters for this combat @"+callerName+". I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots.";
 			}
 			
-			var monsterName = msg.match[6] || "Nameless Monster";
+			
 			
 			var initRoll = rolldie(20);
 			var initScore = initRoll + Number(bonus);
@@ -339,24 +337,47 @@
 				combatantsArray = combatantsArray.sort(combatantSortByInit);
 				robot.brain.set('combatantsArray',combatantsArray);
 				robot.brain.set('currentTurnIndex',0);
+				var firstPlayerName = "";
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
-					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+					if(k == 0)
+					{
+						reply += "\n>("+order+") _@" + combatantsArray[k].name + " the " + getRandomInsult() + "_";
+						firstPlayerName = combatantsArray[k].name;
+					}
+					else
+					{
+						reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+					}
 				}
-				reply += "\n>*Let the bloodletting begin!*";
-				return msg.reply(reply); 
+				reply += "\n>*@" + firstPlayerName + ", you're up first!*";
+				return reply; 
 			}
 			else
 			{
 				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
-				return msg.reply(">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+" for " + numMonsters + " " + monsterName + ".\n>Still waiting on "+stillNeeded+" combatants."); 
+				return ">@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+" for " + numMonsters + " " + monsterName + ".\n>Still waiting on "+stillNeeded+" combatants."; 
 			}
-        });
+		};
 		
-		var combatSetinit = function (callerName, newInit)
+		
+		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
+			//var callerName = msg.message.user.name;
+			//for debug only:
+			var callerName = msg.message.user.name;
+			var bonus = msg.match[2] || 0;
+			
+			var numMonsters = Number(msg.match[4]) || 1;
+			var monsterName = msg.match[6] || "Nameless Monster";
+						
+			var reply = initdm(callerName,bonus,numMonsters,monsterName);
+			return msg.reply(reply);
+		});
+		
+		var combatSetInit = function (callerName, newInit)
 		{
-		  var combat_started = robot.brain.get('combat_flag');
+			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
 			var combatantsArray = robot.brain.get('combatantsArray');
@@ -393,8 +414,6 @@
   		}
   		
   		robot.brain.set('combatantsArray',combatantsArray);
-  		numRegisteredCombatants += 1;
-  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
   		
   		return ">Manually changed @"+callerName+"'s initiative score from `" +oldInit+ "` to `"+newInit+"`.";
 		};
@@ -436,7 +455,7 @@
 				reply += "\n>Here is who has already rolled:";
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
-					reply += "\n>@" + combatantsArray[k].name + " the " + getRandomInsult();
+					reply += "\n>@" + combatantsArray[k].name + " the " + getRandomInsult() + " rolled `" +combatantsArray[k].init+"`.";
 				}
 				return msg.reply(reply);
 				
