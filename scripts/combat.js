@@ -539,9 +539,9 @@
             color: "#cc3300",
             title: "This is a test title",
             title_link: "https://www.google.com",
-            text: "https://a.fsdn.com/allura/p/kdicegen/icon You rolled *`20`*",
-            "unfurl_media": true,
-            /*image_url: "https://a.fsdn.com/allura/p/kdicegen/icon",*/
+            text: "You rolled *`20`*",
+            footer: "Dice Rolling Script"
+            footer_icon: "https://a.fsdn.com/allura/p/kdicegen/icon",
             mrkdwn_in: ["text"]
           }
         ]
