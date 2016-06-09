@@ -180,7 +180,15 @@
 			      var advantage = msg.match[7] || "";
             
             var msgData = diceBot(num,sides,bonusType,bonus,advantage);
-            robot.adapter.customMessage(msgData);
+            msgData['channel'] = msg.message.room;
+            try{
+              
+              robot.adapter.customMessage(msgData);
+            }
+            catch (err) 
+            {
+              robot.logger.debug("Caught error: " + err.message);
+            }
             return;
         });
     
