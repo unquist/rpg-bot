@@ -526,6 +526,32 @@
 			return msg.reply(reply);
 		});
 		
+		robot.respond(/test attachment/i, function(msg) {
+			var callerName = msg.message.user.name;			
+			
+			//# create the message with attachment object
+			/*
+      var msgData = {
+        'channel': msg.message.room,
+        'text': "Latest changes"
+        'attachments': [
+    {
+      fallback: "Comparing #{latestRelease.name}...#{latestRelease.target_commitish} - #{compare.html_url}",
+      title: "Comparing #{latestRelease.name}...#{latestRelease.target_commitish}"
+      title_link: compare.html_url
+      text: commits_summary
+      mrkdwn_in: ["text"]
+    }
+  ]
+}
+*/
+      //# post the message
+      //robot.adapter.customMessage msgData
+			
+			return;
+		});
+		
+		
 		//end function definitions
     };
 
