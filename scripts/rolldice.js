@@ -162,6 +162,7 @@
             
             var msgData = diceBot(num,sides,bonusType,bonus,advantage);
             robot.adapter.customMessage(msgData);
+            return;
         });
     
       	robot.router.post('/hubot/roll', function(req, res) {
