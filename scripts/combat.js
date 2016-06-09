@@ -530,7 +530,7 @@
 			var callerName = msg.message.user.name;			
 			
       var msgData = {
-        channel: res.message.room,
+        channel: msg.message.room,
         text: "Test Attachments",
         attachments: [
           {
