@@ -132,6 +132,24 @@
 	
             return msg.reply(result);
         });
+    
+      	robot.router.post('/hubot/roll', function(req, res) {
+          robot.logger.debug("Received a POST request to /hubot/roll");
+          
+          var data, room, command, text;
+          
+          room = req.params.room;
+          robot.logger.debug("room="+room);
+          data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+          robot.logger.debug("data="+data);
+          command = data.command;
+          robot.logger.debug("command="+command);
+          text = data.text;
+          robot.logger.debug("text="+text);
+          
+          return res.send('20!');
+    });
+      
     };
 
 })();
