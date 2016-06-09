@@ -552,6 +552,56 @@
 			return;
 		});
 		
+		/*begin slash command listening code*/
+		
+		robot.router.post('/hubot/combat', function(req, res) {
+      var data, room, secret;
+      room = req.params.room;
+      data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+      secret = data.secret;
+      
+      robot.logger.debug("I have a secret: " + secret);
+      return res.send('OK');
+    });
+		/*
+		var sendToSlack = function(attachment, integration, message) {
+      
+      var data;
+
+      data = JSON.stringify({
+        "token": integration.get('slack_token'),
+        "channel": integration.get('channel_id'),
+        "username": 'Partyline',
+        "attachments": JSON.stringify(attachment),
+        "icon_url": SLACK_BOT_ICON,
+      });
+
+      robot.http("https://midnight-train").header('Content-Type', 'application/json').post(data)(
+        function(err, res, body) {
+          if (body.ok) {
+            console.log(body);
+          } 
+          else {
+            console.log(err);
+          }
+        }
+      );
+      
+      request.post({
+      json: true,
+      url: 'https://slack.com/api/chat.postMessage',
+      qs: {
+        
+      },
+      }, function(err, resp, body) {
+        if (body.ok) {
+          console.log(body);
+        } else {
+          console.log(err);
+        }
+     });
+    };
+		*/
 		
 		//end function definitions
     };
