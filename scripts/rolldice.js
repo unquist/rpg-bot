@@ -124,8 +124,9 @@
 		
 			   
             var msgData = {
+              text:"foo",
               attachments: [{
-                "fallback": result,
+                "fallback": "testfalback",
                 "color": "#cc3300",
                 "title": "This is a test title",
                 "title_link": "https://www.google.com",
