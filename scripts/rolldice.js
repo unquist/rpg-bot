@@ -122,7 +122,7 @@
 			      }
 
 		
-			   
+			   /*
             var msgData = {
               text:"foo",
               attachments: [{
@@ -150,6 +150,25 @@
                 ]
               }]
           };
+          
+          */
+                var msgData = {
+        channel: msg.message.room,
+        /*text: "Test Attachments",*/
+        attachments: [
+          {
+            fallback: "This is the fallback field text",
+            pretext: "Combat command executed",
+            color: "#cc3300",
+            title: "This is a test title",
+            title_link: "https://www.google.com",
+            text: "You rolled *`20`*",
+            footer: "Dice Rolling Script",
+            footer_icon: "https://a.fsdn.com/allura/p/kdicegen/icon",
+            mrkdwn_in: ["text"]
+          }
+        ]
+      };
           return msgData;
         };
 
