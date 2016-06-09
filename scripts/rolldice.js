@@ -153,7 +153,7 @@
           
           */
                 var msgData = {
-        channel: msg.message.room,
+        
         /*text: "Test Attachments",*/
         attachments: [
           {
