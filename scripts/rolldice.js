@@ -31,14 +31,8 @@
             }
             return results;
         };
-
-        robot.hear(/(\/roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
-            var num = msg.match[2] || 1;
-            var sides = msg.match[4] || 6;
-            var bonusType = msg.match[5] || "NAN";
-			var bonus = msg.match[6] || 0;
-			var advantage = msg.match[7] || "";
-            
+        
+        var diceBot = function(num,sides,bonusType,bonus,advantage) {
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
       			
@@ -126,11 +120,18 @@
                 result += "\n>*Total: `" + rollsTotal + "`*";
               }
 			      }
-			      
 
+	          return result;
+        };
 
-	
-            return msg.reply(result);
+        robot.hear(/(#roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
+            var num = msg.match[2] || 1;
+            var sides = msg.match[4] || 6;
+            var bonusType = msg.match[5] || "NAN";
+			      var bonus = msg.match[6] || 0;
+			      var advantage = msg.match[7] || "";
+            
+            return msg.reply(diceBot(num,sides,bonusType,bonus,advantage));
         });
     
       	robot.router.post('/hubot/roll', function(req, res) {
