@@ -121,7 +121,35 @@
               }
 			      }
 
-	          return result;
+		
+			   
+            var msgData = {
+              attachments: [{
+                "fallback": result,
+                "color": "#cc3300",
+                "title": "This is a test title",
+                "title_link": "https://www.google.com",
+                "footer": "Dice Rolling Script",
+                "footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon"
+                "fields": [
+                {
+                    "value": "@Foo rolled a *`20`*.",
+                    "short": false
+                },
+                {
+                    "title": "First Roll",
+                    "value": "5",
+                    "short": true
+                },
+                {
+                    "title": "Second Roll",
+                    "value": "10",
+                    "short": true
+                }
+                ]
+              }]
+          };
+          return result;
         };
 
         robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
@@ -131,7 +159,8 @@
 			      var bonus = msg.match[6] || 0;
 			      var advantage = msg.match[7] || "";
             
-            return msg.reply(diceBot(num,sides,bonusType,bonus,advantage));
+            var msgData = diceBot(num,sides,bonusType,bonus,advantage);
+            robot.adapter.customMessage(msgData);
         });
     
       	robot.router.post('/hubot/roll', function(req, res) {
