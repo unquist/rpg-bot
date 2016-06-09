@@ -529,24 +529,24 @@
 		robot.respond(/test attachment/i, function(msg) {
 			var callerName = msg.message.user.name;			
 			
-			//# create the message with attachment object
-			/*
       var msgData = {
-        'channel': msg.message.room,
-        'text': "Latest changes"
-        'attachments': [
-    {
-      fallback: "Comparing #{latestRelease.name}...#{latestRelease.target_commitish} - #{compare.html_url}",
-      title: "Comparing #{latestRelease.name}...#{latestRelease.target_commitish}"
-      title_link: compare.html_url
-      text: commits_summary
-      mrkdwn_in: ["text"]
-    }
-  ]
-}
-*/
-      //# post the message
-      //robot.adapter.customMessage msgData
+        channel: res.message.room,
+        text: "Test Attachments",
+        attachments: [
+          {
+            fallback: "This is the fallback field text",
+            pretext: "This is pretext text",
+            color: "#cc3300",
+            title: "This is a test title",
+            title_link: "https://www.google.com",
+            text: "This is the body of text in the message",
+            image_url: "https://a.fsdn.com/allura/p/kdicegen/icon",
+            mrkdwn_in: ["text"]
+          }
+        ]
+      };
+
+      robot.adapter.customMessage(msgData);
 			
 			return;
 		});
