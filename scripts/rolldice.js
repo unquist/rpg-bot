@@ -149,7 +149,7 @@
                 ]
               }]
           };
-          return result;
+          return msgData;
         };
 
         robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
