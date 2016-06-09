@@ -539,8 +539,8 @@
             color: "#cc3300",
             title: "This is a test title",
             title_link: "https://www.google.com",
-            text: "You rolled *`20`*",
-            thumb_url: "https://a.fsdn.com/allura/p/kdicegen/icon",
+            text: "https://a.fsdn.com/allura/p/kdicegen/icon You rolled *`20`*",
+            /*image_url: "https://a.fsdn.com/allura/p/kdicegen/icon",*/
             mrkdwn_in: ["text"]
           }
         ]
