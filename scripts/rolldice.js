@@ -188,7 +188,7 @@
           msgData['channel'] = channel_name;
 		  msgData['response_type'] = 'in_channel';
 		  
-          return res.send(JSON.stringify(msgData));
+          return res.json(msgData);
     });
       
     };
