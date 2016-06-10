@@ -214,3 +214,12 @@ Add the subdomain hubot should connect to. If you web URL looks like
 
 You may want to get comfortable with `heroku logs` and `heroku restart` if
 you're having issues.
+
+# rpg-bot specific functionality
+
+## Roll command
+
+To use rpg-bot's /roll command, you will need to create a new "Slash Command" integration at Slack.  The token defined there should be saved in an environment variable named "HUBOT_SLASH_ROLL_TOKEN".
+```
+export HUBOT_SLASH_ROLL_TOKEN=[your token here]
+```
