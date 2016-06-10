@@ -192,7 +192,7 @@
 		  }
 		  else
 		  {
-			  return res.send('*No valid dice roll!*\nUsage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_ where X is the number of dice, and Y is the number of sides.\nOnly the first paramter, e.g. XdY, is required.\n\nExamples:\n/roll 2d6\n/roll 3d10+2\n/roll 4d4-7 adv');
+			  return res.send('*No valid dice roll!*\nUsage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_\nX is the number of dice, and Y is the number of sides.\nOnly the first paramter, e.g. XdY, is required.\n\nExamples:\n/roll 2d6    (Rolls two six-sided dice)\n/roll 3d10+2    (Rolls three ten-sided dice and adds two to the result)\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)');
 		  }
     });
       
