@@ -23,11 +23,54 @@
         var util = require("util");
 		var hasProp = {}.hasOwnProperty;
 		
-		var insults = ['artless','bawdy','beslubbering','bootless','churlish','cockered','clouted','craven','currish','dankish','dissembling','droning','errant','fawning','fobbing','froward','frothy','gleeking','goatish','gorbellied','impertinent','infectious','jarring','loggerheaded','lumpish','mammering','mangled','mewling','paunchy','pribbling','puking','puny','qualling','rank','reeky','roguish','ruttish','saucy','spleeny','spongy','surly','tottering','unmuzzled','vain','venomed','villainous','warped','wayward','weedy','yeasty','cullionly','fusty','caluminous','wimpled','burly-boned','misbegotten','odiferous','poisonous','fishified','Wart-necked','base-court','bat-fowling','beef-witted','beetle-headed','boil-brained','clapper-clawed','clay-brained','common-kissing','crook-pated','dismal-dreaming','dizzy-eyed','doghearted','dread-bolted','earth-vexing','elf-skinned','fat-kidneyed','fen-sucked','flap-mouthed','fly-bitten','folly-fallen','fool-born','full-gorged','guts-griping','half-faced','hasty-witted','hedge-born','hell-hated','idle-headed','ill-breeding','ill-nurtured','knotty-pated','milk-livered','motley-minded','onion-eyed','plume-plucked','pottle-deep','pox-marked','reeling-ripe','rough-hewn','rude-growing','rump-fed','shard-borne','sheep-biting','spur-galled','swag-bellied','tardy-gaited','tickle-brained','toad-spotted','unchin-snouted','weather-bitten','whoreson','malmsey-nosed','rampallian','lily-livered','scurvy-valiant','brazen-faced','unwashed','bunch-backed','leaden-footed','muddy-mettled','pigeon-livered','scale-sided','apple-john','baggage','barnacle','bladder','boar-pig','bugbear','bum-bailey','canker-blossom','clack-dish','clotpole','coxcomb','codpiece','death-token','dewberry','flap-dragon','flax-wench','flirt-gill','foot-licker','fustilarian','giglet','gudgeon','haggard','harpy','hedge-pig','horn-beast','hugger-mugger','joithead','lewdster','lout','maggot-pie','malt-worm','mammet','measle','minnow','miscreant','moldwarp','mumble-news','nut-hook','pigeon-egg','pignut','puttock','pumpion','ratsbane','scut','skainsmate','strumpet','varlot','vassal','whey-face','wagtail','knave','blind-worm','popinjay','scullian','jolt-head','malcontent','devil-monk','toad','rascal','basket-cockle'];
+		
+    var insult_adj = new Array ("artless","bawdy","beslubbering","bootless","brazen",
+    "churlish","cockered","clouted","craven","currish","dankish","dissembling",
+    "distempered","droning","errant","fawning","fitful","fobbing","froward",
+    "frothy","gleeking","gnarling","goatish","gorbellied","greasy","grizzled",
+    "haughty","hideous","impertinent","infectious","jaded","jarring","knavish",
+    "lewd","loggerheaded","lumpish","mammering","mangled","mewling","paunchy",
+    "peevish","pernicious","prating","pribbling","puking","puny","purpled",
+    "quailing","queasy","rank","reeky","roguish","roynish","ruttish","saucy",
+    "sottish","spleeny","spongy","surly","tottering","unmuzzled","vacant","vain",
+    "venomed","villainous","waggish","wanton","warped","wayward","weedy",
+    "wenching","whoreson","yeasty", "base-court","bat-fowling","beef-witted","beetle-headed",
+    "boil-brained","bunched-backed","clapper-clawed","clay-brained",
+    "common-kissing","crook-pated","dismal-dreaming","dizzy-eyed",
+    "dog-hearted","dread-bolted","earth-vexing","elf-skinned",
+    "empty-hearted","evil-eyed","eye-offending","fat-kidneyed","fen-sucked",
+    "flap-mouthed","fly-bitten","folly-fallen","fool-born","full-gorged",
+    "guts-griping","half-faced","hasty-witted","heavy-handed","hedge-born",
+    "hell-hated","horn-mad","idle-headed","ill-breeding","ill-composed",
+    "ill-nurtured","iron-witted","knotty-pated","lean-witted","lily-livered",
+    "mad-bread","milk-livered","motley-minded","muddy-mettled","onion-eyed",
+    "pale-hearted","paper-faced","pinch-spotted","plume-plucked",
+    "pottle-deep","pox-marked","raw-boned","reeling-ripe","rough-hewn",
+    "rude-growing","rug-headed","rump-fed","shag-eared","shard-borne",
+    "sheep-biting","shrill-gorged","spur-galled","sour-faced",
+    "swag-bellied","tardy-gaited","tickle-brained","toad-spotted",
+    "unchin-snouted","weak-hinged","weather-bitten","white-livered");
+
+    var insult_nouns = new Array ("apple-john","baggage","barnacle","bladder","boar-pig","bugbear",
+    "bum-bailey","canker-blossom","clack-dish","clotpole","coxcomb","codpiece",
+    "crutch","cutpurse","death-token","dewberry","dogfish","egg-shell",
+    "flap-dragon","flax-wench","flirt-gill","foot-licker","fustilarian","giglet",
+    "gudgeon","gull-catcher","haggard","harpy","hedge-pig","hempseed",
+    "hedge-pig","horn-beast","hugger-mugger","jack-a-nape","jolthead",
+    "lewdster","lout","maggot-pie","malignancy","malkin","malt-worm","mammet",
+    "manikin","measle","minimus","minnow","miscreant","moldwarp",
+    "mumble-news","nut-hook","pantaloon","pigeon-egg","pignut","puttock",
+    "pumpion","rabbit-sucker","rampallion","ratsbane","remnant","rudesby",
+    "ruffian","scantling","scullion","scut","skainsmate","snipe","strumpet",
+    "varlot","vassal","waterfly","whey-face","whipster","wagtail","younker");
 
 		var getRandomInsult = function() {
-			var index = randint(insults.length) - 1;
-			return insults[index];
+			var result "the ";
+	    var a = Math.floor(Math.random()*insult_adj.length);
+	    var b = Math.floor(Math.random()*insult_nouns.length);
+	    
+	    result += insult_adj[a] + " " + insult_nouns[b];
+	    return result;
 		};
 		
 		var randint = function(sides) {
@@ -255,7 +298,7 @@
   				for(var k = 0; k < combatantsArray.length; k++)
   				{
   					var order = k + 1;
-  					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+  					reply += "\n>("+order+") @" + combatantsArray[k].name;
   				}
   				reply += "\n>*Let the bloodletting begin!*";
   				return reply; 
@@ -343,12 +386,12 @@
 					var order = k + 1;
 					if(k == 0)
 					{
-						reply += "\n>("+order+") _@" + combatantsArray[k].name + " the " + getRandomInsult() + "_";
+						reply += "\n>("+order+") _@" + combatantsArray[k].name + "_";
 						firstPlayerName = combatantsArray[k].name;
 					}
 					else
 					{
-						reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+						reply += "\n>("+order+") @" + combatantsArray[k].name;
 					}
 				}
 				reply += "\n>*@" + firstPlayerName + ", you're up first!*";
@@ -455,7 +498,7 @@
 				reply += "\n>Here is who has already rolled:";
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
-					reply += "\n>@" + combatantsArray[k].name + " the " + getRandomInsult() + " rolled `" +combatantsArray[k].init+"`.";
+					reply += "\n>@" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
 				}
 				return msg.reply(reply);
 				
@@ -469,11 +512,11 @@
 				
 				if(currentTurnIndex == k)
 				{
-					reply += "\n>("+order+") *_@" + combatantsArray[k].name + " the " + getRandomInsult()+"_*";
+					reply += "\n>("+order+") *_@" + combatantsArray[k].name + "_*";
 				}
 				else
 				{
-					reply += "\n>("+order+") @" + combatantsArray[k].name + " the " + getRandomInsult();
+					reply += "\n>("+order+") @" + combatantsArray[k].name;
 				}
 				
 				
@@ -508,7 +551,7 @@
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
-					reply += "\n>@" + combatantsArray[k].name + " the " + getRandomInsult() + "(initiative of " + combatantsArray[k].init + ")";
+					reply += "\n>@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
 				}
 				return msg.reply(reply);
 				
@@ -563,45 +606,42 @@
       robot.logger.debug("I have a secret: " + secret);
       return res.send('OK');
     });
-		/*
-		var sendToSlack = function(attachment, integration, message) {
-      
-      var data;
 
-      data = JSON.stringify({
-        "token": integration.get('slack_token'),
-        "channel": integration.get('channel_id'),
-        "username": 'Partyline',
-        "attachments": JSON.stringify(attachment),
-        "icon_url": SLACK_BOT_ICON,
-      });
+    robot.router.post('/hubot/combat', function(req, res) {
+      robot.logger.debug("Received a POST request to /hubot/roll");
+          
+      var data, channel_name, response_url, command, text, token,username;
+               
+      data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+      //robot.logger.debug("data:"+util.inspect(data));
+		  command = data.command;
+           
+		  token = data.token;
+		  username = data.user_name;
+		  channel_name = data.channel_name;
 
-      robot.http("https://midnight-train").header('Content-Type', 'application/json').post(data)(
-        function(err, res, body) {
-          if (body.ok) {
-            console.log(body);
-          } 
-          else {
-            console.log(err);
-          }
-        }
-      );
-      
-      request.post({
-      json: true,
-      url: 'https://slack.com/api/chat.postMessage',
-      qs: {
-        
-      },
-      }, function(err, resp, body) {
-        if (body.ok) {
-          console.log(body);
-        } else {
-          console.log(err);
-        }
-     });
-    };
-		*/
+		  //var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i);
+		  text = data.text;
+		  
+		  if(match != null)
+		  {
+			  var num = match[1] || 1;
+			  var sides = match[3] || 6;
+			  var bonusType = match[4] || "";
+			  var bonus = match[5] || 0;
+			  var advantage = match[6] || "";
+			  
+			  var msgData = diceBot(username,num,sides,bonusType,bonus,advantage);
+			  msgData['channel'] = channel_name;
+			  msgData['response_type'] = 'in_channel';
+			  
+			  return res.json(msgData);
+		  }
+		  else
+		  {
+			  return res.send('*No valid dice roll!*\nUsage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_\nX is the number of dice, and Y is the number of sides.\nOnly the first paramter, e.g. XdY, is required.\n\nExamples:\n/roll 2d6    (Rolls two six-sided dice)\n/roll 3d10+2    (Rolls three ten-sided dice and adds two to the result)\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)');
+		  }
+    });
 		
 		//end function definitions
     };
