@@ -142,11 +142,7 @@
 			robot.logger.debug("Clearing all combat data.");
 		};
 		
-		robot.hear(/(combat clearall)/i, function(msg) {
-			var callerName = msg.message.user.name;			
-			clearAll();
-			return msg.reply("@"+callerName+" cleared all current combat data.");
-		});
+	
 		
 		var combatEnd = function (callerName) {
 		  
@@ -567,6 +563,13 @@
 			var reply = "Next turn started. @" +combatantsArray[currentTurnIndex].name+" is up!";
       return reply;
 		};
+	  
+	  /* begin 'hear' functions*/
+	  robot.hear(/(combat clearall)/i, function(msg) {
+			var callerName = msg.message.user.name;			
+			clearAll();
+			return msg.reply("@"+callerName+" cleared all current combat data.");
+		});
 		
 		robot.hear(/(combat next)/i, function(msg) {
 			var callerName = msg.message.user.name;			
@@ -600,6 +603,8 @@
 			robot.logger.debug("msgData sent, now returning");
 			return;
 		});
+		
+		/*end 'hear' functions*/
 		
 		/*begin slash command listening code*/
 
