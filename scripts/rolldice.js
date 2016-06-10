@@ -192,7 +192,7 @@
 		  }
 		  else
 		  {
-			  return res.send('Usage: _/roll #d#([+|-]#) (adv|advantage|dis|disadvantage)_\nOnly the first paramter, e.g. 1d6, is required.\n\nExamples:\n/roll 2d6\n/roll 3d10+2\n/roll 4d4-7 adv');
+			  return res.send('Usage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_ where X is the number of dice, and Y is the number of sides.\nOnly the first paramter, e.g. XdY, is required.\n\nExamples:\n/roll 2d6\n/roll 3d10+2\n/roll 4d4-7 adv');
 		  }
     });
       
