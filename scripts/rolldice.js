@@ -176,17 +176,24 @@
 		  channel_name = data.channel_name;
 
 		  var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i);
-		  var num = match[1] || 1;
-          var sides = match[3] || 6;
-          var bonusType = match[4] || "";
-	      var bonus = match[5] || 0;
-		  var advantage = match[6] || "";
-		  
-		  var msgData = diceBot(username,num,sides,bonusType,bonus,advantage);
-          msgData['channel'] = channel_name;
-		  msgData['response_type'] = 'in_channel';
-		  
-          return res.json(msgData);
+		  if(match != null)
+		  {
+			  var num = match[1] || 1;
+			  var sides = match[3] || 6;
+			  var bonusType = match[4] || "";
+			  var bonus = match[5] || 0;
+			  var advantage = match[6] || "";
+			  
+			  var msgData = diceBot(username,num,sides,bonusType,bonus,advantage);
+			  msgData['channel'] = channel_name;
+			  msgData['response_type'] = 'in_channel';
+			  
+			  return res.json(msgData);
+		  }
+		  else
+		  {
+			  return res.send('Usage: _/roll #d#([+|-]#) (adv|advantage|dis|disadvantage)_\nOnly the first paramter, e.g. 1d6, is required.\n\nExamples:\n/roll 2d6\n/roll 3d10+2\n/roll 4d4-7 adv');
+		  }
     });
       
     };
