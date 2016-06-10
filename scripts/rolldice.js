@@ -165,7 +165,7 @@
       	robot.router.post('/hubot/roll', function(req, res) {
           robot.logger.debug("Received a POST request to /hubot/roll");
           
-          var data, channelId, response_url, command, text;
+          var data, channelId, response_url, command, text, token,username;
                
           data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
           //robot.logger.debug("data:"+util.inspect(data));
@@ -173,9 +173,12 @@
           //robot.logger.debug("command="+command);
           text = data.text;
           //robot.logger.debug("text="+text);
-          token = data.token;
+          
+		  token = data.token;
+		  username = data.user_name;
+		  		  
 		  robot.logger.debug("token="+token);
-		  
+		  robot.logger.debug("username="+username);
 		  
           return res.send('20!');
     });
