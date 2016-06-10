@@ -165,22 +165,30 @@
       	robot.router.post('/hubot/roll', function(req, res) {
           robot.logger.debug("Received a POST request to /hubot/roll");
           
-          var data, channelId, response_url, command, text, token,username;
+          var data, channel_name, response_url, command, text, token,username;
                
           data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
           //robot.logger.debug("data:"+util.inspect(data));
 		  command = data.command;
-          //robot.logger.debug("command="+command);
-          text = data.text;
-          //robot.logger.debug("text="+text);
-          
+          text = data.text;     
 		  token = data.token;
 		  username = data.user_name;
+		  channel_name = data.channel_name;
 		  		  
 		  robot.logger.debug("token="+token);
 		  robot.logger.debug("username="+username);
 		  
-          return res.send('20!');
+		  var num = 2;
+		  var sides = 6;
+		  var bonusType = "+";
+		  var bonus = 10;
+		  var advantage = "";
+		  
+		  var msgData = diceBot(username,num,sides,bonusType,bonus,advantage);
+          msgData['channel'] = channel_name;
+		  msgData['response_type'] = 'in_channel';
+		  
+          return res.send(JSON.stringify(msgData));
     });
       
     };
