@@ -527,7 +527,7 @@
 		
 		var combatNext = function(callerName)
 		{
-		var combat_started = robot.brain.get('combat_flag');
+		  var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
 			var combatantsArray = robot.brain.get('combatantsArray');
@@ -537,11 +537,11 @@
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
 				robot.brain.set('combat_flag', 0);
-				return msg.reply("No combat started @"+callerName+". Begin with `/combat start`");
+				return "No combat started @"+callerName+". Begin with `/combat start`";
 			}  
 			else if(combat_started == 0)
 			{
-				return msg.reply("No combat started @"+callerName+". Begin with `/combat start`");
+				return "No combat started @"+callerName+". Begin with `/combat start`";
 			}
 			else if(numRegisteredCombatants < numTotalCombatants)
 			{
@@ -553,7 +553,7 @@
 					var order = k + 1;
 					reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
 				}
-				return msg.reply(reply);
+				return reply;
 				
 			}
 			var currentTurnIndex = robot.brain.get('currentTurnIndex');
@@ -565,12 +565,12 @@
 			robot.brain.set('currentTurnIndex',currentTurnIndex);
 			
 			var reply = "Next turn started. @" +combatantsArray[currentTurnIndex].name+" is up!";
-
+      return reply;
 		};
 		
 		robot.hear(/(combat next)/i, function(msg) {
 			var callerName = msg.message.user.name;			
-				
+			var reply = combatNext(callerName);
 			
 			return msg.reply(reply);
 		});
