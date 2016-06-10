@@ -140,7 +140,7 @@
           
           return msgData;
         };
-
+/*
         robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
             var callerName = msg.message.user.name;
 			var num = msg.match[2] || 1;
@@ -161,7 +161,7 @@
             }
             return;
         });
-    
+  */  
       	robot.router.post('/hubot/roll', function(req, res) {
           robot.logger.debug("Received a POST request to /hubot/roll");
           
@@ -170,19 +170,17 @@
           data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
           //robot.logger.debug("data:"+util.inspect(data));
 		  command = data.command;
-          text = data.text;     
+          //text = data.text;     
 		  token = data.token;
 		  username = data.user_name;
 		  channel_name = data.channel_name;
-		  		  
-		  robot.logger.debug("token="+token);
-		  robot.logger.debug("username="+username);
-		  
-		  var num = 2;
-		  var sides = 6;
-		  var bonusType = "+";
-		  var bonus = 10;
-		  var advantage = "";
+
+		  var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i);
+		  var num = match[1] || 1;
+          var sides = match[3] || 6;
+          var bonusType = match[4] || "";
+	      var bonus = match[5] || 0;
+		  var advantage = match[6] || "";
 		  
 		  var msgData = diceBot(username,num,sides,bonusType,bonus,advantage);
           msgData['channel'] = channel_name;
