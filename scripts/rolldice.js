@@ -20,7 +20,8 @@
 
 (function() {
     module.exports = function(robot) {
-        var randint = function(sides) {
+        var util = require("util");
+		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
         };
 
@@ -32,11 +33,11 @@
             return results;
         };
         
-        var diceBot = function(num,sides,bonusType,bonus,advantage) {
+        var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
       			
-      			var result = "you rolled " + num + "d" + sides;
+      			var result = "@" + name + " rolled " + num + "d" + sides;
       			if(bonusType.indexOf("+") != -1)
       			{
       				result += "+" + bonus;
@@ -48,14 +49,14 @@
 			
 			      if(advantage.indexOf("dis") != -1)
 			      {
-			        result += " with disadvantage\n>First result: ";
+			        result += " with disadvantage\nFirst result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n>Second result: ";
+		          result += "\nSecond result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -71,19 +72,19 @@
       			  	rollsTotal += Number(bonus);
       			  }
 		          
-		          result += "\n>*Total of lowest rolls: `" + rollsTotal + "`*";
+		          result += "\n*Total of lowest rolls: `" + rollsTotal + "`*";
               
 			      }
 			      else if(advantage.indexOf("adv") != -1)
 			      {
-			        result += " with advantage\n>First result: ";
+			        result += " with advantage\nFirst result: ";
 			        var secondRollsTotal = rollsTotal;
 			        
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-		          result += "\n>Second result: ";
+		          result += "\nSecond result: ";
 		          rolls = rolldice(sides, num);
 		          for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
@@ -99,7 +100,7 @@
       			  	rollsTotal += Number(bonus);
       			  }
 		          
-              result += "\n>*Total of highest rolls: `" + rollsTotal + "`*";
+              result += "\n*Total of highest rolls: `" + rollsTotal + "`*";
               
 			      }
 			      else
@@ -109,77 +110,46 @@
       			  	rollsTotal += Number(bonus);
       			  }
 			        
-			        result += "\n>Result: ";
+			        result += "\n*Result: ";
 			        for (var j = 0; j < rolls.length; j++) {
                 result += "`" + rolls[j] + "` ";
                 rollsTotal += rolls[j];
 		          }
-
+					result += "*";
               if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
               {
-                result += "\n>*Total: `" + rollsTotal + "`*";
+                result += "\n*Total: `" + rollsTotal + "`*";
               }
 			      }
 
 		
-			   /*
+			   
             var msgData = {
-              text:"foo",
+              
               attachments: [{
-                "fallback": "testfalback",
+                "fallback": result,
                 "color": "#cc3300",
-                "title": "This is a test title",
-                "title_link": "https://www.google.com",
                 "footer": "Dice Rolling Script",
                 "footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon",
-                "fields": [
-                {
-                    "value": "@Foo rolled a *`20`*.",
-                    "short": false
-                },
-                {
-                    "title": "First Roll",
-                    "value": "5",
-                    "short": true
-                },
-                {
-                    "title": "Second Roll",
-                    "value": "10",
-                    "short": true
-                }
-                ]
+                "text": result,
+				"mrkdwn_in": ["text"]
               }]
           };
           
-          */
-                var msgData = {
-        
-        /*text: "Test Attachments",*/
-        attachments: [
-          {
-            fallback: "This is the fallback field text",
-            pretext: "Combat command executed",
-            color: "#cc3300",
-            title: "This is a test title",
-            title_link: "https://www.google.com",
-            text: "You rolled *`20`*",
-            footer: "Dice Rolling Script",
-            footer_icon: "https://a.fsdn.com/allura/p/kdicegen/icon",
-            mrkdwn_in: ["text"]
-          }
-        ]
-      };
+          
+          
           return msgData;
         };
 
         robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
-            var num = msg.match[2] || 1;
+            var callerName = msg.message.user.name;
+			var num = msg.match[2] || 1;
             var sides = msg.match[4] || 6;
             var bonusType = msg.match[5] || "NAN";
-			      var bonus = msg.match[6] || 0;
-			      var advantage = msg.match[7] || "";
+			var bonus = msg.match[6] || 0;
+			var advantage = msg.match[7] || "";
             
-            var msgData = diceBot(num,sides,bonusType,bonus,advantage);
+            var msgData = diceBot(callerName,num,sides,bonusType,bonus,advantage);
             msgData['channel'] = msg.message.room;
             try{
               
@@ -201,7 +171,8 @@
           robot.logger.debug("room="+room);
           data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
           robot.logger.debug("data="+data);
-          command = data.command;
+          robot.logger.debug("data:"+util.inspect(data));
+		  command = data.command;
           robot.logger.debug("command="+command);
           text = data.text;
           robot.logger.debug("text="+text);
