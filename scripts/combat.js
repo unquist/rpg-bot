@@ -596,6 +596,10 @@
 		  {
 			msgData['response_type'] = 'in_channel';
 		  }
+		  else
+		  {
+			msgData['response_type'] = 'ephemeral';
+		  }
 		  
 		  return msgData;
 		}
@@ -650,7 +654,7 @@
 			else
 			{
 				var reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
-				var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+				var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 				return res.json(msgData);
 			}
 		});
