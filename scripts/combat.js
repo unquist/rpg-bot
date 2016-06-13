@@ -648,7 +648,7 @@
 			}
 			else
 			{
-				var reply = "I didn't understand _" + text + "_! Use _/combat help_ for an explanation of each command.";
+				var reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
 				var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 				return res.json(msgData);
 			}
