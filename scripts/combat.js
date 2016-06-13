@@ -24,53 +24,53 @@
 		var hasProp = {}.hasOwnProperty;
 		
 		
-    var insult_adj = new Array ("artless","bawdy","beslubbering","bootless","brazen",
-    "churlish","cockered","clouted","craven","currish","dankish","dissembling",
-    "distempered","droning","errant","fawning","fitful","fobbing","froward",
-    "frothy","gleeking","gnarling","goatish","gorbellied","greasy","grizzled",
-    "haughty","hideous","impertinent","infectious","jaded","jarring","knavish",
-    "lewd","loggerheaded","lumpish","mammering","mangled","mewling","paunchy",
-    "peevish","pernicious","prating","pribbling","puking","puny","purpled",
-    "quailing","queasy","rank","reeky","roguish","roynish","ruttish","saucy",
-    "sottish","spleeny","spongy","surly","tottering","unmuzzled","vacant","vain",
-    "venomed","villainous","waggish","wanton","warped","wayward","weedy",
-    "wenching","whoreson","yeasty", "base-court","bat-fowling","beef-witted","beetle-headed",
-    "boil-brained","bunched-backed","clapper-clawed","clay-brained",
-    "common-kissing","crook-pated","dismal-dreaming","dizzy-eyed",
-    "dog-hearted","dread-bolted","earth-vexing","elf-skinned",
-    "empty-hearted","evil-eyed","eye-offending","fat-kidneyed","fen-sucked",
-    "flap-mouthed","fly-bitten","folly-fallen","fool-born","full-gorged",
-    "guts-griping","half-faced","hasty-witted","heavy-handed","hedge-born",
-    "hell-hated","horn-mad","idle-headed","ill-breeding","ill-composed",
-    "ill-nurtured","iron-witted","knotty-pated","lean-witted","lily-livered",
-    "mad-bread","milk-livered","motley-minded","muddy-mettled","onion-eyed",
-    "pale-hearted","paper-faced","pinch-spotted","plume-plucked",
-    "pottle-deep","pox-marked","raw-boned","reeling-ripe","rough-hewn",
-    "rude-growing","rug-headed","rump-fed","shag-eared","shard-borne",
-    "sheep-biting","shrill-gorged","spur-galled","sour-faced",
-    "swag-bellied","tardy-gaited","tickle-brained","toad-spotted",
-    "unchin-snouted","weak-hinged","weather-bitten","white-livered");
+		var insult_adj = new Array ("artless","bawdy","beslubbering","bootless","brazen",
+		"churlish","cockered","clouted","craven","currish","dankish","dissembling",
+		"distempered","droning","errant","fawning","fitful","fobbing","froward",
+		"frothy","gleeking","gnarling","goatish","gorbellied","greasy","grizzled",
+		"haughty","hideous","impertinent","infectious","jaded","jarring","knavish",
+		"lewd","loggerheaded","lumpish","mammering","mangled","mewling","paunchy",
+		"peevish","pernicious","prating","pribbling","puking","puny","purpled",
+		"quailing","queasy","rank","reeky","roguish","roynish","ruttish","saucy",
+		"sottish","spleeny","spongy","surly","tottering","unmuzzled","vacant","vain",
+		"venomed","villainous","waggish","wanton","warped","wayward","weedy",
+		"wenching","whoreson","yeasty", "base-court","bat-fowling","beef-witted","beetle-headed",
+		"boil-brained","bunched-backed","clapper-clawed","clay-brained",
+		"common-kissing","crook-pated","dismal-dreaming","dizzy-eyed",
+		"dog-hearted","dread-bolted","earth-vexing","elf-skinned",
+		"empty-hearted","evil-eyed","eye-offending","fat-kidneyed","fen-sucked",
+		"flap-mouthed","fly-bitten","folly-fallen","fool-born","full-gorged",
+		"guts-griping","half-faced","hasty-witted","heavy-handed","hedge-born",
+		"hell-hated","horn-mad","idle-headed","ill-breeding","ill-composed",
+		"ill-nurtured","iron-witted","knotty-pated","lean-witted","lily-livered",
+		"mad-bread","milk-livered","motley-minded","muddy-mettled","onion-eyed",
+		"pale-hearted","paper-faced","pinch-spotted","plume-plucked",
+		"pottle-deep","pox-marked","raw-boned","reeling-ripe","rough-hewn",
+		"rude-growing","rug-headed","rump-fed","shag-eared","shard-borne",
+		"sheep-biting","shrill-gorged","spur-galled","sour-faced",
+		"swag-bellied","tardy-gaited","tickle-brained","toad-spotted",
+		"unchin-snouted","weak-hinged","weather-bitten","white-livered");
 
-    var insult_nouns = new Array ("apple-john","baggage","barnacle","bladder","boar-pig","bugbear",
-    "bum-bailey","canker-blossom","clack-dish","clotpole","coxcomb","codpiece",
-    "crutch","cutpurse","death-token","dewberry","dogfish","egg-shell",
-    "flap-dragon","flax-wench","flirt-gill","foot-licker","fustilarian","giglet",
-    "gudgeon","gull-catcher","haggard","harpy","hedge-pig","hempseed",
-    "hedge-pig","horn-beast","hugger-mugger","jack-a-nape","jolthead",
-    "lewdster","lout","maggot-pie","malignancy","malkin","malt-worm","mammet",
-    "manikin","measle","minimus","minnow","miscreant","moldwarp",
-    "mumble-news","nut-hook","pantaloon","pigeon-egg","pignut","puttock",
-    "pumpion","rabbit-sucker","rampallion","ratsbane","remnant","rudesby",
-    "ruffian","scantling","scullion","scut","skainsmate","snipe","strumpet",
-    "varlot","vassal","waterfly","whey-face","whipster","wagtail","younker");
+		var insult_nouns = new Array ("apple-john","baggage","barnacle","bladder","boar-pig","bugbear",
+		"bum-bailey","canker-blossom","clack-dish","clotpole","coxcomb","codpiece",
+		"crutch","cutpurse","death-token","dewberry","dogfish","egg-shell",
+		"flap-dragon","flax-wench","flirt-gill","foot-licker","fustilarian","giglet",
+		"gudgeon","gull-catcher","haggard","harpy","hedge-pig","hempseed",
+		"hedge-pig","horn-beast","hugger-mugger","jack-a-nape","jolthead",
+		"lewdster","lout","maggot-pie","malignancy","malkin","malt-worm","mammet",
+		"manikin","measle","minimus","minnow","miscreant","moldwarp",
+		"mumble-news","nut-hook","pantaloon","pigeon-egg","pignut","puttock",
+		"pumpion","rabbit-sucker","rampallion","ratsbane","remnant","rudesby",
+		"ruffian","scantling","scullion","scut","skainsmate","snipe","strumpet",
+		"varlot","vassal","waterfly","whey-face","whipster","wagtail","younker");
 
 		var getRandomInsult = function() {
-			var result "the ";
-	    var a = Math.floor(Math.random()*insult_adj.length);
-	    var b = Math.floor(Math.random()*insult_nouns.length);
+			var result = "the ";
+			var a = Math.floor(Math.random()*insult_adj.length);
+			var b = Math.floor(Math.random()*insult_nouns.length);
 	    
-	    result += insult_adj[a] + " " + insult_nouns[b];
-	    return result;
+			result += insult_adj[a] + " " + insult_nouns[b];
+			return result;
 		};
 		
 		var randint = function(sides) {
@@ -142,8 +142,7 @@
 			robot.logger.debug("Clearing all combat data.");
 		};
 		
-	
-		
+			
 		var combatEnd = function (callerName) {
 		  
 			var combat_started = robot.brain.get('combat_flag');
@@ -182,13 +181,7 @@
 			return "@"+callerName+" is taking the low road. Ending Combat (all combat data cleared).";
 		};
 		
-		
-		robot.hear(/(combat end)/i, function(msg) {
-			var callerName = msg.message.user.name;
-			var reply = combatEnd(callerName);
-			return msg.reply(reply);
-		});
-		
+
 		var combatStart = function(callerName,numCombatants) {
 			var combat_started = robot.brain.get('combat_flag');
 			robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
@@ -227,21 +220,8 @@
 			   
 		};
 		
-		robot.hear(/(combat start )(\d+)/i, function(msg) {
-			var callerName = msg.message.user.name;
-			var numCombatants = msg.match[2] || -1;
-			var reply = combatStart(callerName,numCombatants);
-			return msg.reply(reply);
-		});
-		
-		robot.hear(/combat start$/i, function(msg) {
-            var callerName = msg.message.user.name;
-			var reply = "Need at least two to tango @"+callerName+"! Usage `combat start [num participants]` where [num participants] is 2 or more.\n";
-			return msg.reply(reply);
-	
-        });
-		
-		  var combatInit = function(callerName, bonus) {
+
+		var combatInit = function(callerName, bonus) {
 		    var combat_started = robot.brain.get('combat_flag');
 			  var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			  //array of players
@@ -307,15 +287,7 @@
 		  
 		  };
 		  
-	    robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
-			  var callerName = msg.message.user.name;
-				var bonus = msg.match[2] || 0;
-			  bonus = Number(bonus);
-			
-			  var reply = combatInit(callerName,bonus);
-			  return msg.reply(reply);
-		
-      });
+
 		var initdm = function(callerName,bonus,numMonsters,monsterName) {
 			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
 			var combat_started = robot.brain.get('combat_flag');
@@ -400,22 +372,8 @@
 			}
 		};
 		
+		var combatSetInit = function (callerName, newInit) {
 		
-		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
-			//var callerName = msg.message.user.name;
-			//for debug only:
-			var callerName = msg.message.user.name;
-			var bonus = msg.match[2] || 0;
-			
-			var numMonsters = Number(msg.match[4]) || 1;
-			var monsterName = msg.match[6] || "Nameless Monster";
-						
-			var reply = initdm(callerName,bonus,numMonsters,monsterName);
-			return msg.reply(reply);
-		});
-		
-		var combatSetInit = function (callerName, newInit)
-		{
 			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
@@ -457,18 +415,8 @@
   		return "Manually changed @"+callerName+"'s initiative score from `" +oldInit+ "` to `"+newInit+"`.";
 		};
 		
-		robot.hear(/(combat setinit (\d+))/i, function(msg) {
-			var callerName = msg.message.user.name;		
-			var init = msg.match[2] || 0;
-			init = Number(init);
-			
-			var reply = combatSetInit(callerName,init);
-			 
-			return msg.reply(reply);
-		});
+		var combatStatus = function(callerName) {
 		
-		var combatStatus = function(callerName)
-		{
 		  var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
@@ -514,15 +462,8 @@
 			}
 			return reply;
 		};
-		
-		robot.hear(/(combat status)/i, function(msg) {
-			var callerName = msg.message.user.name;			
-			var reply = combatStatus(callerName);
-			return msg.reply(reply);
-		});
-		
-		var combatNext = function(callerName)
-		{
+			
+		var combatNext = function(callerName) {
 		  var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
@@ -578,71 +519,140 @@
 			return msg.reply(reply);
 		});
 		
-		robot.respond(/test attachment/i, function(msg) {
-			var callerName = msg.message.user.name;			
-			
-      var msgData = {
-        channel: msg.message.room,
-        /*text: "Test Attachments",*/
-        attachments: [
-          {
-            fallback: "This is the fallback field text",
-            pretext: "Combat command executed",
-            color: "#cc3300",
-            title: "This is a test title",
-            title_link: "https://www.google.com",
-            text: "You rolled *`20`*",
-            footer: "Dice Rolling Script",
-            footer_icon: "https://a.fsdn.com/allura/p/kdicegen/icon",
-            mrkdwn_in: ["text"]
-          }
-        ]
-      };
-      robot.logger.debug("msgData formatted, now sending");
-      robot.adapter.customMessage(msgData);
-			robot.logger.debug("msgData sent, now returning");
-			return;
+		robot.hear(/(combat end)/i, function(msg) {
+			var callerName = msg.message.user.name;
+			var reply = combatEnd(callerName);
+			return msg.reply(reply);
 		});
 		
+		robot.hear(/(combat start )(\d+)/i, function(msg) {
+			var callerName = msg.message.user.name;
+			var numCombatants = msg.match[2] || -1;
+			var reply = combatStart(callerName,numCombatants);
+			return msg.reply(reply);
+		});
+		
+		robot.hear(/combat start$/i, function(msg) {
+            var callerName = msg.message.user.name;
+			var reply = "Need at least two to tango @"+callerName+"! Usage `combat start [num participants]` where [num participants] is 2 or more.\n";
+			return msg.reply(reply);
+	
+        });
+		
+		robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
+			var callerName = msg.message.user.name;
+			var bonus = msg.match[2] || 0;
+			bonus = Number(bonus);
+		
+			var reply = combatInit(callerName,bonus);
+			return msg.reply(reply);
+		});
+		
+		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
+			var callerName = msg.message.user.name;
+			var bonus = msg.match[2] || 0;
+			
+			var numMonsters = Number(msg.match[4]) || 1;
+			var monsterName = msg.match[6] || "Nameless Monster";
+						
+			var reply = initdm(callerName,bonus,numMonsters,monsterName);
+			return msg.reply(reply);
+		});
+		
+		robot.hear(/(combat setinit (\d+))/i, function(msg) {
+			var callerName = msg.message.user.name;		
+			var init = msg.match[2] || 0;
+			init = Number(init);
+			
+			var reply = combatSetInit(callerName,init);
+			 
+			return msg.reply(reply);
+		});
+		
+		robot.hear(/(combat status)/i, function(msg) {
+			var callerName = msg.message.user.name;			
+			var reply = combatStatus(callerName);
+			return msg.reply(reply);
+		});
 		/*end 'hear' functions*/
 		
 		/*begin slash command listening code*/
-
-
-    robot.router.post('/hubot/combat', function(req, res) {
-      robot.logger.debug("Received a POST request to /hubot/roll");
-          
-      var data, channel_name, response_url, command, text, token,username;
-               
-      data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
-      //robot.logger.debug("data:"+util.inspect(data));
-		  command = data.command;
-           
-		  token = data.token;
-		  username = data.user_name;
-		  channel_name = data.channel_name;
-
-		  var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i);
+		var getFormattedJSONAttachment = function(messageText,channel,inChannel) {
+			
+			var msgData = {
+				attachments: [{
+					"fallback": messageText,
+					"color": "#cc3300",
+					"footer": "Combat Script",
+					"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
+					"text": messageText,
+					"channel":channel,
+					"mrkdwn_in": ["text"]
+              }]
+          };
 		  
-		  if(match != null)
+		  if(inChannel)
 		  {
-			  var num = match[1] || 1;
-			  var sides = match[3] || 6;
-			  var bonusType = match[4] || "";
-			  var bonus = match[5] || 0;
-			  var advantage = match[6] || "";
-			  
-			  var msgData = diceBot(username,num,sides,bonusType,bonus,advantage);
-			  msgData['channel'] = channel_name;
-			  msgData['response_type'] = 'in_channel';
-			  
-			  return res.json(msgData);
+			msgData['response_type'] = 'in_channel';
 		  }
-		  else
-		  {
-			  return res.send('*No valid dice roll!*\nUsage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_\nX is the number of dice, and Y is the number of sides.\nOnly the first paramter, e.g. XdY, is required.\n\nExamples:\n/roll 2d6    (Rolls two six-sided dice)\n/roll 3d10+2    (Rolls three ten-sided dice and adds two to the result)\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)');
-		  }
-    });
+		  
+		  return msgData;
+		}
+		
+
+		robot.router.post('/hubot/combat', function(req, res) {
+			robot.logger.debug("Received a POST request to /hubot/roll");
+			  
+			var data, channel_name, response_url, command, subcommand, text, token,username;
+				   
+			data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+			//robot.logger.debug("data:"+util.inspect(data));
+			command = data.command;
+		   
+			token = data.token;
+			username = data.user_name;
+			channel_name = data.channel_name;
+			text = data.text;
+			var match = text.match(/([a-z]+)(\s*)(.*)/i);
+			  
+			if(match != null)
+			{
+				var subcommand = match[1] || "invalid";
+				var parameters = match[2] || null;
+
+				switch(subcommand)
+				{
+					case "clearall":
+						break;
+					case "next":
+						break;
+					case "end":
+						break;
+					case "start":
+						break;
+					case "init":
+						break;
+					case "initdm":
+						break;
+					case "setinit":
+						break;
+					case "status":
+						break;
+					case "help":
+						break;
+					default:
+						var reply = "I don't know how to _" + subcommand + "_! Use _/combat help_ for an explanation of each command.";
+						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+						return res.json(msgData);
+				}
+			}
+			else
+			{
+				var reply = "I didn't understand _" + text + "_! Use _/combat help_ for an explanation of each command.";
+				var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+				return res.json(msgData);
+			}
+		});
 		
 		//end function definitions
     };
