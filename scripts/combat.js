@@ -506,40 +506,40 @@
 		};
 	  
 	  /* begin 'hear' functions*/
-	  robot.hear(/(combat clearall)/i, function(msg) {
+	  robot.hear(/(combat_hear clearall)/i, function(msg) {
 			var callerName = msg.message.user.name;			
 			clearAll();
 			return msg.reply("@"+callerName+" cleared all current combat data.");
 		});
 		
-		robot.hear(/(combat next)/i, function(msg) {
+		robot.hear(/(combat_hear next)/i, function(msg) {
 			var callerName = msg.message.user.name;			
 			var reply = combatNext(callerName);
 			
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/(combat end)/i, function(msg) {
+		robot.hear(/(combat_hear end)/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var reply = combatEnd(callerName);
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/(combat start )(\d+)/i, function(msg) {
+		robot.hear(/(combat_hear start )(\d+)/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var numCombatants = msg.match[2] || -1;
 			var reply = combatStart(callerName,numCombatants);
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/combat start$/i, function(msg) {
+		robot.hear(/combat_hear start$/i, function(msg) {
             var callerName = msg.message.user.name;
 			var reply = "Need at least two to tango @"+callerName+"! Usage `combat start [num participants]` where [num participants] is 2 or more.\n";
 			return msg.reply(reply);
 	
         });
 		
-		robot.hear(/combat init(\s){0,1}(\d+){0,1}$/i, function(msg) {
+		robot.hear(/combat_hear init(\s){0,1}(\d+){0,1}$/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var bonus = msg.match[2] || 0;
 			bonus = Number(bonus);
@@ -548,7 +548,7 @@
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/combat initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
+		robot.hear(/combat_hear initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var bonus = msg.match[2] || 0;
 			
@@ -559,7 +559,7 @@
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/(combat setinit (\d+))/i, function(msg) {
+		robot.hear(/(combat_hear setinit (\d+))/i, function(msg) {
 			var callerName = msg.message.user.name;		
 			var init = msg.match[2] || 0;
 			init = Number(init);
@@ -569,7 +569,7 @@
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/(combat status)/i, function(msg) {
+		robot.hear(/(combat_hear status)/i, function(msg) {
 			var callerName = msg.message.user.name;			
 			var reply = combatStatus(callerName);
 			return msg.reply(reply);
@@ -606,7 +606,7 @@
 		
 
 		robot.router.post('/hubot/combat', function(req, res) {
-			robot.logger.debug("Received a POST request to /hubot/roll");
+			robot.logger.debug("Received a POST request to /hubot/combat");
 			  
 			var data, channel_name, response_url, command, subcommand, text, token,username;
 				   
@@ -654,7 +654,7 @@
 					    }
 					    else
 					    {
-					      reply = combatEnd(username,Number(numCombatants));
+					      reply = combatStart(username,Number(numCombatants));
 					    }
 					  }
 					  else
