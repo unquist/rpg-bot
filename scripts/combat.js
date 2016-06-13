@@ -216,7 +216,7 @@
 			   
 			   
 			   robot.brain.set('combat_flag', 1);
-			   return "@"+callerName+" started combat with " + numCombatants + " belligerents. Everyone roll for initiative!";
+			   return "@"+callerName+" started combat with " + numCombatants + " belligerents. Everyone in @channel roll for initiative!";
 			   
 		};
 		
