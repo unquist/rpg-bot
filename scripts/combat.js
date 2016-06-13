@@ -581,7 +581,7 @@
 			
 			var msgData = {
 				attachments: [{
-					"fallback": messageText,
+					"fallback": "test",
 					"color": "#cc3300",
 					"footer": "Combat Script",
 					"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
