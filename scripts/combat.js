@@ -580,7 +580,8 @@
 		var getFormattedJSONAttachment = function(messageText,channel,inChannel) {
 			
 			var msgData = {
-				attachments: [{
+				"text":messageText,
+				"attachments": [{
 					"fallback": messageText,
 					"color": "#cc3300",
 					"footer": "Combat Script",
