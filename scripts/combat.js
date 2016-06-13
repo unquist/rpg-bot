@@ -623,13 +623,16 @@
 			if(match != null)
 			{
 				var subcommand = match[1] || "invalid";
-				var parameters = match[2] || null;
-        
+				var parameters = match[3] || "";
+        robot.logger.debug("Subcommand recieved: ["+subcommand+"]");
+        robot.logger.debug("Parameters recieved: ["+parameters+"]");
 				switch(subcommand)
 				{
 					case "clearall":
 						clearAll();
-						return res.send("All combat data cleared.");
+						reply = "All combat data cleared.";
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
 						break;
 					case "next":
 					  reply = combatNext(username);
@@ -642,6 +645,24 @@
 						return res.json(msgData);
 						break;
 					case "start":
+					  if(parameters != "")
+					  {
+					    var numCombatants = parameters.match(/\d+/i) || -1;
+					    if(numCombatants == -1)
+					    {
+					      reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
+					    }
+					    else
+					    {
+					      reply = combatEnd(username,Number(numCombatants));
+					    }
+					  }
+					  else
+					  {
+					    reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
+					  }
+					  var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
 						break;
 					case "init":
 						break;
