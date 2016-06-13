@@ -581,7 +581,7 @@
 			
 			var msgData = {
 				attachments: [{
-					"fallback": "test",
+					"fallback": messageText,
 					"color": "#cc3300",
 					"footer": "Combat Script",
 					"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
@@ -649,7 +649,7 @@
 			else
 			{
 				var reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
-				var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+				var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 				return res.json(msgData);
 			}
 		});
