@@ -645,14 +645,14 @@
 						break;
 					case "help":
 						var reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
-						reply += "\n_/combat start [NUM COMBATANTS]_ - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
-						reply += "\n_/combat init [BONUS]_ - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
-						reply += "\n_/combat initdm [BONUS] [NUM MONSTERS] [MONSTER NAME]_ - The DM can run this to quickly add monsters of a single type to a combat.";
-						reply += "\n_/combat setinit [INIT]_ - Optional commabnd. Manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
-						reply += "\n_/combat next_ - Signal to the bot that the current player's turn is over (and it's time for the next player).";
-						reply += "\n_/combat status_ - Broadcasts the current order and indicates whomever's turn it is.";
-						reply += "\n_/combat end_ - End the combat. You won't be able to start a new combat until you end the old one.";
-						reply += "\n_/combat help_ - Prints this message.";
+						reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
+						reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
+						reply += "\n\n*_/combat initdm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
+						reply += "\n\n*_/combat setinit [INIT]_* - Optional commabnd. Manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
+						reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
+						reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
+						reply += "\n\n*_/combat end_* - End the combat. You won't be able to start a new combat until you end the old one.";
+						reply += "\n\n*_/combat help_* - Prints this message.";
 						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 						return res.json(msgData);
 						break;
