@@ -687,7 +687,8 @@
 								var bonus = initdmParams[1] || 0;
 								var numMonsters = initdmParams[2] || 0;
 								var monsterName = initdmParams[3] || "Nameless Horror";
-								reply = initdm(username,bonus,numMonsters,monsterName);
+								reply = "bonus=["+bonus+"], numMonsters=["+numMonsters+"], monsterName=["+monsterName+"]\n";
+								reply += initdm(username,bonus,numMonsters,monsterName);
 							}
 						}
 						else
