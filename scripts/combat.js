@@ -64,6 +64,20 @@
 		"ruffian","scantling","scullion","scut","skainsmate","snipe","strumpet",
 		"varlot","vassal","waterfly","whey-face","whipster","wagtail","younker");
 
+		var helpText = function() {
+			var reply = "";
+			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
+			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
+			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
+			reply += "\n\n*_/combat initdm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
+			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
+			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
+			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
+			reply += "\n\n*_/combat end_* - End the combat. You won't be able to start a new combat until you end the old one.";
+			reply += "\n\n*_/combat help_* - Prints this message.";
+			return reply;
+		};
+		
 		var getRandomInsult = function() {
 			var result = "the ";
 			var a = Math.floor(Math.random()*insult_adj.length);
@@ -701,19 +715,32 @@
 						return res.json(msgData);
 						break;
 					case "setinit":
+						if(parameters != "")
+						{
+							var newInit = parameters.match(/\d+/i) || -1;
+							if(newInit == -1)
+							{
+								reply = "Need to specify the new initiative value!\n For example, *_/combat setinit 12_* will set your initiative to 12. Note that you can only use this function up until all initiatives have been rolled.";
+							}
+							else
+							{
+								reply = combatSetInit(username,Number(newInit));
+							}
+						}
+						else
+						{
+							reply = "Need to specify the new initiative value!\n For example, *_/combat setinit 12_* will set your initiative to 12. Note that you can only use this function up until all initiatives have been rolled.";
+						}
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
 						break;
 					case "status":
+						reply = combatStatus(username);
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
 						break;
 					case "help":
-						reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
-						reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
-						reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
-						reply += "\n\n*_/combat initdm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
-						reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
-						reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
-						reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
-						reply += "\n\n*_/combat end_* - End the combat. You won't be able to start a new combat until you end the old one.";
-						reply += "\n\n*_/combat help_* - Prints this message.";
+						reply = helpText();
 						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 						return res.json(msgData);
 						break;
