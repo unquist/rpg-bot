@@ -283,9 +283,9 @@
   				for(var k = 0; k < combatantsArray.length; k++)
   				{
   					var order = k + 1;
-					if(combatantsArray[k].type == PC) {
+					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") @" + combatantsArray[k].name;
-					} else if (combatantsArray[k].type == MONSTER) {
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name;
 					}
   				}
@@ -371,9 +371,9 @@
 						firstPlayerName = combatantsArray[k].name;
 					}
 					
-					if(combatantsArray[k].type == PC) {
+					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") @" + combatantsArray[k].name;
-					} else if (combatantsArray[k].type == MONSTER) {
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name;
 					}					
 				}
@@ -455,9 +455,9 @@
 				reply += "\nHere is who has already rolled:";
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
-					if(combatantsArray[k].type == PC) {
+					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n@" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
-					} else if (combatantsArray[k].type == MONSTER) {
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
 					}
 					
@@ -473,18 +473,18 @@
 				var order = k + 1;
 				if(currentTurnIndex == k)
 				{
-					if(combatantsArray[k].type == PC) {
+					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*";
-					} else if (combatantsArray[k].type == MONSTER) {
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*";
 					}
 					
 				}
 				else
 				{
-					if(combatantsArray[k].type == PC) {
+					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") @" + combatantsArray[k].name;
-					} else if (combatantsArray[k].type == MONSTER) {
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name;
 					}
 				}
@@ -517,9 +517,9 @@
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
-					if(combatantsArray[k].type == PC) {
+					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
-					} else if (combatantsArray[k].type == MONSTER) {
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
 					}
 					
@@ -535,9 +535,9 @@
 			}
 			robot.brain.set('currentTurnIndex',currentTurnIndex);
 			var reply = ""
-			if(combatantsArray[currentTurnIndex].type == PC) {
+			if(combatantsArray[currentTurnIndex].type == PC_TYPE) {
 				reply = "Next turn started. @" +combatantsArray[currentTurnIndex].name+" is up!";
-			} else if (combatantsArray[currentTurnIndex].type == MONSTER) {
+			} else if (combatantsArray[currentTurnIndex].type == MONSTER_TYPE) {
 				reply = "Next turn started. " +combatantsArray[currentTurnIndex].name+" is up!";
 			}
 			
