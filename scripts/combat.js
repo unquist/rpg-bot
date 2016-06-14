@@ -23,8 +23,8 @@
         var util = require("util");
 		var hasProp = {}.hasOwnProperty;
 		
-		const var PC_TYPE = 0;
-		const var MONSTER_TYPE = 1;
+		const PC_TYPE = 0;
+		const MONSTER_TYPE = 1;
 		
 		var insult_adj = new Array ("artless","bawdy","beslubbering","bootless","brazen",
 		"churlish","cockered","clouted","craven","currish","dankish","dissembling",
