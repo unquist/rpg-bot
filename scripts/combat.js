@@ -624,8 +624,8 @@
 			{
 				var subcommand = match[1] || "invalid";
 				var parameters = match[3] || "";
-        robot.logger.debug("Subcommand recieved: ["+subcommand+"]");
-        robot.logger.debug("Parameters recieved: ["+parameters+"]");
+				robot.logger.debug("Subcommand recieved: ["+subcommand+"]");
+				robot.logger.debug("Parameters recieved: ["+parameters+"]");
 				switch(subcommand)
 				{
 					case "clearall":
@@ -645,28 +645,57 @@
 						return res.json(msgData);
 						break;
 					case "start":
-					  if(parameters != "")
-					  {
-					    var numCombatants = parameters.match(/\d+/i) || -1;
-					    if(numCombatants == -1)
-					    {
-					      reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
-					    }
-					    else
-					    {
-					      reply = combatStart(username,Number(numCombatants));
-					    }
-					  }
-					  else
-					  {
-					    reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
-					  }
-					  var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						if(parameters != "")
+						{
+							var numCombatants = parameters.match(/\d+/i) || -1;
+							if(numCombatants == -1)
+							{
+								reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
+							}
+							else
+							{
+								reply = combatStart(username,Number(numCombatants));
+							}
+						}
+						else
+						{
+							reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
+						}
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
 						break;
 					case "init":
+						var bonus = 0;
+						if(parameters != "")
+						{
+							bonus = parameters.match(/\d+/i) || 0;
+						}
+						reply = combatStart(username,Number(bonus));
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
 						break;
 					case "initdm":
+						if(parameters != "")
+						{
+							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
+							if(initdmParams == null)
+							{
+								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+							}
+							else
+							{
+								var bonus = initdmParams[1] || 0;
+								var numMonsters = initdmParams[2] || 0;
+								var monsterName = initdmParams[3] || "Nameless Horror";
+								reply = initdm(username,bonus,numMonsters,monsterName);
+							}
+						}
+						else
+						{
+							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+						}
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
 						break;
 					case "setinit":
 						break;
