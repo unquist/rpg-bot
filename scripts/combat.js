@@ -23,6 +23,8 @@
         var util = require("util");
 		var hasProp = {}.hasOwnProperty;
 		
+		const var PC_TYPE = 0;
+		const var MONSTER_TYPE = 1;
 		
 		var insult_adj = new Array ("artless","bawdy","beslubbering","bootless","brazen",
 		"churlish","cockered","clouted","craven","currish","dankish","dissembling",
@@ -104,19 +106,12 @@
             return randint(sides);
         };
 		
-		function Combatant (name,init) {
+		function Combatant (name,init,type) {
 			this.name = name;
 			this.init = Number(init);
+			this.type = Number(type);
 		};
- 
-		Combatant.prototype.getName = function() {
-			return this.name;
-		};
-		
-		Combatant.prototype.getInit = function() {
-			return this.init;
-		};
-		
+ 	
 		var combatantSortByName = function(a,b) {
 			var nameA=a.name.toLowerCase();
 			var nameB=b.name.toLowerCase();
@@ -267,7 +262,7 @@
   			
   			var initRoll = rolldie(20);
   			var initScore = initRoll + bonus;
-  			var newCombatant = new Combatant(callerName,initScore);
+  			var newCombatant = new Combatant(callerName,initScore,PC_TYPE);
   			robot.brain.set(callerName+"_initScore",initScore);
   			
   			combatantsArray.push(newCombatant);
@@ -288,9 +283,13 @@
   				for(var k = 0; k < combatantsArray.length; k++)
   				{
   					var order = k + 1;
-  					reply += "\n("+order+") @" + combatantsArray[k].name;
+					if(combatantsArray[k].type == PC) {
+						reply += "\n("+order+") @" + combatantsArray[k].name;
+					} else if (combatantsArray[k].type == MONSTER) {
+						reply += "\n("+order+") " + combatantsArray[k].name;
+					}
   				}
-  				reply += "\n*Let the bloodletting begin!*";
+  				reply += "\n*Let the fight begin!*";
   				return reply; 
   			}
   			else
@@ -333,7 +332,8 @@
 						
 			if((numRegisteredCombatants + numMonsters) > numTotalCombatants)
 			{
-				return "That's too many monsters for this combat @"+callerName+". I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots.";
+				var remainingSpots = numTotalCombatants - numRegisteredCombatants;
+				return "That's too many monsters for this combat @"+callerName+". You can add " + remainingSpots + " monsters maximum. I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots. ";
 			}
 			
 			
@@ -343,8 +343,8 @@
 			for(var k = 0; k < numMonsters; k++)
 			{
 				var index = k + 1;
-				var thisMonsterName = monsterName+"["+index+"]";
-				var newCombatant = new Combatant(thisMonsterName,initScore);
+				var thisMonsterName = monsterName+"["+index+"] the " + getRandomInsult();
+				var newCombatant = new Combatant(thisMonsterName,initScore,MONSTER_TYPE);
 				combatantsArray.push(newCombatant);
 			}
 			
@@ -368,13 +368,14 @@
 					var order = k + 1;
 					if(k == 0)
 					{
-						reply += "\n("+order+") _@" + combatantsArray[k].name + "_";
 						firstPlayerName = combatantsArray[k].name;
 					}
-					else
-					{
+					
+					if(combatantsArray[k].type == PC) {
 						reply += "\n("+order+") @" + combatantsArray[k].name;
-					}
+					} else if (combatantsArray[k].type == MONSTER) {
+						reply += "\n("+order+") " + combatantsArray[k].name;
+					}					
 				}
 				reply += "\n*@" + firstPlayerName + ", you're up first!*";
 				return reply; 
@@ -454,7 +455,12 @@
 				reply += "\nHere is who has already rolled:";
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
-					reply += "\n@" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
+					if(combatantsArray[k].type == PC) {
+						reply += "\n@" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
+					} else if (combatantsArray[k].type == MONSTER) {
+						reply += "\n" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
+					}
+					
 				}
 				return reply;
 				
@@ -467,11 +473,20 @@
 				var order = k + 1;
 				if(currentTurnIndex == k)
 				{
-					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*";
+					if(combatantsArray[k].type == PC) {
+						reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*";
+					} else if (combatantsArray[k].type == MONSTER) {
+						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*";
+					}
+					
 				}
 				else
 				{
-					reply += "\n("+order+") @" + combatantsArray[k].name;
+					if(combatantsArray[k].type == PC) {
+						reply += "\n("+order+") @" + combatantsArray[k].name;
+					} else if (combatantsArray[k].type == MONSTER) {
+						reply += "\n("+order+") " + combatantsArray[k].name;
+					}
 				}
 			}
 			return reply;
@@ -502,7 +517,12 @@
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
-					reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
+					if(combatantsArray[k].type == PC) {
+						reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
+					} else if (combatantsArray[k].type == MONSTER) {
+						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
+					}
+					
 				}
 				return reply;
 				
@@ -514,9 +534,14 @@
 				currentTurnIndex = 0;
 			}
 			robot.brain.set('currentTurnIndex',currentTurnIndex);
+			var reply = ""
+			if(combatantsArray[currentTurnIndex].type == PC) {
+				reply = "Next turn started. @" +combatantsArray[currentTurnIndex].name+" is up!";
+			} else if (combatantsArray[currentTurnIndex].type == MONSTER) {
+				reply = "Next turn started. " +combatantsArray[currentTurnIndex].name+" is up!";
+			}
 			
-			var reply = "Next turn started. @" +combatantsArray[currentTurnIndex].name+" is up!";
-      return reply;
+			return reply;
 		};
 	  
 	  /* begin 'hear' functions*/
