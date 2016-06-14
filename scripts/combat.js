@@ -631,7 +631,7 @@
 					case "clearall":
 						clearAll();
 						reply = "All combat data cleared.";
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 						return res.json(msgData);
 						break;
 					case "next":
@@ -670,7 +670,7 @@
 						{
 							bonus = parameters.match(/\d+/i) || 0;
 						}
-						reply = combatStart(username,Number(bonus));
+						reply = combatInit(username,Number(bonus));
 						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
 						break;
