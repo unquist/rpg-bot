@@ -21,6 +21,8 @@
 (function() {
     module.exports = function(robot) {
         var util = require("util");
+		var enemy_name = require('./enemy_name');
+
 		var hasProp = {}.hasOwnProperty;
 		
 		const PC_TYPE = 0;
@@ -106,8 +108,9 @@
             return randint(sides);
         };
 		
-		function Combatant (name,init,type) {
+		function Combatant (name,id,init,type) {
 			this.name = name;
+			this.id = id;
 			this.init = Number(init);
 			this.type = Number(type);
 		};
@@ -262,12 +265,14 @@
   			
   			var initRoll = rolldie(20);
   			var initScore = initRoll + bonus;
-  			var newCombatant = new Combatant(callerName,initScore,PC_TYPE);
+			numRegisteredCombatants += 1;
+			
+  			var newCombatant = new Combatant(callerName,numRegisteredCombatants,initScore,PC_TYPE);
   			robot.brain.set(callerName+"_initScore",initScore);
   			
   			combatantsArray.push(newCombatant);
   			robot.brain.set('combatantsArray',combatantsArray);
-  			numRegisteredCombatants += 1;
+
   			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
   			
   			//ready to start combat?
@@ -284,9 +289,9 @@
   				{
   					var order = k + 1;
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") @" + combatantsArray[k].name;
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name;
+						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					}
   				}
   				reply += "\n*Let the fight begin!*";
@@ -340,11 +345,13 @@
 			
 			var initRoll = rolldie(20);
 			var initScore = initRoll + Number(bonus);
+			var numCombatantsIndex = numRegisteredCombatants;
 			for(var k = 0; k < numMonsters; k++)
 			{
 				var index = k + 1;
-				var thisMonsterName = monsterName+"["+index+"] the " + getRandomInsult();
-				var newCombatant = new Combatant(thisMonsterName,initScore,MONSTER_TYPE);
+				numCombatantsIndex += 1;
+				var thisMonsterName = enemy_name.getRandomEnemyName() + " the " + monsterName;
+				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE);
 				combatantsArray.push(newCombatant);
 			}
 			
@@ -372,9 +379,9 @@
 					}
 					
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") @" + combatantsArray[k].name;
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name;
+						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					}					
 				}
 				reply += "\n*@" + firstPlayerName + ", you're up first!*";
@@ -474,18 +481,18 @@
 				if(currentTurnIndex == k)
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*";
+						reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*";
+						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
 					}
 					
 				}
 				else
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") @" + combatantsArray[k].name;
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name;
+						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					}
 				}
 			}
@@ -518,9 +525,9 @@
 				{
 					var order = k + 1;
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
+						reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  [id:"+combatantsArray[k].id+"]";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")";
+						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  [id:"+combatantsArray[k].id+"]";
 					}
 					
 				}
