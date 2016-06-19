@@ -506,13 +506,19 @@
 			return reply;
 		};
 	  
+	  var addCombatant = function(callerName,bonus)
+	  {
+	  
+	  };
+	  
 	  /* begin 'hear' functions*/
+	  /*
 	  robot.hear(/(combat_clean_names)/i, function(msg) {
 			var names = enemy_name.cleanNames();			
 			robot.logger.debug(util.inspect(names));
 			return msg.reply("names inspected.");
 		});
-	  
+	  */
 	  robot.hear(/(combat_hear clearall)/i, function(msg) {
 			var callerName = msg.message.user.name;			
 			clearAll();
