@@ -92,6 +92,8 @@ var insult_adj = new Array ("Artless","Bawdy","Beslubbering","Bootless","Brazen"
 
 var insult_nouns = new Array ("Apple-John","Baggage","Barnacle","Bladder","Boar-Pig","Bugbear", "Bum-Bailey","Canker-Blossom","Clack-Dish","Clotpole","Coxcomb","Codpiece", "Crutch","Cutpurse","Death-Token","Dewberry","Dogfish","Egg-Shell", "Flap-Dragon","Flax-Wench","Flirt-Gill","Foot-Licker","Fustilarian","Giglet", "Gudgeon","Gull-Catcher","Haggard","Harpy","Hedge-Pig","Hempseed", "Hedge-Pig","Horn-Beast","Hugger-Mugger","Jack-A-Nape","Jolthead", "Lewdster","Lout","Maggot-Pie","Malignancy","Malkin","Malt-Worm","Mammet", "Manikin", "Measle","Minimus","Minnow","Miscreant","Moldwarp", "Mumble-News","Nut-Hook","Pantaloon","Pigeon-Egg","Pignut","Puttock", "Pumpion","Rabbit-Sucker","Rampallion","Ratsbane","Remnant","Rudesby", "Ruffian","Scantling","Scullion","Scut","Skainsmate","Snipe","Strumpet", "Varlot","Vassal","Waterfly","Whey-Face","Whipster","Wagtail","Younker",'Abydocomist', 'Bedswerver', 'Bespawler', 'Bobolyne', 'Cumberworld', 'Dalcop', 'Dew-Beater', 'Dorbel', 'Drate-Poke', 'Driggle-Draggle', 'Fopdoodle', 'Fustylugs', 'Fustilarian', 'Gillie-Wet-Foot', 'Gnashgab', 'Gobermouch', 'Gowpenful-O-Anything','Klazomaniac', 'Leasing-Monger', 'Loiter-Sack', 'Lubberwort', 'Muck-Spout', 'Mumblecrust', 'Quisby', 'Raggabrash', 'Rakefire', 'Roiderbanks', 'Saddle-Goose', 'Scobberlotcher', 'Skelpie-Limmer', 'Smell-Feast', 'Smellfungus', 'Snoutband', 'Sorner', 'Stampcrab', 'Stymphalist', 'Tallowcatch', 'Triptaker', 'Wandought', 'Whiffle-Whaffle', 'Yaldson', 'Zoilist'); 
 
+var epithets = new Array ('the Peculiar' , 'the Potbelly' , 'the Disinherited' , 'the Slobberer' , 'the One-Eyed' , 'the Grim' , 'the Loser' , 'the Fratricide' , 'the Hairy-Footed' , 'the Strict' , 'the Fanged' , 'the Gouty' , 'the Fat' , 'the Idiot' , 'the Accursed' , 'the Speckled' , 'the Priest-Hater' , 'the Fart' , 'the Bellringer' , 'the Bomb' , 'the Fickle' , 'the Bitten' , 'the Leprous' , 'the Trembler' , 'the Crazy' , 'the Bad' , 'the Lousy' , 'the Impotent' , 'the Cabbage' , 'the Boneless' , 'the Lame' , 'the Mad' , 'the Slit-Nosed' , 'the Luxurious' , 'the Debonaire' , 'the Good-For-Nothing' , 'the Stammerer' , 'the Unavoidable' , 'the Sausage-Maker' , 'the Caulker' , 'the Titbit' , 'the Short' , 'the Unfortunate' , 'the Hoarse' , 'the Caped' , 'Of-the-Heads' , 'the Cross-Eyed' , 'the Big' , 'the Hairy' , 'the Bastard' , 'the Silent' , 'the Elbow-High' , 'the Hermit' , 'the Butcher' , 'the Mighty' , 'the Unjust' , 'the Cruel' , 'the Attacker' , 'the Fearless' , 'the Bloody' , 'the Mean' , 'the Scarred ' , 'the Killer' , 'the Ugly' , 'the Warmonger' , 'the Pale' , 'the Strong' , 'the Swift-footed' , 'the Proud' , 'the Horse-breaker' , 'the Prudent' , 'the Boxer ' , 'the Loose-tongued ' , 'the Hyena' , 'the Jackal' , 'the Unshorn' , 'the Curse of men ' , 'the Brazen ' , 'the Monstrous' , 'the Sacker of cities' , 'the Raging' , 'the Dreaded' , 'the Earth-shaker' , 'the Encircler' , 'the Pompous' );
+
 var getRandomInsult = function() {
 	var result = "the ";
 	var a = Math.floor(Math.random()*insult_adj.length);
@@ -103,28 +105,29 @@ var getRandomInsult = function() {
 		
 var getRandomEnemyName = function() {
 	/*
-	35% of names are singular names
-	35% should be two names
+	30% of names are singular names
+	25% should be two names
 	15% should be name + insult noun
 	15% should be insult adjective + noun
+	15% should be name + epithet
 	*/
 	//get a number from 1 to 100
 	var probability = Math.round(Math.random() * (99)) + 1;
 	
-	if(probability <= 35)
+	if(probability <= 30)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
 		var indexB = Math.floor(Math.random()*names.length);
 		var name = names[indexA] + " " +names[indexB];
 		return name;
 	}
-	else if(probability <= 70)
+	else if(probability <= 55)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
 		var name = names[indexA];
 		return name;	
 	}
-	else if(probability <= 85)
+	else if(probability <= 70)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
 		var name = names[indexA];
@@ -133,7 +136,7 @@ var getRandomEnemyName = function() {
 		var insult = insult_nouns[indexB];
 		return name + " " + insult;	
 	}
-	else
+	else if(probability <= 85)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
 		var name = names[indexA];
@@ -141,6 +144,15 @@ var getRandomEnemyName = function() {
 		var indexB = Math.floor(Math.random()*insult_adj.length);
 		var insult = insult_adj[indexB];
 		return insult + " " + name;	
+	}
+	else
+	{
+	  var indexA = Math.floor(Math.random()*names.length);
+		var name = names[indexA];
+		
+		var indexB = Math.floor(Math.random()*insult_nouns.length);
+		var epithet = epithets[indexB];
+		return name + " " + epithet;	
 	}
 };
 
