@@ -39,6 +39,7 @@
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat add [BONUS]_* - Use this to add a player to a combat that has already started. BONUS is your Dex. initiative bonus.";
 			reply += "\n\n*_/combat add-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can use this to add new monsters to a fight that has already started.";
+			reply += "\n\n*_/combat kill [ID] - Remove combatant with [ID] from the combat.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
 			return reply;
@@ -690,7 +691,114 @@
 		  	
 		};
 		
+	  var combatKill = function(callerName,combatantId) {
+		var combat_started = robot.brain.get('combat_flag');
+		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+		//array of players
+		var combatantsArray = robot.brain.get('combatantsArray');
+		var numTotalCombatants = robot.brain.get('numTotalCombatants');
 		
+		if(combat_started != 0 && combat_started != 1)
+		{
+  			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			robot.brain.set('combat_flag', 0);
+			return "No combat started @"+callerName+". Begin with `/combat start`";
+		}  
+		if(combat_started == 0)
+		{
+			return "Don't get trigger happy @"+callerName+". Need to start combat and roll initiative before you remove anyone...";
+		}
+	    
+		var indexOfCombatantToBeKilled = -1;
+		for(var i = 0; i< combatantsArray.length; i++)
+		{
+			var currentCombatant = combatantsArray[i];
+			if(currentCombatant.id == combatantId)
+			{
+				indexOfCombatantToBeKilled = i;
+				break;
+			}
+		}
+		
+		if(indexOfCombatantToBeKilled == -1)
+		{
+			return "Could not find a combatant with ID `"+combatantId+"`.";
+		}
+		
+		//we've located the correct player. Need to remove from array, erase any redis data.
+		// do we need to treat monsters and PCs differently???
+		
+		//if we don't have everyone, just reduce the number of registered
+		// combatants by 1.  If the fight has already started, decremement
+		// both the registered fighters and the total number.
+		if(numRegisteredCombatants < numTotalCombatants)
+	    {
+			combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
+		}
+		else 
+  		{
+  			var currentTurnIndex = robot.brain.get('currentTurnIndex');
+		}
+  			
+		var key;
+		for (key in robot.brain.data._private) 
+		{
+			if(!hasProp.call(robot.brain.data._private, key)) continue;
+			robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+			if(key.indexOf("_initScore") != -1)
+			{
+				delete robot.brain.data._private[key];
+			}
+		}	
+  		robot.logger.debug("Kill request from " + callerName + " for ID [" + combatantId + "]");
+  			
+  			
+		
+		//now add the new player and resort the array
+  		combatantsArray.push(newCombatant);
+  		combatantsArray = combatantsArray.sort(combatantSortByInit);
+		
+		//loop through the array, find the player whose turn it is, and reset the index
+		for(var i = 0; i < combatantsArray.length; i++)
+		{
+			if(combatantsArray[i].id == currentCombatant.id)
+			{
+				currentTurnIndex = i;
+				robot.brain.set('currentTurnIndex',currentTurnIndex);
+			}
+		}
+		
+		robot.brain.set('combatantsArray',combatantsArray);
+
+  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+  		robot.brain.set('numTotalCombatants',numTotalCombatants);
+  		
+		//now construct our response_type
+		var reply = "New player @"+callerName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
+		for(var k = 0; k < combatantsArray.length; k++)
+		{
+			var order = k + 1;
+			if(currentTurnIndex == k)
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+				}
+				
+			}
+			else
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+				}
+			}
+		}
+		return reply;		
+		  
+	  };
 		
 		
 	  /* begin 'hear' functions*/
@@ -957,6 +1065,26 @@
 					case "help":
 						reply = helpText();
 						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+						return res.json(msgData);
+						break;
+					case "kill":
+						if(parameters != "")
+						{
+							var playerID = parameters.match(/\d+/i) || -1;
+							if(playerID == -1)
+							{
+								reply = "Need to specify the id of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
+							}
+							else
+							{
+								reply = combatKill(username,Number(playerID));
+							}
+						}
+						else
+						{
+							reply = "Need to specify the id of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
+						}
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
 						break;
 					default:
