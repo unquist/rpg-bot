@@ -210,7 +210,7 @@
 		  	}
 			  else if(robot.brain.get(callerName+"_initScore") != null)
   			{
-  				return "@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use `combat setinit [init]` to manually fix your initiative up until the start of combat.";
+  				return "@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use *_/combat setinit [init]_* to manually fix your initiative, up until the start of combat.";
   			}
   			
   			
@@ -566,7 +566,7 @@
   		robot.brain.set('numTotalCombatants',numTotalCombatants);
   		
 		//now construct our response_type
-		var reply = "Added new player @"+callerName+" with initiative `"+initScore+"`. Here is the new order, with current combatant highlighted:"; 
+		var reply = "New player @"+callerName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for totaL initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
 		for(var k = 0; k < combatantsArray.length; k++)
 		{
 			var order = k + 1;
