@@ -621,7 +621,7 @@
   		var initScore = initRoll + Number(bonus);
 		
 		var numCombatantsIndex = numRegisteredCombatants;
-		var newMonsterCombatants = new Array[];
+		var newMonsterCombatants = new Array();
 		for(var k = 0; k < numMonsters; k++)
 		{
 			var index = k + 1;
