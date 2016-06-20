@@ -28,23 +28,21 @@
 		const PC_TYPE = 0;
 		const MONSTER_TYPE = 1;
 		
-
-
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
-			reply += "\n\n*_/combat initdm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
+			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
 			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
-			reply += "\n\n*_/combat end_* - End the combat. You won't be able to start a new combat until you end the old one.";
+			reply += "\n\n*_/combat add [BONUS]_* - Use this to add a player to a combat that has already started. BONUS is your Dex. initiative bonus.";
+			reply += "\n\n*_/combat add-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can use this to add new monsters to a fight that has already started.";
+			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
 			return reply;
 		};
-		
-		
 		
 		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
@@ -345,7 +343,7 @@
 			else
 			{
 				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
-				return "@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+" for " + numMonsters + " " + monsterName + ".\nStill waiting on "+stillNeeded+" combatants."; 
+				return "@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".\nStill waiting on "+stillNeeded+" combatants."; 
 			}
 		};
 		
@@ -506,11 +504,185 @@
 			return reply;
 		};
 	  
-	  var addCombatant = function(callerName,bonus)
-	  {
-	  
+	  var combatAdd = function(callerName,bonus) {
+		var combat_started = robot.brain.get('combat_flag');
+		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+		//array of players
+		var combatantsArray = robot.brain.get('combatantsArray');
+		var numTotalCombatants = robot.brain.get('numTotalCombatants');
+		
+		if(combat_started != 0 && combat_started != 1)
+		{
+  			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			robot.brain.set('combat_flag', 0);
+			return "No combat started @"+callerName+". Begin with `/combat start`";
+		}  
+		if(combat_started == 0)
+		{
+			return "Don't get trigger happy @"+callerName+". Need to start combat and roll initiative before you add yourself...";
+		}
+	    else if(numRegisteredCombatants < numTotalCombatants)
+	    {
+			return "No need to use *_add_* right @"+callerName+". Try *_/combat init [BONUS]_* to roll for initiative and join the fight.";
+		}
+		else if(robot.brain.get(callerName+"_initScore") != null)
+  		{
+  			return "@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use `combat setinit [init]` to manually fix your initiative up until the start of combat.";
+  		}
+  			
+  			
+  		robot.logger.debug("Add request from " + callerName + " with bonus of [" + bonus + "]");
+  			
+  		var initRoll = rolldie(20);
+  		var initScore = initRoll + bonus;
+		numRegisteredCombatants += 1;
+		numTotalCombatants += 1;
+			
+  		var newCombatant = new Combatant(callerName,numRegisteredCombatants,initScore,PC_TYPE);
+  		robot.brain.set(callerName+"_initScore",initScore);
+  			
+		//now we have the new combatant and their init. But need to make sure the turn counter 
+		// stays correct before re-sorting.
+		var currentTurnIndex = Number(robot.brain.get('currentTurnIndex'));
+		var currentCombatant = combatantsArray[currentTurnIndex];
+		
+		//now add the new player and resort the array
+  		combatantsArray.push(newCombatant);
+  		combatantsArray = combatantsArray.sort(combatantSortByInit);
+		
+		//loop through the array, find the player whose turn it is, and reset the index
+		for(var i = 0; i < combatantsArray.length; i++)
+		{
+			if(combatantsArray[i].id == currentCombatant.id)
+			{
+				currentTurnIndex = i;
+				robot.brain.set('currentTurnIndex',currentTurnIndex);
+			}
+		}
+		
+		robot.brain.set('combatantsArray',combatantsArray);
+
+  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+  		robot.brain.set('numTotalCombatants',numTotalCombatants);
+  		
+		//now construct our response_type
+		var reply = "Added new player @"+callerName+" with initiative `"+initScore+"`. Here is the new order, with current combatant highlighted:"; 
+		for(var k = 0; k < combatantsArray.length; k++)
+		{
+			var order = k + 1;
+			if(currentTurnIndex == k)
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+				}
+				
+			}
+			else
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+				}
+			}
+		}
+		return reply;		
+		  
 	  };
 	  
+	  var combatAddDM = function(callerName,bonus,numMonsters,monsterName) {
+			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
+			var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return "No combat started @"+callerName+". Begin with `/combat start`";
+			}  
+			if(combat_started == 0)
+			{
+				return "Don't get trigger happy @"+callerName+". Need to start combat before you roll initiative...";
+			}
+			else if(numTotalCombatants == numRegisteredCombatants)
+			{
+				return "This combat is full up @"+callerName+". Add your self to the fight with `combat add [initiative bonus]`";
+			}
+			
+			
+			robot.logger.debug("Adding [" + numMonsters + "] to the combat");
+			robot.logger.debug("Number of registered = " + numRegisteredCombatants);
+			robot.logger.debug("Total number of combatants = " + numTotalCombatants);
+						
+			if((numRegisteredCombatants + numMonsters) > numTotalCombatants)
+			{
+				var remainingSpots = numTotalCombatants - numRegisteredCombatants;
+				return "That's too many monsters for this combat @"+callerName+". You can add " + remainingSpots + " monsters maximum. I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots. ";
+			}
+			
+			
+			
+			var initRoll = rolldie(20);
+			var initScore = initRoll + Number(bonus);
+			var numCombatantsIndex = numRegisteredCombatants;
+			for(var k = 0; k < numMonsters; k++)
+			{
+				var index = k + 1;
+				numCombatantsIndex += 1;
+				var thisMonsterName = enemy_name.getRandomEnemyName() + " the " + monsterName;
+				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE);
+				combatantsArray.push(newCombatant);
+			}
+			
+			robot.brain.set('combatantsArray',combatantsArray);
+			numRegisteredCombatants += numMonsters;
+			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			
+			//ready to start combat?
+			if(numRegisteredCombatants == numTotalCombatants)
+			{
+				var reply = "@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
+				reply += "\nAll Combatants accounted for.";
+				reply += "\nHere is the combat order:";
+				
+				combatantsArray = combatantsArray.sort(combatantSortByInit);
+				robot.brain.set('combatantsArray',combatantsArray);
+				robot.brain.set('currentTurnIndex',0);
+				var firstPlayerName = "";
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					var order = k + 1;
+					if(k == 0)
+					{
+						firstPlayerName = combatantsArray[k].name;
+					}
+					
+					if(combatantsArray[k].type == PC_TYPE) {
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+					}					
+				}
+				reply += "\n*@" + firstPlayerName + ", you're up first!*";
+				return reply; 
+			}
+			else
+			{
+				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
+				return "@" + callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+" for " + numMonsters + " " + monsterName + ".\nStill waiting on "+stillNeeded+" combatants."; 
+			}
+		};
+		
+		
+		
+		
 	  /* begin 'hear' functions*/
 	  /*
 	  robot.hear(/(combat_clean_names)/i, function(msg) {
@@ -561,7 +733,7 @@
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/combat_hear initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
+		robot.hear(/combat_hear init-dm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var bonus = msg.match[2] || 0;
 			
@@ -687,13 +859,13 @@
 						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
 						break;
-					case "initdm":
+					case "init-dm":
 						if(parameters != "")
 						{
 							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
 							if(initdmParams == null)
 							{
-								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 							}
 							else
 							{
@@ -707,7 +879,42 @@
 						}
 						else
 						{
-							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+						}
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
+						break;
+					case "add":
+						var bonus = 0;
+						if(parameters != "")
+						{
+							bonus = parameters.match(/\d+/i) || 0;
+						}
+						reply = combatAdd(username,Number(bonus));
+						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						return res.json(msgData);
+						break;
+					case "add-dm":
+						if(parameters != "")
+						{
+							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
+							if(initdmParams == null)
+							{
+								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+							}
+							else
+							{
+								var bonus = initdmParams[1] || 0;
+								bonus = Number(bonus);
+								var numMonsters = initdmParams[2] || 0;
+								numMonsters = Number(numMonsters);
+								var monsterName = initdmParams[3] || "Nameless Horror";
+								reply += initdm(username,bonus,numMonsters,monsterName);
+							}
+						}
+						else
+						{
+							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 						}
 						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
