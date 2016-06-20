@@ -33,7 +33,7 @@
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
-			reply += "\n\n*_/combat initdm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
+			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
 			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
@@ -611,7 +611,7 @@
 		}
 	    else if(numRegisteredCombatants < numTotalCombatants)
 	    {
-			return "No need to use *_add_* right now @"+callerName+". Try *_/combat initdm [BONUS] [NUM MONSTERS] [NAME]_* to roll initiative for a few monsters.";
+			return "No need to use *_add_* right now @"+callerName+". Try *_/combat init-dm [BONUS] [NUM MONSTERS] [NAME]_* to roll initiative for a few monsters.";
 		}
  			
   			
@@ -743,7 +743,7 @@
 			return msg.reply(reply);
 		});
 		
-		robot.hear(/combat_hear initdm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
+		robot.hear(/combat_hear init-dm(\s){0,1}(\d+){0,1}(\s){0,1}(\d+){0,1}(\s){0,1}([a-z]*){0,1}$/i, function(msg) {
 			var callerName = msg.message.user.name;
 			var bonus = msg.match[2] || 0;
 			
@@ -875,7 +875,7 @@
 							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
 							if(initdmParams == null)
 							{
-								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 							}
 							else
 							{
@@ -889,7 +889,7 @@
 						}
 						else
 						{
-							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 						}
 						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
@@ -907,24 +907,24 @@
 					case "add-dm":
 						if(parameters != "")
 						{
-							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
-							if(initdmParams == null)
+							var addDmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
+							if(addDmParams == null)
 							{
-								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 							}
 							else
 							{
-								var bonus = initdmParams[1] || 0;
+								var bonus = addDmParams[1] || 0;
 								bonus = Number(bonus);
-								var numMonsters = initdmParams[2] || 0;
+								var numMonsters = addDmParams[2] || 0;
 								numMonsters = Number(numMonsters);
-								var monsterName = initdmParams[3] || "Nameless Horror";
-								reply += initdm(username,bonus,numMonsters,monsterName);
+								var monsterName = addDmParams[3] || "Nameless Horror";
+								reply += combatAddDM(username,bonus,numMonsters,monsterName);
 							}
 						}
 						else
 						{
-							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat initdm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat add-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 						}
 						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
