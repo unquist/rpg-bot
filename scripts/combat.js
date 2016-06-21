@@ -65,6 +65,7 @@
 		function Combatant (name,id,init,type) {
 			this.name = name;
 			this.id = id;
+			this.tieBreaker = rolldie(10000);
 			this.init = Number(init);
 			this.type = Number(type);
 		};
@@ -85,6 +86,17 @@
 			if (initA < initB) //sort int descending
 				return 1 
 			if (initA > initB)
+				return -1
+			//if the initiatives are tied, sort by the tie breaker score.
+			return combatantSortByTieBreaker(a,b) //default return value (no sorting) 
+		};
+		
+		var combatantSortByTieBreaker = function(a,b) {
+			var tieBreakerA=a.tieBreaker;
+			var tieBreakerB=b.tieBreaker;
+			if (tieBreakerA < tieBreakerB) //sort int descending
+				return 1 
+			if (tieBreakerA > tieBreakerA)
 				return -1
 			return 0 //default return value (no sorting) 
 		};
