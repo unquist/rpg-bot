@@ -782,7 +782,7 @@
 	  {
 			numRegisteredCombatants -= 1;
 			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-			combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
+			combatantsArray.splice(indexOfCombatantToBeKilled,1);
 			robot.brain.set('combatantsArray',combatantsArray);
 			var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
 			return "Removed " +combatantToBeKilled.name + " before the fight started. Still looking for " + combatantsLeft + " to start the fight.";
@@ -801,7 +801,7 @@
   		var currentPlayer = combatantsArray[currentTurnIndex];
   		
   		//remove the killed player from the combatantsArray
-  		combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
+  		combatantsArray.splice(indexOfCombatantToBeKilled,1);
   		robot.brain.set('combatantsArray',combatantsArray);
   		//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
   		if(currentPlayer.id == combatantToBeKilled.id)
