@@ -121,7 +121,8 @@ var getRandomEnemyName = function() {
 	*/
 	//get a number from 1 to 100
 	var probability = Math.round(Math.random() * (99)) + 1;
-	
+	return "mud";
+	/*
 	if(probability <= 30)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
@@ -169,6 +170,7 @@ var getRandomEnemyName = function() {
 		robot.logger.debug("Returning name + epithet ["+name+"]");
 		return name;
 	}
+	*/
 };
 
 var cleanNames = function() {
