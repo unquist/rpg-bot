@@ -725,15 +725,20 @@
 			return "Could not find a combatant with ID `"+combatantId+"`.";
 		}
 		
+		var combatantToBeKilled = combatantsArray[indexOfCombatantToBeKilled];
+		
 		//we've located the correct player. Need to remove from array, erase any redis data.
 		// do we need to treat monsters and PCs differently???
 		
 		//if we don't have everyone, just reduce the number of registered
 		// combatants by 1.  If the fight has already started, decremement
 		// both the registered fighters and the total number.
+		if(
+		
+		
 		if(numRegisteredCombatants < numTotalCombatants)
 	    {
-			combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
+			
 		}
 		else 
   		{
@@ -750,6 +755,8 @@
 				delete robot.brain.data._private[key];
 			}
 		}	
+		
+		combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
   		robot.logger.debug("Kill request from " + callerName + " for ID [" + combatantId + "]");
   			
   			
