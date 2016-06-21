@@ -28,6 +28,14 @@
 		const PC_TYPE = 0;
 		const MONSTER_TYPE = 1;
 		
+		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out their chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined their ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleep with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'return to dust' ,'walked the plank')
+		
+		var getRandomDeathEuphemism = function() {
+		  var index = Math.floor(Math.random()*death_euphemisms.length);
+		  var euphemism = death_euphemisms[index];
+      return euphemism; 
+		}
+		
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
@@ -729,7 +737,8 @@
 		{
 			return "Don't get trigger happy @"+callerName+". Need to start combat and roll initiative before you remove anyone...";
 		}
-	    
+	 
+	 robot.logger.debug("Kill request from " + callerName + " for ID [" + combatantId + "]");   
 		var indexOfCombatantToBeKilled = -1;
 		for(var i = 0; i< combatantsArray.length; i++)
 		{
@@ -749,85 +758,101 @@
 		var combatantToBeKilled = combatantsArray[indexOfCombatantToBeKilled];
 		
 		//we've located the correct player. Need to remove from array, erase any redis data.
-		// do we need to treat monsters and PCs differently???
-		
+	
+	  //PCs have special redis data to prevent them from rolling init too many times. Need to erase it.	
 		if(combatantToBeKilled.type == PC_TYPE) {
-			
-		} else if (combatantToBeKilled.type == MONSTER_TYPE) {
-			
-		}
+		  try
+		  {
+		    var key = combatantToBeKilled.name+"_initScore";
+		    robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+		    if(hasProp.call(robot.brain.data._private, key))
+		    {
+		      delete robot.brain.data._private[key];
+		    }
+		  }
+		  catch(err)
+		  {
+		    robot.logger.debug("Caught error trying to delete key in Kill function ->" + err.message);
+		  }
+		} 
 		
 		
 		//if we don't have everyone, just reduce the number of registered combatants by 1.  
 		if(numRegisteredCombatants < numTotalCombatants)
 	  {
-			
+			numRegisteredCombatants -= 1;
+			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
+			robot.brain.set('combatantsArray',combatantsArray);
+			var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
+			return "Removed " +combatantToBeKilled.name + " before the fight started. Still looking for " + combatantsLeft + " to start the fight.";
 		}
-		else // If the fight has already started, decremement both the registered fighters and the total number. Need to keep the turn counter correct too.
+		else 
   	{
-  			var currentTurnIndex = robot.brain.get('currentTurnIndex');
-		}
-  			
-		var key;
-		for (key in robot.brain.data._private) 
-		{
-			if(!hasProp.call(robot.brain.data._private, key)) continue;
-			robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
-			if(key.indexOf("_initScore") != -1)
-			{
-				delete robot.brain.data._private[key];
-			}
-		}	
-		
-		combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
-  		robot.logger.debug("Kill request from " + callerName + " for ID [" + combatantId + "]");
-  			
-  			
-		
-		//now add the new player and resort the array
-  		combatantsArray.push(newCombatant);
-  		combatantsArray = combatantsArray.sort(combatantSortByInit);
-		
-		//loop through the array, find the player whose turn it is, and reset the index
-		for(var i = 0; i < combatantsArray.length; i++)
-		{
-			if(combatantsArray[i].id == currentCombatant.id)
-			{
-				currentTurnIndex = i;
-				robot.brain.set('currentTurnIndex',currentTurnIndex);
-			}
-		}
-		
-		robot.brain.set('combatantsArray',combatantsArray);
-
-  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-  		robot.brain.set('numTotalCombatants',numTotalCombatants);
+  	  // If the fight has already started, decremement both the registered fighters and the total number. 
+  	  // Need to keep the turn counter correct too.
+  	  // We shouldn't need to reshuffle the array b/c it's already in the correct order.
+  	  numRegisteredCombatants -= 1;
+  	  numTotalCombatants -= 1;
+  	  robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+  	  robot.brain.set('numTotalCombatants',numTotalCombatants);
+  	  
+  		var currentTurnIndex = robot.brain.get('currentTurnIndex');
+  		var currentPlayer = combatantsArray[currentTurnIndex];
   		
-		//now construct our response_type
-		var reply = "New player @"+callerName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
-		for(var k = 0; k < combatantsArray.length; k++)
-		{
-			var order = k + 1;
-			if(currentTurnIndex == k)
-			{
-				if(combatantsArray[k].type == PC_TYPE) {
-					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
-				}
-				
-			}
-			else
-			{
-				if(combatantsArray[k].type == PC_TYPE) {
-					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
-				}
-			}
+  		//remove the killed player from the combatantsArray
+  		combatantsArray = combatantsArray.splice(indexOfCombatantToBeKilled,1);
+  		robot.brain.set('combatantsArray',combatantsArray);
+  		//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
+  		if(currentPlayer.id == combatantToBeKilled.id)
+  		{
+  		  currentTurnIndex += 1;
+  		  if(currentTurnIndex > combatantsArray.length)
+  		  {
+  		    currentTurnIndex = 0;
+  		  }
+  		  robot.brain.set('currentTurnIndex',currentTurnIndex);
+  		}
+  		else
+  	  {
+  	    //we know who's turn it should be. Just need to reset the turn index to the correct value.
+  	    for(var k = 0; k < combatantsArray.length; k++)
+  	    {
+  	      if(combatantsArray[k].id == currentPlayer.id)
+  	      {
+  	        currentTurnIndex = k;
+  	        robot.brain.set('currentTurnIndex',currentTurnIndex);
+  	        break;
+  	      }
+  	    }
+  	  }
+  		
+  		//now construct our response message.
+  		var reply = combatantToBeKilled.name + " "  + getRandomDeathEuphemism() + ". Here's who's still standing:"
+  		for(var k = 0; k < combatantsArray.length; k++)
+  		{
+  			var order = k + 1;
+  			if(currentTurnIndex == k)
+  			{
+  				if(combatantsArray[k].type == PC_TYPE) {
+  					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+  				}
+  				
+  			}
+  			else
+  			{
+  				if(combatantsArray[k].type == PC_TYPE) {
+  					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+  					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+  				}
+  			}
+  		}
+  		return reply;		
 		}
-		return reply;		
-		  
+
 	  };
 		
 		
