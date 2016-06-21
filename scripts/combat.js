@@ -1010,7 +1010,7 @@
 					case "init-dm":
 						if(parameters != "")
 						{
-							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
+							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+(.+)/i) || null;
 							if(initdmParams == null)
 							{
 								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
@@ -1045,7 +1045,7 @@
 					case "add-dm":
 						if(parameters != "")
 						{
-							var addDmParams = parameters.match(/(\d+)\s+(\d+)\s+([a-z]+)/i) || null;
+							var addDmParams = parameters.match(/(\d+)\s+(\d+)\s+(.+)/i) || null;
 							if(addDmParams == null)
 							{
 								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
