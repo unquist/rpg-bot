@@ -752,7 +752,7 @@
 		
 		if(indexOfCombatantToBeKilled == -1)
 		{
-			return "Could not find a combatant with ID `"+combatantId+"`.";
+			return "Could not find a combatant with id `"+combatantId+"`.";
 		}
 		
 		var combatantToBeKilled = combatantsArray[indexOfCombatantToBeKilled];
@@ -800,21 +800,41 @@
   		var currentTurnIndex = robot.brain.get('currentTurnIndex');
   		var currentPlayer = combatantsArray[currentTurnIndex];
   		
-  		//remove the killed player from the combatantsArray
-  		combatantsArray.splice(indexOfCombatantToBeKilled,1);
-  		robot.brain.set('combatantsArray',combatantsArray);
+  		
   		//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
   		if(currentPlayer.id == combatantToBeKilled.id)
   		{
-  		  currentTurnIndex += 1;
-  		  if(currentTurnIndex > combatantsArray.length)
+  		
+  		  //set the index to whomever comes after them.
+  		  var newCurrentPlayer;
+  		  if((currentTurnIndex+1) > combatantsArray.length)
   		  {
-  		    currentTurnIndex = 0;
+  		    newCurrentPlayer = combatantsArray[0];
   		  }
-  		  robot.brain.set('currentTurnIndex',currentTurnIndex);
+  		  else
+  		  {
+  		    newCurrentPlayer = combatantsArray[currentTurnIndex+1];
+  		  }
+  		  
+  		  //remove the killed player from the combatantsArray
+  	  	combatantsArray.splice(indexOfCombatantToBeKilled,1);
+  		  robot.brain.set('combatantsArray',combatantsArray);
+  		  for(var k = 0; k < combatantsArray.length; k++)
+  	    {
+  	      if(combatantsArray[k].id == newCurrentPlayer.id)
+  	      {
+  	        currentTurnIndex = k;
+  	        robot.brain.set('currentTurnIndex',currentTurnIndex);
+  	        break;
+  	      }
+  	    }
   		}
   		else
   	  {
+  	    //remove the killed player from the combatantsArray
+  		  combatantsArray.splice(indexOfCombatantToBeKilled,1);
+  		  robot.brain.set('combatantsArray',combatantsArray);
+  		  
   	    //we know who's turn it should be. Just need to reset the turn index to the correct value.
   	    for(var k = 0; k < combatantsArray.length; k++)
   	    {
