@@ -264,9 +264,9 @@
   				{
   					var order = k + 1;
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					}
   				}
   				
@@ -356,9 +356,9 @@
 				{
 					var order = k + 1;
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					}					
 				}
 				
@@ -446,9 +446,9 @@
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n@" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
+						reply += "\n@" + combatantsArray[k].name + " _[id:"+combatantsArray[k].id+"]_ rolled `" +combatantsArray[k].init+"`.";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n" + combatantsArray[k].name + " rolled `" +combatantsArray[k].init+"`.";
+						reply += "\n" + combatantsArray[k].name + " _[id:"+combatantsArray[k].id+"]_ rolled `" +combatantsArray[k].init+"`.";
 					}
 					
 				}
@@ -464,18 +464,18 @@
 				if(currentTurnIndex == k)
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 					
 				}
 				else
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") @" + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 				}
 			}
@@ -508,9 +508,9 @@
 				{
 					var order = k + 1;
 					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n@" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  _[id:"+combatantsArray[k].id+"]_";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  [id:"+combatantsArray[k].id+"]";
+						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 					
 				}
@@ -603,18 +603,18 @@
 			if(currentTurnIndex == k)
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
-					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 				
 			}
 			else
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
-					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") @" + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 			}
 		}
@@ -701,18 +701,18 @@
 			if(currentTurnIndex == k)
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
-					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 				
 			}
 			else
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
-					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") @" + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 			}
 		}
@@ -835,18 +835,18 @@
   			if(currentTurnIndex == k)
   			{
   				if(combatantsArray[k].type == PC_TYPE) {
-  					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+  					reply += "\n("+order+") *_@" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
   				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  [id:"+combatantsArray[k].id+"]";
+  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
   				}
   				
   			}
   			else
   			{
   				if(combatantsArray[k].type == PC_TYPE) {
-  					reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+  					reply += "\n("+order+") @" + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
   				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-  					reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
+  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
   				}
   			}
   		}
