@@ -202,7 +202,7 @@
 			   
 			   
 			   robot.brain.set('combat_flag', 1);
-			   return "@"+callerName+" started combat with " + numCombatants + " belligerents. Everyone in @channel roll for initiative with the _/combat init [BONUS]_ command!";
+			   return "@"+callerName+" started combat with " + numCombatants + " belligerents.\nEveryone in @channel roll for initiative with the _/combat init [BONUS]_ command!";
 			   
 		};
 		
@@ -309,7 +309,7 @@
 			}
 			else if(numTotalCombatants == numRegisteredCombatants)
 			{
-				return "This combat is full up @"+callerName+". Add your self to the fight with `combat add [initiative bonus]`";
+				return "This combat is full up @"+callerName+". Add your self to the fight with `combat add [initiative bonus]`.";
 			}
 			
 			
@@ -320,7 +320,7 @@
 			if((numRegisteredCombatants + numMonsters) > numTotalCombatants)
 			{
 				var remainingSpots = numTotalCombatants - numRegisteredCombatants;
-				return "That's too many monsters for this combat @"+callerName+". You can add " + remainingSpots + " monsters maximum. I already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots. ";
+				return "That's too many monsters for this combat @"+callerName+". You can add " + remainingSpots + " monsters maximum.\nI already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots. ";
 			}
 			
 			
@@ -557,7 +557,7 @@
 		}
 		else if(robot.brain.get(callerName+"_initScore") != null)
   		{
-  			return "@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use `combat setinit [init]` to manually fix your initiative up until the start of combat.";
+  			return "@" + callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies.\nYou can use `combat setinit [init]` to manually fix your initiative up until the start of combat.";
   		}
   			
   			
@@ -637,11 +637,11 @@
 		}  
 		if(combat_started == 0)
 		{
-			return "Don't get trigger happy @"+callerName+". Need to start combat and roll initiative before you add more monsters...";
+			return "Don't get trigger happy @"+callerName+".\nNeed to start combat and roll initiative before you add more monsters...";
 		}
 	    else if(numRegisteredCombatants < numTotalCombatants)
 	    {
-			return "No need to use *_add_* right now @"+callerName+". Try *_/combat init-dm [BONUS] [NUM MONSTERS] [NAME]_* to roll initiative for a few monsters.";
+			return "No need to use *_add_* right now @"+callerName+".\nTry *_/combat init-dm [BONUS] [NUM MONSTERS] [NAME]_* to roll initiative for a few monsters.";
 		}
  			
   			
@@ -785,7 +785,7 @@
 			combatantsArray.splice(indexOfCombatantToBeKilled,1);
 			robot.brain.set('combatantsArray',combatantsArray);
 			var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
-			return "Removed " +combatantToBeKilled.name + " before the fight started. Still looking for " + combatantsLeft + " to start the fight.";
+			return "Removed " +combatantToBeKilled.name + " before the fight started.\nStill looking for " + combatantsLeft + " to start the fight.";
 		}
 		else 
   	{
@@ -848,7 +848,7 @@
   	  }
   		
   		//now construct our response message.
-  		var reply = combatantToBeKilled.name + " "  + getRandomDeathEuphemism() + ". Here's who's still standing:"
+  		var reply = combatantToBeKilled.name + " "  + getRandomDeathEuphemism() + ".\nHere's who's still standing:"
   		for(var k = 0; k < combatantsArray.length; k++)
   		{
   			var order = k + 1;
