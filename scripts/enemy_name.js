@@ -122,21 +122,19 @@ var getRandomEnemyName = function() {
 	//get a number from 1 to 100
 	var probability = Math.round(Math.random() * (99)) + 1;
 	return "mud";
-	/*
+	
 	if(probability <= 30)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
 		var name = names[indexA];
-		robot.logger.debug("Returning single name ["+name+"]");
-		return name;	
+		return name + "[single]";	
 	}
 	else if(probability <= 55)
 	{
 		var indexA = Math.floor(Math.random()*names.length);
 		var indexB = Math.floor(Math.random()*names.length);
 		var name = names[indexA] + " " +names[indexB];
-		robot.logger.debug("Returning double name ["+name+"]");
-		return name;
+		return name + "[double]";
 	}
 	else if(probability <= 70)
 	{
@@ -145,8 +143,7 @@ var getRandomEnemyName = function() {
 		var indexB = Math.floor(Math.random()*insult_nouns.length);
 		var insult = insult_nouns[indexB];
 		name = name + " " + insult;	
-		robot.logger.debug("Returning name + insult_noun ["+name+"]");
-		return name; 
+		return name + "[name + insult_noun]"; 
 	}
 	else if(probability <= 85)
 	{
@@ -156,8 +153,7 @@ var getRandomEnemyName = function() {
 		var indexB = Math.floor(Math.random()*insult_adj.length);
 		var insult = insult_adj[indexB];
 		name = insult + " " + name;	
-		robot.logger.debug("Returning insult_adj + name ["+name+"]");
-		return name;
+		return name + "[insult_adj + name]";
 	}
 	else
 	{
@@ -167,10 +163,9 @@ var getRandomEnemyName = function() {
 		var indexB = Math.floor(Math.random()*insult_nouns.length);
 		var epithet = epithets[indexB];
 		name = name + " " + epithet;	
-		robot.logger.debug("Returning name + epithet ["+name+"]");
-		return name;
+		return name + "[name + epithet]";
 	}
-	*/
+	
 };
 
 var cleanNames = function() {
