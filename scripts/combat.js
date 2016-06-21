@@ -733,7 +733,7 @@
 		//if we don't have everyone, just reduce the number of registered
 		// combatants by 1.  If the fight has already started, decremement
 		// both the registered fighters and the total number.
-		if(
+		//if(
 		
 		
 		if(numRegisteredCombatants < numTotalCombatants)
