@@ -251,6 +251,7 @@
   				combatantsArray = combatantsArray.sort(combatantSortByInit);
   				robot.brain.set('combatantsArray',combatantsArray);
   				robot.brain.set('currentTurnIndex',0);
+  				var firstPlayer = combatantsArray[0];
   				for(var k = 0; k < combatantsArray.length; k++)
   				{
   					var order = k + 1;
@@ -260,7 +261,14 @@
 						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					}
   				}
-  				reply += "\n*Let the fight begin!*";
+  				
+  				
+  				if(firstPlayer.type == PC_TYPE) {
+					  reply += "\n*@" + firstPlayer.name + ", you're up first!*";
+				  } else if (firstPlayer.type == MONSTER_TYPE) {
+					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
+				  }	
+  				
   				return reply; 
   			}
   			else
@@ -335,22 +343,23 @@
 				combatantsArray = combatantsArray.sort(combatantSortByInit);
 				robot.brain.set('combatantsArray',combatantsArray);
 				robot.brain.set('currentTurnIndex',0);
-				var firstPlayerName = "";
+				var firstPlayer = combatantsArray[0];
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
-					if(k == 0)
-					{
-						firstPlayerName = combatantsArray[k].name;
-					}
-					
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") @" + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					} else if (combatantsArray[k].type == MONSTER_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name + "  [id:"+combatantsArray[k].id+"]";
 					}					
 				}
-				reply += "\n*@" + firstPlayerName + ", you're up first!*";
+				
+				if(firstPlayer.type == PC_TYPE) {
+					reply += "\n*@" + firstPlayer.name + ", you're up first!*";
+				} else if (firstPlayer.type == MONSTER_TYPE) {
+					reply += "\n*" + firstPlayer.name + ", you're up first!*";
+				}	
+				
 				return reply; 
 			}
 			else
@@ -742,18 +751,20 @@
 		//we've located the correct player. Need to remove from array, erase any redis data.
 		// do we need to treat monsters and PCs differently???
 		
-		//if we don't have everyone, just reduce the number of registered
-		// combatants by 1.  If the fight has already started, decremement
-		// both the registered fighters and the total number.
-		//if(
-		
-		
-		if(numRegisteredCombatants < numTotalCombatants)
-	    {
+		if(combatantToBeKilled.type == PC_TYPE) {
+			
+		} else if (combatantToBeKilled.type == MONSTER_TYPE) {
 			
 		}
-		else 
-  		{
+		
+		
+		//if we don't have everyone, just reduce the number of registered combatants by 1.  
+		if(numRegisteredCombatants < numTotalCombatants)
+	  {
+			
+		}
+		else // If the fight has already started, decremement both the registered fighters and the total number. Need to keep the turn counter correct too.
+  	{
   			var currentTurnIndex = robot.brain.get('currentTurnIndex');
 		}
   			
