@@ -33,6 +33,26 @@
             return results;
         };
         
+		var addMessageOnNaturalTwentyOrOne(roll,sides)
+		{
+			var result = "";
+			
+			if(sides == 20 && roll == 20)
+			{
+				result = "`" + rolls[j] + "` _*CRITICAL!*_ ";
+			}
+			else if(sides == 20 && roll == 1)
+			{
+				result = "`" + rolls[j] + "` _*FAIL!*_ ";
+			}
+			else
+			{
+				result += "`" + rolls[j] + "` ";
+			}
+			
+			return result;
+		}
+		
 		var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
 			var rolls = rolldice(sides, num);
 			var rollsTotal = 0;
@@ -54,13 +74,14 @@
 				var secondRollsTotal = rollsTotal;
 				
 				for (var j = 0; j < rolls.length; j++) {
-					result += "`" + rolls[j] + "` ";
+					
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
 					rollsTotal += rolls[j];
 				}
 				result += "\nSecond result: ";
 				rolls = rolldice(sides, num);
 				for (var j = 0; j < rolls.length; j++) {
-					result += "`" + rolls[j] + "` ";
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
 					secondRollsTotal += rolls[j];
 				}
 				
@@ -68,6 +89,7 @@
 				{
 					rollsTotal = secondRollsTotal;
 				}
+				
 				if(Number(bonus) > 0)
 				{
 					if(addBonus) {
@@ -76,6 +98,10 @@
 					else
 					{
 						rollsTotal -= Number(bonus);
+						if(rollsTotal < 1)
+						{
+							rollsTotal = 1;
+						}
 					}
 				}
 				
@@ -88,13 +114,13 @@
 				var secondRollsTotal = rollsTotal;
 				
 				for (var j = 0; j < rolls.length; j++) {
-					result += "`" + rolls[j] + "` ";
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
 					rollsTotal += rolls[j];
 				}
 				result += "\nSecond result: ";
 				rolls = rolldice(sides, num);
 				for (var j = 0; j < rolls.length; j++) {
-					result += "`" + rolls[j] + "` ";
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
 					secondRollsTotal += rolls[j];
 				}
 				
@@ -105,12 +131,17 @@
 				if(Number(bonus) > 0)
 				{
 					
-					if(addBonus) {
+					if(addBonus) 
+					{
 						rollsTotal += Number(bonus);
 					}
 					else
 					{
 						rollsTotal -= Number(bonus);
+						if(rollsTotal < 1)
+						{
+							rollsTotal = 1;
+						}
 					}
 				}
 				
@@ -127,12 +158,16 @@
 					else
 					{
 						rollsTotal -= Number(bonus);
+						if(rollsTotal < 1)
+						{
+							rollsTotal = 1;
+						}
 					}
 				}
 				
 				result += "\n*Result: ";
 				for (var j = 0; j < rolls.length; j++) {
-					result += "`" + rolls[j] + "` ";
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
 					rollsTotal += rolls[j];
 				}
 				result += "*";
