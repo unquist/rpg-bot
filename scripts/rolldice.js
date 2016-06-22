@@ -54,11 +54,28 @@
 			return result;
 		};
 		
+		var checkForCritical = function(roll,sides,critical) {
+			
+			if(critical)
+			{
+				return true;
+			}
+			else if(roll == 20 && sides == 20)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		};
+		
 		var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
 			var rolls = rolldice(sides, num);
 			var rollsTotal = 0;
 			var addBonus = true;
 			var result = "@" + name + " rolled " + num + "d" + sides;
+			var criticalHit = false;
 			if(bonusType.indexOf("+") != -1)
 			{
 				result += "+" + bonus;
@@ -77,12 +94,14 @@
 				for (var j = 0; j < rolls.length; j++) {
 					
 					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
+					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
 					rollsTotal += rolls[j];
 				}
 				result += "\nSecond result: ";
 				rolls = rolldice(sides, num);
 				for (var j = 0; j < rolls.length; j++) {
 					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
+					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
 					secondRollsTotal += rolls[j];
 				}
 				
@@ -116,12 +135,14 @@
 				
 				for (var j = 0; j < rolls.length; j++) {
 					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
+					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
 					rollsTotal += rolls[j];
 				}
 				result += "\nSecond result: ";
 				rolls = rolldice(sides, num);
 				for (var j = 0; j < rolls.length; j++) {
 					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
+					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
 					secondRollsTotal += rolls[j];
 				}
 				
@@ -165,6 +186,7 @@
 				result += "\n*Result: ";
 				for (var j = 0; j < rolls.length; j++) {
 					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
+					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
 					rollsTotal += rolls[j];
 				}
 				result += "*";
@@ -181,16 +203,22 @@
 			
 			
 			var msgData = {
-				attachments: [{
-					"fallback": result,
-					"color": "#cc3300",
-					"footer": "Dice Rolling Script",
-					"footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon",
-					"text": result,
-					"mrkdwn_in": ["text"]
-				}]
+				attachments: [
+					{
+						"fallback": result,
+						"color": "#cc3300",
+						"footer": "Dice Rolling Script",
+						"footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon",
+						"text": result,
+						"mrkdwn_in": ["text"]
+					}
+				]
 			};
-          
+          if(criticalHit)
+		  {
+			msgData.attachments.push({"text": "http://www.neverdrains.com/criticalhit/images/critical-hit.jpg","mrkdwn_in": ["text"]});
+		  }
+		  
           return msgData;
         };
 /*
