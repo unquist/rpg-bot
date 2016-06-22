@@ -48,7 +48,7 @@
 			}
 			else
 			{
-				result += "```" + roll + "``` ";
+				result += "`" + roll + "` ";
 			}
 			
 			return result;
