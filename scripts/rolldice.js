@@ -39,11 +39,11 @@
 			
 			if(sides == 20 && roll == 20)
 			{
-				result = "`" + roll + "` _*CRITICAL!*_ ";
+				result = "_*`" + roll + " CRITICAL!`*_ ";
 			}
 			else if(sides == 20 && roll == 1)
 			{
-				result = "`" + roll + "` _*FAIL!*_ ";
+				result = "_*`" + roll + " FAIL!*_ ";
 			}
 			else
 			{
