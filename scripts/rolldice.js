@@ -106,7 +106,7 @@
 					}
 				}
 				
-				result += "\n*Total of lowest rolls: `" + rollsTotal + "`*";
+				result += "\n*Total of lowest rolls (w/ modifier): `" + rollsTotal + "`*";
 				
 			}
 			else if(advantage.indexOf("adv") != -1)
@@ -146,7 +146,7 @@
 					}
 				}
 				
-				result += "\n*Total of highest rolls: `" + rollsTotal + "`*";
+				result += "\n*Total of highest rolls (w/ modifier): `" + rollsTotal + "`*";
 				
 			}
 			else
@@ -158,11 +158,7 @@
 					}
 					else
 					{
-						rollsTotal -= Number(bonus);
-						if(rollsTotal < 1)
-						{
-							rollsTotal = 1;
-						}
+						rollsTotal -= Number(bonus);			
 					}
 				}
 				
@@ -174,6 +170,10 @@
 				result += "*";
 				if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
 				{
+					if(rollsTotal < 1)
+					{
+						rollsTotal = 1;
+					}
 					result += "\n*Total: `" + rollsTotal + "`*";
 				}
 			}
