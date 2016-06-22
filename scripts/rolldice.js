@@ -216,7 +216,7 @@
 			};
           if(criticalHit)
 		  {
-			msgData.attachments.push({"image_url": "http://www.neverdrains.com/criticalhit/images/critical-hit.jpg"});
+			msgData.attachments.push({"image_url": "http://www.neverdrains.com/criticalhit/images/critical-hit.jpg", "text": "*CRITICAL!*","mrkdwn_in": ["text"]});
 		  }
 		  
           return msgData;
