@@ -36,7 +36,7 @@
         var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
             var rolls = rolldice(sides, num);
             var rollsTotal = 0;
-      			
+      			var addBonus = true;
       			var result = "@" + name + " rolled " + num + "d" + sides;
       			if(bonusType.indexOf("+") != -1)
       			{
@@ -44,6 +44,7 @@
       			}
       			else if(bonusType.indexOf("-") != -1)
       			{
+					addBonus = false;
       				result += "-" + bonus;
       			}
 			
@@ -69,7 +70,13 @@
 		          }
 		          if(Number(bonus) > 0)
       		    {
-      			  	rollsTotal += Number(bonus);
+					if(addBonus) {
+						rollsTotal += Number(bonus);
+					}
+					else
+					{
+						rollsTotal -= Number(bonus);
+					}
       			  }
 		          
 		          result += "\n*Total of lowest rolls: `" + rollsTotal + "`*";
@@ -97,7 +104,14 @@
 		          }
 		          if(Number(bonus) > 0)
       		    {
-      			  	rollsTotal += Number(bonus);
+      			  	
+					if(addBonus) {
+						rollsTotal += Number(bonus);
+					}
+					else
+					{
+						rollsTotal -= Number(bonus);
+					}
       			  }
 		          
               result += "\n*Total of highest rolls: `" + rollsTotal + "`*";
@@ -107,7 +121,13 @@
 			      {
 			        if(Number(bonus) > 0)
       		    {
-      			  	rollsTotal += Number(bonus);
+      			  	if(addBonus) {
+						rollsTotal += Number(bonus);
+					}
+					else
+					{
+						rollsTotal -= Number(bonus);
+					}
       			  }
 			        
 			        result += "\n*Result: ";
