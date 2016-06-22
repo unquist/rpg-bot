@@ -47,7 +47,7 @@
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat add [BONUS]_* - Use this to add a player to a combat that has already started. BONUS is your Dex. initiative bonus.";
 			reply += "\n\n*_/combat add-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can use this to add new monsters to a fight that has already started.";
-			reply += "\n\n*_/combat kill [ID] - Remove combatant with [ID] from the combat.";
+			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
 			return reply;

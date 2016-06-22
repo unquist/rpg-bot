@@ -33,43 +33,43 @@
             return results;
         };
         
-        var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
-            var rolls = rolldice(sides, num);
-            var rollsTotal = 0;
-      			var addBonus = true;
-      			var result = "@" + name + " rolled " + num + "d" + sides;
-      			if(bonusType.indexOf("+") != -1)
-      			{
-      				result += "+" + bonus;
-      			}
-      			else if(bonusType.indexOf("-") != -1)
-      			{
-					addBonus = false;
-      				result += "-" + bonus;
-      			}
+		var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
+			var rolls = rolldice(sides, num);
+			var rollsTotal = 0;
+			var addBonus = true;
+			var result = "@" + name + " rolled " + num + "d" + sides;
+			if(bonusType.indexOf("+") != -1)
+			{
+				result += "+" + bonus;
+			}
+			else if(bonusType.indexOf("-") != -1)
+			{
+				addBonus = false;
+				result += "-" + bonus;
+			}
 			
-			      if(advantage.indexOf("dis") != -1)
-			      {
-			        result += " with disadvantage\nFirst result: ";
-			        var secondRollsTotal = rollsTotal;
-			        
-			        for (var j = 0; j < rolls.length; j++) {
-                result += "`" + rolls[j] + "` ";
-                rollsTotal += rolls[j];
-		          }
-		          result += "\nSecond result: ";
-		          rolls = rolldice(sides, num);
-		          for (var j = 0; j < rolls.length; j++) {
-                result += "`" + rolls[j] + "` ";
-                secondRollsTotal += rolls[j];
-		          }
-		          
-		          if(secondRollsTotal < rollsTotal)
-		          {
-		            rollsTotal = secondRollsTotal;
-		          }
-		          if(Number(bonus) > 0)
-      		    {
+			if(advantage.indexOf("dis") != -1)
+			{
+				result += " with disadvantage\nFirst result: ";
+				var secondRollsTotal = rollsTotal;
+				
+				for (var j = 0; j < rolls.length; j++) {
+					result += "`" + rolls[j] + "` ";
+					rollsTotal += rolls[j];
+				}
+				result += "\nSecond result: ";
+				rolls = rolldice(sides, num);
+				for (var j = 0; j < rolls.length; j++) {
+					result += "`" + rolls[j] + "` ";
+					secondRollsTotal += rolls[j];
+				}
+				
+				if(secondRollsTotal < rollsTotal)
+				{
+					rollsTotal = secondRollsTotal;
+				}
+				if(Number(bonus) > 0)
+				{
 					if(addBonus) {
 						rollsTotal += Number(bonus);
 					}
@@ -77,34 +77,34 @@
 					{
 						rollsTotal -= Number(bonus);
 					}
-      			  }
-		          
-		          result += "\n*Total of lowest rolls: `" + rollsTotal + "`*";
-              
-			      }
-			      else if(advantage.indexOf("adv") != -1)
-			      {
-			        result += " with advantage\nFirst result: ";
-			        var secondRollsTotal = rollsTotal;
-			        
-			        for (var j = 0; j < rolls.length; j++) {
-                result += "`" + rolls[j] + "` ";
-                rollsTotal += rolls[j];
-		          }
-		          result += "\nSecond result: ";
-		          rolls = rolldice(sides, num);
-		          for (var j = 0; j < rolls.length; j++) {
-                result += "`" + rolls[j] + "` ";
-                secondRollsTotal += rolls[j];
-		          }
-		          
-		          if(secondRollsTotal > rollsTotal)
-		          {
-		            rollsTotal = secondRollsTotal;
-		          }
-		          if(Number(bonus) > 0)
-      		    {
-      			  	
+				}
+				
+				result += "\n*Total of lowest rolls: `" + rollsTotal + "`*";
+				
+			}
+			else if(advantage.indexOf("adv") != -1)
+			{
+				result += " with advantage\nFirst result: ";
+				var secondRollsTotal = rollsTotal;
+				
+				for (var j = 0; j < rolls.length; j++) {
+					result += "`" + rolls[j] + "` ";
+					rollsTotal += rolls[j];
+				}
+				result += "\nSecond result: ";
+				rolls = rolldice(sides, num);
+				for (var j = 0; j < rolls.length; j++) {
+					result += "`" + rolls[j] + "` ";
+					secondRollsTotal += rolls[j];
+				}
+				
+				if(secondRollsTotal > rollsTotal)
+				{
+					rollsTotal = secondRollsTotal;
+				}
+				if(Number(bonus) > 0)
+				{
+					
 					if(addBonus) {
 						rollsTotal += Number(bonus);
 					}
@@ -112,51 +112,48 @@
 					{
 						rollsTotal -= Number(bonus);
 					}
-      			  }
-		          
-              result += "\n*Total of highest rolls: `" + rollsTotal + "`*";
-              
-			      }
-			      else
-			      {
-			        if(Number(bonus) > 0)
-      		    {
-      			  	if(addBonus) {
+				}
+				
+				result += "\n*Total of highest rolls: `" + rollsTotal + "`*";
+				
+			}
+			else
+			{
+				if(Number(bonus) > 0)
+				{
+					if(addBonus) {
 						rollsTotal += Number(bonus);
 					}
 					else
 					{
 						rollsTotal -= Number(bonus);
 					}
-      			  }
-			        
-			        result += "\n*Result: ";
-			        for (var j = 0; j < rolls.length; j++) {
-                result += "`" + rolls[j] + "` ";
-                rollsTotal += rolls[j];
-		          }
-					result += "*";
-              if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
-              {
-                result += "\n*Total: `" + rollsTotal + "`*";
-              }
-			      }
+				}
+				
+				result += "\n*Result: ";
+				for (var j = 0; j < rolls.length; j++) {
+					result += "`" + rolls[j] + "` ";
+					rollsTotal += rolls[j];
+				}
+				result += "*";
+				if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
+				{
+					result += "\n*Total: `" + rollsTotal + "`*";
+				}
+			}
 
-		
-			   
-            var msgData = {
-              
-              attachments: [{
-                "fallback": result,
-                "color": "#cc3300",
-                "footer": "Dice Rolling Script",
-                "footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon",
-                "text": result,
-				"mrkdwn_in": ["text"]
-              }]
-          };
-          
-          
+			
+			
+			var msgData = {
+				attachments: [{
+					"fallback": result,
+					"color": "#cc3300",
+					"footer": "Dice Rolling Script",
+					"footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon",
+					"text": result,
+					"mrkdwn_in": ["text"]
+				}]
+			};
           
           return msgData;
         };
