@@ -33,7 +33,7 @@
             return results;
         };
         
-		var addMessageOnNaturalTwentyOrOne(roll,sides)
+		var addMessageOnNaturalTwentyOrOne = function(roll,sides)
 		{
 			var result = "";
 			
@@ -51,7 +51,7 @@
 			}
 			
 			return result;
-		}
+		};
 		
 		var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
 			var rolls = rolldice(sides, num);
