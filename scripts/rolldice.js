@@ -174,7 +174,7 @@
 					{
 						rollsTotal = 1;
 					}
-					result += "\n*Total: `" + rollsTotal + "`*";
+					result += "\n*Total (w/ modifier): `" + rollsTotal + "`*";
 				}
 			}
 
