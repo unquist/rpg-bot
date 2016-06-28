@@ -175,7 +175,7 @@
 			delete robot.brain.data._private['combatantsArray'];
 			
 			robot.logger.debug("Ending combat.");
-			return callerName+" decided that enough is enough. Ending Combat (all combat data cleared).";
+			return callerName+" decided that enough is enough.\nEnding Combat (all combat data cleared).";
 		};
 		
 
