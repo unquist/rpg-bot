@@ -49,16 +49,16 @@
         
     };
     
-		var addMessageOnNaturalTwentyOrOne = function(roll,sides)
+		var addMessageOnNaturalTwentyOrOne = function(roll,sides,number)
 		{
 			var result = "";
 			
-			if(sides == 20 && roll == 20)
+			if(sides == 20 && roll == 20 && number == 1)
 			{
 				//_*`roll CRITICAL!`*_
 				result = "_ `" + roll + " CRITICAL!` _ ";
 			}
-			else if(sides == 20 && roll == 1)
+			else if(sides == 20 && roll == 1 && number == 1)
 			{
 				result = "_ `" + roll + " FAIL!` _ ";
 			}
@@ -70,13 +70,13 @@
 			return result;
 		};
 		
-		var checkForCritical = function(roll,sides,critical) {
+		var checkForCritical = function(roll,sides,numDice,critical) {
 			
 			if(critical)
 			{
 				return true;
 			}
-			else if(roll == 20 && sides == 20)
+			else if(roll == 20 && sides == 20 && numDice == 1)
 			{
 				return true;
 			}
@@ -109,15 +109,15 @@
 				
 				for (var j = 0; j < rolls.length; j++) {
 					
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
-					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
+					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
 					rollsTotal += rolls[j];
 				}
 				result += "\nSecond result: ";
 				rolls = rolldice(sides, num);
 				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
-					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
+					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
 					secondRollsTotal += rolls[j];
 				}
 				
@@ -150,15 +150,15 @@
 				var secondRollsTotal = rollsTotal;
 				
 				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
-					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
+					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
 					rollsTotal += rolls[j];
 				}
 				result += "\nSecond result: ";
 				rolls = rolldice(sides, num);
 				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
-					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
+					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
 					secondRollsTotal += rolls[j];
 				}
 				
@@ -201,8 +201,8 @@
 				
 				result += "\nResult: ";
 				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
-					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
+					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
+					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
 					rollsTotal += rolls[j];
 				}
 				
