@@ -36,6 +36,17 @@
       return euphemism; 
 		}
 		
+		var getRealNameFromId = function(userId)
+    {
+      var user = robot.brain.data.users[userId];
+      if(user == null)
+      {
+        return "<Unknown User>"
+      }
+      
+      return user.real_name;
+    };
+		
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
@@ -993,7 +1004,8 @@
 			command = data.command;
 		   
 			token = data.token;
-			username = data.user_name;
+			//username = data.user_name;
+			username = getRealNameFromId(data.user_id);
 			channel_name = data.channel_name;
 			text = data.text;
 			var match = text.match(/([a-z]+-{0,1}[a-z]{0,2})(\s*)(.*)/i);
