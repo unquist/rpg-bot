@@ -183,13 +183,13 @@
 					}
 				}
 				
-				result += "\n*Result: ";
+				result += "\nResult: ";
 				for (var j = 0; j < rolls.length; j++) {
 					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides);
 					criticalHit = checkForCritical(rolls[j],sides,criticalHit);
 					rollsTotal += rolls[j];
 				}
-				result += "*";
+				
 				if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
 				{
 					if(rollsTotal < 1)
