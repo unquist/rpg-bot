@@ -37,7 +37,7 @@
       var helpText = "Usage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_";
       helpText += "\nX is the number of dice, and Y is the number of sides.";
       helpText += "\nOnly the first paramter, e.g. XdY, is required.";
-      helpText += "\nDice roller will recognize a critical hit (natural 20) and miss (natural 1) when rolling a d20.";
+      helpText += "\nDice roller will recognize a critical hit (natural 20) and miss (natural 1) when rolling a 1d20.";
       helpText += "\nThe minimum value that dice roller will return is always 1.";
       helpText += "\n\nExamples:";
       helpText += "\n/roll 2d6    (Rolls two six-sided dice)";
