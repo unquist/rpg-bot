@@ -32,7 +32,23 @@
             }
             return results;
         };
+    var getHelpText = function()
+    {
+      var helpText = "Usage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_";
+      helpText += "\nX is the number of dice, and Y is the number of sides.";
+      helpText += "\nOnly the first paramter, e.g. XdY, is required.";
+      helpText += "\nDice roller will recognize a critical hit (natural 20) and miss (natural 1) when rolling a d20.";
+      helpText += "\nThe minimum value that dice roller will return is always 1.";
+      helpText += "\n\nExamples:";
+      helpText += "\n/roll 2d6    (Rolls two six-sided dice)";
+      helpText += "\n/roll 3d20+2    (Rolls three twenty-sided dice and adds two to the result)";
+      helpText += "\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)";
+      helpText += "\n/roll 1d4 dis    (Rolls a single four-sided die twice and takes the lower result.)";
+      return helpText;
+      
         
+    };
+    
 		var addMessageOnNaturalTwentyOrOne = function(roll,sides)
 		{
 			var result = "";
@@ -40,11 +56,11 @@
 			if(sides == 20 && roll == 20)
 			{
 				//_*`roll CRITICAL!`*_
-				result = "* `" + roll + " CRITICAL!` * ";
+				result = "_ `" + roll + " CRITICAL!` _ ";
 			}
 			else if(sides == 20 && roll == 1)
 			{
-				result = "* `" + roll + " FAIL!` * ";
+				result = "_ `" + roll + " FAIL!` _ ";
 			}
 			else
 			{
@@ -243,19 +259,24 @@
             return;
         });
   */  
-      	robot.router.post('/hubot/roll', function(req, res) {
-          robot.logger.debug("Received a POST request to /hubot/roll");
+    robot.router.post('/hubot/roll', function(req, res) {
+      robot.logger.debug("Received a POST request to /hubot/roll");
           
-          var data, channel_name, response_url, command, text, token,username;
+      var data, channel_name, response_url, command, text, token,username;
                
-          data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
-          //robot.logger.debug("data:"+util.inspect(data));
+      data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+      //robot.logger.debug("data:"+util.inspect(data));
 		  command = data.command;
-          //text = data.text;     
+      //text = data.text;     
 		  token = data.token;
 		  username = data.user_name;
 		  channel_name = data.channel_name;
-
+      var helpMatch = data.text.match(/help/i);
+      if(helpMatch != null)
+      {
+        return res.send(getHelpText());
+      }
+      
 		  var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i);
 		  if(match != null)
 		  {
@@ -273,7 +294,7 @@
 		  }
 		  else
 		  {
-			  return res.send('*No valid dice roll!*\nUsage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_\nX is the number of dice, and Y is the number of sides.\nOnly the first paramter, e.g. XdY, is required.\n\nExamples:\n/roll 2d6    (Rolls two six-sided dice)\n/roll 3d10+2    (Rolls three ten-sided dice and adds two to the result)\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)');
+			  return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
 		  }
     });
       
