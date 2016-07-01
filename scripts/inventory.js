@@ -14,6 +14,9 @@
 
 (function() {
     module.exports = function(robot) {
+      
+      var GoogleSpreadsheet = require('google-spreadsheet');
+      
       var util = require("util");
 		  
 		  var test = function() {
