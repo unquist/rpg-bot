@@ -14,11 +14,10 @@
 
 (function() {
     module.exports = function(robot) {
-        var util = require("util");
-		var randint = function(sides) {
+      var util = require("util");
+		  
+		  var test = function() {
             return Math.round(Math.random() * (sides - 1)) + 1;
-        };
-
-
+      };
 
 })();
