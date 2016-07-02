@@ -5,6 +5,7 @@
   "author": "unquist@gmail.com",
   "description": "A simple robot for playing D&D on slack.",
   "dependencies": {
+    "google-spreadsheet": "^2.0.3",
     "hubot": "^2.19.0",
     "hubot-brain-inspect": "0.0.1",
     "hubot-diagnostics": "0.0.1",
