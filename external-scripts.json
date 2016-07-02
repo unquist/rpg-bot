@@ -9,5 +9,6 @@
   "hubot-redis-brain",
   "hubot-rules",
   "hubot-shipit",
-  "hubot-brain-inspect"
+  "hubot-brain-inspect",
+  "google-spreadsheet"
 ]
