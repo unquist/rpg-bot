@@ -549,7 +549,7 @@
 			reply += "\nThere are _" + numMonstersRemaining + "_ enemies remaining."
 			
 			//now list the current list of combatants
-			var reply = "\nHere is the current order:"; 
+			var reply += "\nHere is the current order:"; 
 			for(var k = 0; k < combatantsArray.length; k++)
 			{
 				var order = k + 1;
