@@ -776,10 +776,7 @@
 		
 	  var combatKill = function(callerName,combatantIdArray) {
 		var combat_started = robot.brain.get('combat_flag');
-		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
-		//array of players
-		var combatantsArray = robot.brain.get('combatantsArray');
-		var numTotalCombatants = robot.brain.get('numTotalCombatants');
+
 		
 		if(combat_started != 0 && combat_started != 1)
 		{
@@ -794,7 +791,7 @@
 	 
 	 robot.logger.debug("Kill request from " + callerName + " for IDs [" + combatantIdArray + "]");   
 	 
-	 //
+	 
 	 var combatantsToBeKilled = new Array();
     for(var k = 0; k < combatantIdArray.length; k++)
     {
@@ -808,7 +805,10 @@
         combatantsToBeKilled.push(tempCombatantToBeKilled);
       }
     }
-    
+    var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+		//array of players
+		var combatantsArray = robot.brain.get('combatantsArray');
+		var numTotalCombatants = robot.brain.get('numTotalCombatants');
     
   		//now construct our response message.
   		var reply = "";
@@ -910,7 +910,7 @@
 			combatantsArray.splice(indexOfCombatantToBeKilled,1);
 			robot.brain.set('combatantsArray',combatantsArray);
 			var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
-			return "Removed " +combatantToBeKilled.name + " before the fight started.\nStill looking for " + combatantsLeft + " to start the fight.";
+			return combatantToBeKilled;;
 		}
 		else 
   	{
@@ -973,6 +973,8 @@
   	  }
   	  
   	  return combatantToBeKilled;
+		}
+		  
 		};
 	  /* begin 'hear' functions*/
 	  /*
