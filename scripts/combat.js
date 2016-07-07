@@ -299,7 +299,7 @@
 		  };
 		  
 
-		var initdm = function(callerName,bonus,numMonsters,monsterName) {
+		var initdm = function(callerName,bonus,addBonus,numMonsters,monsterName) {
 			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
 			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
@@ -337,7 +337,19 @@
 			
 			
 			var initRoll = rolldie(20);
-			var initScore = initRoll + Number(bonus);
+			var initScore = initRoll;
+			var bonusDescription = "";
+			if(addBonus)
+			{
+				initScore += Number(bonus);
+				bonusDescription = "+" + bonus;
+				
+			}
+			else
+			{
+				initScore -= Number(bonus);
+				bonusDescription = "-" + bonus;
+			}
 			var numCombatantsIndex = numRegisteredCombatants;
 			for(var k = 0; k < numMonsters; k++)
 			{
@@ -355,7 +367,7 @@
 			//ready to start combat?
 			if(numRegisteredCombatants == numTotalCombatants)
 			{
-				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
+				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
 				reply += "\nAll Combatants accounted for.";
 				reply += "\nHere is the combat order:";
 				
@@ -1067,19 +1079,28 @@
 					case "init-dm":
 						if(parameters != "")
 						{
-							var initdmParams = parameters.match(/(\d+)\s+(\d+)\s+(.+)/i) || null;
+							var initdmParams = parameters.match(/(\+|-){0,1}(\d+)\s+(\d+)\s+(.+)/i) || null;
 							if(initdmParams == null)
 							{
 								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 							}
 							else
 							{
-								var bonus = initdmParams[1] || 0;
+								var addBonus = initdmParams[1] || true;
+								if(addBonus == "-")
+								{
+									addBonus = false;
+								}
+								else
+								{
+									addBonus = true;
+								}
+								var bonus = initdmParams[2] || 0;
 								bonus = Number(bonus);
-								var numMonsters = initdmParams[2] || 0;
+								var numMonsters = initdmParams[3] || 0;
 								numMonsters = Number(numMonsters);
-								var monsterName = initdmParams[3] || "Nameless Horror";
-								reply += initdm(username,bonus,numMonsters,monsterName);
+								var monsterName = initdmParams[4] || "Nameless Horror";
+								reply += initdm(username,bonus,addBonus,numMonsters,monsterName);
 							}
 						}
 						else
