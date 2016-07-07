@@ -774,6 +774,7 @@
 		  	
 		};
 		
+		/*
 	  var combatKill = function(callerName,combatantIdArray) {
 		var combat_started = robot.brain.get('combat_flag');
 
@@ -976,6 +977,9 @@
 		}
 		  
 		};
+		
+		
+		*/
 	  /* begin 'hear' functions*/
 	  /*
 	  robot.hear(/(combat_clean_names)/i, function(msg) {
