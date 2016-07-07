@@ -856,7 +856,7 @@
 
 	  };
 		//kill off a comnatant and return their Combatant object
-		var killPlayerWithId = function(callerName,combatantId,combat_started,numRegisteredCombatants,combatantsArray,numTotalCombatants) {
+		var killPlayerWithId = function(callerName,combatantId) {
 		
 		var combat_started = robot.brain.get('combat_flag');
 		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
