@@ -796,15 +796,23 @@
 	 var combatantsToBeKilled = new Array();
     for(var k = 0; k < combatantIdArray.length; k++)
     {
-      var tempCombatantToBeKilled = killPlayerWithId(callerName,combatantIdArray[k]);
-      if(tempCombatantToBeKilled == -1)
-      {
-        robot.logger.debug("Didn't find player with ID ["+combatantIdArray[k]+"]");
+      try{
+        var tempCombatantToBeKilled = killPlayerWithId(callerName,combatantIdArray[k]);
+        if(tempCombatantToBeKilled == -1)
+        {
+          robot.logger.debug("Didn't find player with ID ["+combatantIdArray[k]+"]");
+        }
+        else
+        {
+          combatantsToBeKilled.push(tempCombatantToBeKilled);
+        }
       }
-      else
+      catch (error)
       {
-        combatantsToBeKilled.push(tempCombatantToBeKilled);
+        robot.logger.debug("Caught error while trying to kill player: ["+error.essage+"]");
+        return "Error occured during kill request: ["+error.essage+"]";
       }
+
     }
     var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 		//array of players
@@ -1271,6 +1279,7 @@
 							  {
 							    playerIdArray.push(Number(playerID[k]));
 							  }
+							  robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
 								reply = combatKill(username,playerIdArray);
 							}
 						}
