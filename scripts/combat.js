@@ -774,7 +774,7 @@
 		  	
 		};
 		
-	  var combatKill = function(callerName,combatantId) {
+	  var combatKill = function(callerName,combatantIdArray) {
 		var combat_started = robot.brain.get('combat_flag');
 		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 		//array of players
@@ -792,7 +792,58 @@
 			return "Don't get trigger happy "+callerName+". Need to start combat and roll initiative before you remove anyone...";
 		}
 	 
-	 robot.logger.debug("Kill request from " + callerName + " for ID [" + combatantId + "]");   
+	 robot.logger.debug("Kill request from " + callerName + " for IDs [" + combatantIdArray + "]");   
+	 
+	 //
+	 var combatantsToBeKilled = new Array();
+    for(var k = 0; k < combatantIdArray.length; k++)
+    {
+      var tempCombatantToBeKilled = killPlayerWithId(callerName,combatantIdArray[k]);
+      if(tempCombatantToBeKilled == -1)
+      {
+        robot.logger.debug("Didn't find player with ID ["+combatantIdArray[k]+"]");
+      }
+      else
+      {
+        combatantsToBeKilled.push(tempCombatantToBeKilled);
+      }
+    }
+  		//now construct our response message.
+  		var reply = combatantToBeKilled.name + " "  + getRandomDeathEuphemism() + ".\nHere's who's still standing:"
+  		for(var k = 0; k < combatantsArray.length; k++)
+  		{
+  			var order = k + 1;
+  			if(currentTurnIndex == k)
+  			{
+  				if(combatantsArray[k].type == PC_TYPE) {
+  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+  				}
+  				
+  			}
+  			else
+  			{
+  				if(combatantsArray[k].type == PC_TYPE) {
+  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+  				}
+  			}
+  		}
+  		return reply;		
+		}
+
+	  };
+		//kill off a comnatant and return their Combatant object
+		var killPlayerWithId = function(callerName,combatantId,combat_started,numRegisteredCombatants,combatantsArray,numTotalCombatants) {
+		
+		var combat_started = robot.brain.get('combat_flag');
+		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+		//array of players
+		var combatantsArray = robot.brain.get('combatantsArray');
+		var numTotalCombatants = robot.brain.get('numTotalCombatants');
+		
 		var indexOfCombatantToBeKilled = -1;
 		for(var i = 0; i< combatantsArray.length; i++)
 		{
@@ -806,7 +857,7 @@
 		
 		if(indexOfCombatantToBeKilled == -1)
 		{
-			return "Could not find a combatant with id `"+combatantId+"`.";
+			return -1;
 		}
 		
 		var combatantToBeKilled = combatantsArray[indexOfCombatantToBeKilled];
@@ -900,36 +951,9 @@
   	      }
   	    }
   	  }
-  		
-  		//now construct our response message.
-  		var reply = combatantToBeKilled.name + " "  + getRandomDeathEuphemism() + ".\nHere's who's still standing:"
-  		for(var k = 0; k < combatantsArray.length; k++)
-  		{
-  			var order = k + 1;
-  			if(currentTurnIndex == k)
-  			{
-  				if(combatantsArray[k].type == PC_TYPE) {
-  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-  				}
-  				
-  			}
-  			else
-  			{
-  				if(combatantsArray[k].type == PC_TYPE) {
-  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-  				}
-  			}
-  		}
-  		return reply;		
-		}
-
-	  };
-		
-		
+  	  
+  	  return combatantToBeKilled;
+		};
 	  /* begin 'hear' functions*/
 	  /*
 	  robot.hear(/(combat_clean_names)/i, function(msg) {
@@ -1209,14 +1233,19 @@
 					case "kill":
 						if(parameters != "")
 						{
-							var playerID = parameters.match(/\d+/i) || -1;
+							var playerID = parameters.match(/(\d+)/ig) || -1;
 							if(playerID == -1)
 							{
-								reply = "Need to specify the id of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
+								reply = "Need to specify the id or ids of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
 							}
 							else
 							{
-								reply = combatKill(username,Number(playerID));
+							  var playerIdArray = new Array();
+							  for(var k = 1; k < playerID.length; k++)
+							  {
+							    playerIdArray.push(Number(playerID[k]));
+							  }
+								reply = combatKill(username,playerIdArray);
 							}
 						}
 						else
