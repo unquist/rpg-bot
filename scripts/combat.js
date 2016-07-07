@@ -1274,6 +1274,7 @@
 							}
 							else
 							{
+							  robot.logger.debug("original playerID arry set to->"+playerID+"<--");
 							  var playerIdArray = new Array();
 							  for(var k = 1; k < playerID.length; k++)
 							  {
