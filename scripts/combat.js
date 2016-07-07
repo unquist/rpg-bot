@@ -3,11 +3,6 @@
 //
 // Dependencies:
 //   None
-// Description:
-//   Rolls dice!
-//
-// Dependencies:
-//   None
 //
 // Configuration:
 //   None
@@ -553,6 +548,42 @@
 			} else if (combatantsArray[currentTurnIndex].type == MONSTER_TYPE) {
 				reply = "Next turn started. " +combatantsArray[currentTurnIndex].name+" is up!";
 			}
+			
+			//now list out the number of monsters left, and the current status.
+			var numMonstersRemaining = 0
+			for(var k = 0; k < combatantsArray.length; k++)
+			{
+			  if(combatantsArray[k].type == MONSTER_TYPE)
+			  {
+			    numMonstersRemaining +=1;
+			  }
+			}
+			reply += "\nThere are _" + numMonstersRemaining + "_ enemies remaining."
+			
+			//now list the current list of combatants
+			reply += "\nHere is the current order:"; 
+			for(var k = 0; k < combatantsArray.length; k++)
+			{
+				var order = k + 1;
+				if(currentTurnIndex == k)
+				{
+					if(combatantsArray[k].type == PC_TYPE) {
+						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+					}
+					
+				}
+				else
+				{
+					if(combatantsArray[k].type == PC_TYPE) {
+						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+					}
+				}
+			}
+			
 			
 			return reply;
 		};
@@ -1167,7 +1198,7 @@
 						break;
 					case "status":
 						reply = combatStatus(username);
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 						return res.json(msgData);
 						break;
 					case "help":
