@@ -23,7 +23,7 @@
 		const PC_TYPE = 0;
 		const MONSTER_TYPE = 1;
 		
-		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out their chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined their ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleep with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'return to dust' ,'walked the plank')
+		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out his chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined his ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleeps with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'return to dust' ,'walked the plank','forgot to keep breathing','punched his ticket','took the long walk');
 		
 		var getRandomDeathEuphemism = function() {
 		  var index = Math.floor(Math.random()*death_euphemisms.length);
@@ -808,8 +808,28 @@
         combatantsToBeKilled.push(tempCombatantToBeKilled);
       }
     }
+    
+    
   		//now construct our response message.
-  		var reply = combatantToBeKilled.name + " "  + getRandomDeathEuphemism() + ".\nHere's who's still standing:"
+  		var reply = "";
+  		if(combatantsToBeKilled.length < 1)
+  		{
+  		  return "No valid Ids found. No combatants removed from combat."; 
+  		}
+  		else if(combatantsToBeKilled.length == 1)
+  		{
+  		  reply += combatantsToBeKilled[0].name + " "  + getRandomDeathEuphemism() + ".\nHere's who's still standing:";
+  		}
+  		else
+  		{
+  		  for(var k = 0; k < combatantsToBeKilled.length; k++)
+  		  {
+  		    reply += combatantsToBeKilled[k].name + " "  + getRandomDeathEuphemism() + ".\n";
+  		  }
+  		  
+  		  reply += "Here's who's still standing:";
+  		}
+  		
   		for(var k = 0; k < combatantsArray.length; k++)
   		{
   			var order = k + 1;
