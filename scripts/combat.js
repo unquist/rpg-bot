@@ -774,7 +774,7 @@
 		  	
 		};
 		
-		/*
+		
 	  var combatKill = function(callerName,combatantIdArray) {
 		var combat_started = robot.brain.get('combat_flag');
 
@@ -853,9 +853,9 @@
   			}
   		}
   		return reply;		
-		}
+		};
 
-	  };
+	  
 		//kill off a comnatant and return their Combatant object
 		var killPlayerWithId = function(callerName,combatantId) {
 		
@@ -979,7 +979,7 @@
 		};
 		
 		
-		*/
+		
 	  /* begin 'hear' functions*/
 	  /*
 	  robot.hear(/(combat_clean_names)/i, function(msg) {
