@@ -49,194 +49,117 @@
         
     };
     
-		var addMessageOnNaturalTwentyOrOne = function(roll,sides,number)
-		{
-			var result = "";
-			
-			if(sides == 20 && roll == 20 && number == 1)
-			{
-				//_*`roll CRITICAL!`*_
-				result = "_ `" + roll + " CRITICAL!` _ ";
-			}
-			else if(sides == 20 && roll == 1 && number == 1)
-			{
-				result = "_ `" + roll + " FAIL!` _ ";
-			}
-			else
-			{
-				result += "`" + roll + "` ";
-			}
-			
-			return result;
-		};
-		
-		var checkForCritical = function(roll,sides,numDice,critical) {
-			
-			if(critical)
-			{
-				return true;
-			}
-			else if(roll == 20 && sides == 20 && numDice == 1)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		};
-		
-		var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
-			var rolls = rolldice(sides, num);
-			var rollsTotal = 0;
-			var addBonus = true;
-			var result = name + " rolled " + num + "d" + sides;
-			var criticalHit = false;
-			if(bonusType.indexOf("+") != -1)
-			{
-				result += "+" + bonus;
-			}
-			else if(bonusType.indexOf("-") != -1)
-			{
-				addBonus = false;
-				result += "-" + bonus;
-			}
-			
-			if(advantage.indexOf("dis") != -1)
-			{
-				result += " with disadvantage\nFirst result: ";
-				var secondRollsTotal = rollsTotal;
-				
-				for (var j = 0; j < rolls.length; j++) {
-					
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
-					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
-					rollsTotal += rolls[j];
-				}
-				result += "\nSecond result: ";
-				rolls = rolldice(sides, num);
-				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
-					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
-					secondRollsTotal += rolls[j];
-				}
-				
-				if(secondRollsTotal < rollsTotal)
-				{
-					rollsTotal = secondRollsTotal;
-				}
-				
-				if(Number(bonus) > 0)
-				{
-					if(addBonus) {
-						rollsTotal += Number(bonus);
-					}
-					else
-					{
-						rollsTotal -= Number(bonus);
-						if(rollsTotal < 1)
-						{
-							rollsTotal = 1;
-						}
-					}
-				}
-				
-				result += "\n*Total of lowest rolls (w/ modifier): `" + rollsTotal + "`*";
-				
-			}
-			else if(advantage.indexOf("adv") != -1)
-			{
-				result += " with advantage\nFirst result: ";
-				var secondRollsTotal = rollsTotal;
-				
-				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
-					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
-					rollsTotal += rolls[j];
-				}
-				result += "\nSecond result: ";
-				rolls = rolldice(sides, num);
-				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
-					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
-					secondRollsTotal += rolls[j];
-				}
-				
-				if(secondRollsTotal > rollsTotal)
-				{
-					rollsTotal = secondRollsTotal;
-				}
-				if(Number(bonus) > 0)
-				{
-					
-					if(addBonus) 
-					{
-						rollsTotal += Number(bonus);
-					}
-					else
-					{
-						rollsTotal -= Number(bonus);
-						if(rollsTotal < 1)
-						{
-							rollsTotal = 1;
-						}
-					}
-				}
-				
-				result += "\n*Total of highest rolls (w/ modifier): `" + rollsTotal + "`*";
-				
-			}
-			else
-			{
-				if(Number(bonus) > 0)
-				{
-					if(addBonus) {
-						rollsTotal += Number(bonus);
-					}
-					else
-					{
-						rollsTotal -= Number(bonus);			
-					}
-				}
-				
-				result += "\nResult: ";
-				for (var j = 0; j < rolls.length; j++) {
-					result += addMessageOnNaturalTwentyOrOne(rolls[j],sides,num);
-					criticalHit = checkForCritical(rolls[j],sides,num,criticalHit);
-					rollsTotal += rolls[j];
-				}
-				
-				if ((rolls.length > 1) || (rolls.length == 1 && Number(bonus) > 0)) 
-				{
-					if(rollsTotal < 1)
-					{
-						rollsTotal = 1;
-					}
-					result += "\n*Total (w/ modifier): `" + rollsTotal + "`*";
-				}
-			}
+	var getRollResults = function(sides, num) {
+		var result = {
+			rolls: rolldice(sides, num),
+			rollsTotal: 0
+		}
+		for( var i = 0; i < result.rolls.length ; i++) {
+			result.rollsTotal += result.rolls[i];
+		}
+		return result;
+	};
 
-			
-			
-			var msgData = {
-				attachments: [
-					{
-						"fallback": result,
-						"color": "#cc3300",
-						"footer": "Dice Rolling Script",
-						"footer_icon": "https://a.fsdn.com/allura/p/kdicegen/icon",
-						"text": result,
-						"mrkdwn_in": ["text"]
-					}
-				]
-			};
-          if(criticalHit)
-		  {
+		
+	var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
+		var results = [];
+		var isCrit = false;
+		var isFail = false;
+		var firstResults = getRollResults(sides,num);
+		results.push(firstResults);
+		var finalResults = firstResults;
+
+		if(advantage.startsWith("adv")) {
+			var secondResults = getRollResults(sides,num);
+			results.push(secondResults);
+			if(firstResults.rollsTotal > secondResults.rollsTotal) {
+				finalResults = firstResults;
+			} else {
+				finalResults = secondResults;
+			}
+		} else if(advantage.startsWith("dis")) {
+			var secondResults = getRollResults(sides,num);
+			results.push(secondResults);
+			if(firstResults.rollsTotal > secondResults.rollsTotal) {
+				finalResults = secondResults;
+			} else {
+				finalResults = firstResults;
+			}
+		}
+
+		if(sides == 20 && num == 1) {
+			if(finalResults.rollsTotal == 20) {
+				isCrit = true;
+			} else if(finalResults.rollsTotal == 1) {
+				isFail = true;
+			}
+		}
+		// add bonus
+		var finalTotal = finalResults.rollsTotal;
+		var bonusString = "";
+		if(bonusType && (bonusType == "+" || bonusType == "-")) {
+			finalTotal = finalTotal + Number(bonusType+bonus);
+			bonusString = bonusType+bonus;
+		}
+
+		//printing results
+		var text = name + " rolled *`" + finalTotal + "`*";
+		if(advantage) {
+			if(advantage.startsWith("adv")) {
+				text += " with advantage";	
+			} else if (advantage.startsWith("dis")) {
+				text += " with disadvantage";
+			}
+		}
+		if(isCrit) {
+			text += " `_CRITICAL!_`";
+		} else if(isFail) {
+			text += " `FAIL!`";
+		}
+		text += "\n";
+
+		var formatResult = function(num, sides, bonusString, result) {
+			var m = "_" + num + "d" + sides + bonusString + "_ : ";
+			if(result.rolls.length > 1) {
+				m += "Results";
+				for(var i = 0; i < result.rolls.length; i++) {
+					m += " `"+result.rolls[i]+"`"
+				}
+				m += " " + bonusString;
+			} else {
+				m += "Result _" + result.rollsTotal + bonusString+"_"
+			}
+			m += "  Total: _" + (result.rollsTotal+Number(bonusString)) + "_\n"
+
+			return m;
+		};
+
+		for(var i = 0; i < results.length; i++) {
+			text += formatResult(num,sides,bonusString,results[i]);
+		}
+
+		//build slack message
+		var msgData = {
+			attachments: [
+				{
+					"fallback": text,
+					"color": "#cc3300",
+					"text": text,
+					"mrkdwn_in": ["text"]
+				}
+			]
+		};
+		
+		if(isCrit) {
 			msgData.attachments.push({"image_url": "http://www.neverdrains.com/criticalhit/images/critical-hit.jpg", "text": "*CRITICAL!*","mrkdwn_in": ["text"]});
-		  }
-		  
-          return msgData;
-        };
+		}
+		if(isFail) {
+			msgData.attachments.push({"image_url": "http://i.imgur.com/eVW7XtF.jpg", "text": "*FAIL!*","mrkdwn_in": ["text"]});
+		}
+		
+		return msgData;
+	};		
+
 /*
         robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
             var callerName = msg.message.user.name;
