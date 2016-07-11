@@ -105,9 +105,9 @@
 		//printing results
 		var text = name + " rolled *`" + finalTotal + "`*";
 		if(advantage) {
-			if(advantage.startsWith("adv")) {
+			if(advantage.toString().startsWith("adv")) {
 				text += " with advantage";	
-			} else if (advantage.startsWith("dis")) {
+			} else if (advantage.toString().startsWith("dis")) {
 				text += " with disadvantage";
 			}
 		}
