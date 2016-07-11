@@ -219,7 +219,7 @@
       {
         return res.send(getHelpText());
       }
-      		var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\w]+)/i);
+      		var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\w]+)?/i);
 		  
 		  if(match != null)
 		  {
