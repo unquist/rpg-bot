@@ -34,7 +34,7 @@
         };
     var getHelpText = function()
     {
-      var helpText = "Usage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage)_";
+      var helpText = "Usage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage) (label)_";
       helpText += "\nX is the number of dice, and Y is the number of sides.";
       helpText += "\nOnly the first paramter, e.g. XdY, is required.";
       helpText += "\nDice roller will recognize a critical hit (natural 20) and miss (natural 1) when rolling a 1d20.";
@@ -61,7 +61,7 @@
 	};
 
 		
-	var diceBot = function(name,num,sides,bonusType,bonus,advantage) {
+	var diceBot = function(name,num,sides,bonusType,bonus,advantage,label) {
 		var results = [];
 		var isCrit = false;
 		var isFail = false;
@@ -104,6 +104,7 @@
 
 		//printing results
 		var text = name + " rolled *`" + finalTotal + "`*";
+
 		if(advantage) {
 			if(advantage.indexOf("dis") != -1) {
 				text += " with disadvantage";	
@@ -111,8 +112,13 @@
 				text += " with advantage";
 			}
 		}
+
+		if(label) {
+			text += " for _'"+label+"'_";
+		}
+
 		if(isCrit) {
-			text += " `_CRITICAL!_`";
+			text += " _`CRITICAL!`_";
 		} else if(isFail) {
 			text += " `FAIL!`";
 		}
@@ -129,7 +135,7 @@
 			} else {
 				m += "Result _" + result.rollsTotal + bonusString+"_"
 			}
-			m += "  Total: _" + (result.rollsTotal+Number(bonusString)) + "_\n"
+			m += "  Total: _*" + (result.rollsTotal+Number(bonusString)) + "*_\n"
 
 			return m;
 		};
@@ -213,8 +219,8 @@
       {
         return res.send(getHelpText());
       }
-      
-		  var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i);
+      		var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\w]+)/i);
+		  
 		  if(match != null)
 		  {
 			  var num = match[1] || 1;
@@ -223,7 +229,17 @@
 			  var bonus = match[5] || 0;
 			  var advantage = match[6] || "";
 			  
-			  var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage);
+			  var label = match[7] || "";
+
+			  if(label && ! advantage) {
+			  	if(label.indexOf("adv") == 0 || label.indexOf("dis") == 0) {
+			  		//swap label and advantage if ncessary.
+			  		advantage = label;
+			  		label = "";
+			  	}
+			  }
+
+			  var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage,label);
 			  msgData['channel'] = channel_name;
 			  msgData['response_type'] = 'in_channel';
 			  
