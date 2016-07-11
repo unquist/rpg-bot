@@ -200,6 +200,27 @@
       return user.real_name;
     };
   
+  	/*
+	 * returns a msgData object representing the slack response on success or null if it couldn't parse the input
+  	*/
+    var doRoll = function(realName,text) {
+    	var match = text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\w]+)?/i);
+		  
+		if(match != null)
+		{
+			var num = match[1] || 1;
+			var sides = match[3] || 6;
+			var bonusType = match[4] || "";
+			var bonus = match[5] || 0;
+			var advantage = match[6] || "";  
+			var label = match[7] || "";
+
+			 var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage,label);
+			 return msgData;
+		}
+		return null;
+    };
+
     robot.router.post('/hubot/roll', function(req, res) {
       robot.logger.debug("Received a POST request to /hubot/roll");
           
@@ -219,44 +240,57 @@
       {
         return res.send(getHelpText());
       }
-      		var match = data.text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\w]+)/i);
-		  
-		  if(match != null)
-		  {
-			  var num = match[1] || 1;
-			  var sides = match[3] || 6;
-			  var bonusType = match[4] || "";
-			  var bonus = match[5] || 0;
-			  var advantage = match[6] || "";
-			  
-			  var label = match[7] || "";
 
-			  if(label && ! advantage) {
-			  	if(label.indexOf("adv") == 0 || label.indexOf("dis") == 0) {
-			  		//swap label and advantage if ncessary.
-			  		advantage = label;
-			  		label = "";
-			  	}
-			  }
+      var text = data.text; //create a copy since we will be modifying this
+  	  var match = text.match(/(\d+)(d)(\d+)/ig);
 
-			  if(label && ! bonus) {
-			      //if label is just a number swap, otherwise keep it
-			      if(!isNaN(parseFloat(label)) && isFinite(label)) {
-				  bonus = label;
-				  label = "";
-			      }
-			  }
+  	  if(! match) {
+  	  	robot.logger.debug("failed match!");
+  	  	return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+  	  }
 
-			  var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage,label);
-			  msgData['channel'] = channel_name;
-			  msgData['response_type'] = 'in_channel';
-			  
-			  return res.json(msgData);
-		  }
-		  else
-		  {
-			  return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
-		  }
+  	  args = [];
+	var match = text.match(/(\d+)(d)(\d+)/ig);
+	for (var i = match.length-1 ; i >= 0; i--) {
+  		var idx = text.lastIndexOf(match[i]);
+  		arg = text.slice(idx);
+  		args.push(arg);
+  		text = text.slice(0,idx);
+  		console.log("arg: "+arg);
+  		console.log("remaining: "+text);
+	}
+
+	  var msgData = null;
+	  for (var i = args.length-1; i >= 0; i--) {
+	    robot.logger.debug("Rolling: "+args[i]);
+	    nextMessage = doRoll(realName,args[i]);
+	    if(nextMessage) {
+	    	if(msgData == null) {
+	    		msgData = nextMessage;
+	    	} else {
+	    		msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
+	    	}
+	    } else {
+	    	return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+	    }
+	    
+	  }
+
+		msgData['channel'] = channel_name;
+		msgData['response_type'] = 'in_channel';	  
+		return res.json(msgData);
+		/*
+      msgData = doRoll(realName,data.text);
+      if(msgData) {
+
+      	msgData['channel'] = channel_name;
+		msgData['response_type'] = 'in_channel';
+
+		return res.json(msgData);
+      } else {
+      	return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+      }
+*/
     });
       
     };
