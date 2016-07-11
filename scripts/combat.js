@@ -827,6 +827,9 @@
 		var combatantsArray = robot.brain.get('combatantsArray');
 		var numTotalCombatants = robot.brain.get('numTotalCombatants');
     
+    var currentTurnIndex = robot.brain.get('currentTurnIndex');
+  	var currentPlayer = combatantsArray[currentTurnIndex];
+    
   		//now construct our response message.
   		var reply = "";
   		if(combatantsToBeKilled.length < 1)
