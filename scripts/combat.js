@@ -1287,17 +1287,11 @@
 							{
 							  robot.logger.debug("original playerId arry set to->"+playerId+"<--");
 							  var playerIdArray = new Array();
-							  if(playerId.length == 1)
-							  {
-							    playerIdArray.push(Number(playerId));
-							  }
-							  else
-							  {
-  							  for(var k = 1; k < playerId.length; k++)
-  							  {
-  							    playerIdArray.push(Number(playerId[k]));
-  							  }
-							  }
+							  for(var k = 0; k < playerId.length; k++)
+  							{
+  							  playerIdArray.push(Number(playerId[k]));
+  							}
+							  
 							  robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
 								reply = combatKill(username,playerIdArray);
 							}
