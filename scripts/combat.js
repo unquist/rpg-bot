@@ -1275,18 +1275,25 @@
 					case "kill":
 						if(parameters != "")
 						{
-							var playerID = parameters.match(/(\d+)/ig) || -1;
-							if(playerID == -1)
+							var playerId = parameters.match(/(\d+)/ig) || -1;
+							if(playerId == -1)
 							{
 								reply = "Need to specify the id or ids of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
 							}
 							else
 							{
-							  robot.logger.debug("original playerID arry set to->"+playerID+"<--");
+							  robot.logger.debug("original playerId arry set to->"+playerId+"<--");
 							  var playerIdArray = new Array();
-							  for(var k = 1; k < playerID.length; k++)
+							  if(playerId.length == 1)
 							  {
-							    playerIdArray.push(Number(playerID[k]));
+							    playerIdArray.push(Number(playerId));
+							  }
+							  else
+							  {
+  							  for(var k = 1; k < playerId.length; k++)
+  							  {
+  							    playerIdArray.push(Number(playerId[k]));
+  							  }
 							  }
 							  robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
 								reply = combatKill(username,playerIdArray);
