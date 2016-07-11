@@ -69,21 +69,21 @@
 		results.push(firstResults);
 		var finalResults = firstResults;
 
-		if(advantage.startsWith("adv")) {
+		if(advantage.indexOf("dis") != -1) {
 			var secondResults = getRollResults(sides,num);
 			results.push(secondResults);
 			if(firstResults.rollsTotal > secondResults.rollsTotal) {
-				finalResults = firstResults;
-			} else {
 				finalResults = secondResults;
+			} else {
+				finalResults = firstResults;
 			}
-		} else if(advantage.startsWith("dis")) {
+		} else if(advantage.indexOf("adv") != -1) {
 			var secondResults = getRollResults(sides,num);
 			results.push(secondResults);
 			if(firstResults.rollsTotal > secondResults.rollsTotal) {
-				finalResults = secondResults;
-			} else {
 				finalResults = firstResults;
+			} else {
+				finalResults = secondResults;
 			}
 		}
 
@@ -106,9 +106,9 @@
 		var text = name + " rolled *`" + finalTotal + "`*";
 		if(advantage) {
 			if(advantage.indexOf("dis") != -1) {
-				text += " with advantage";	
+				text += " with disadvantage";	
 			} else if (advantage.indexOf("adv") != -1) {
-				text += " with disadvantage";
+				text += " with advantage";
 			}
 		}
 		if(isCrit) {
