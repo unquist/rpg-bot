@@ -239,6 +239,11 @@
 			  	}
 			  }
 
+			  if(label && ! bonus) {
+			      bonus = label;
+			      label = "";
+			  }
+
 			  var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage,label);
 			  msgData['channel'] = channel_name;
 			  msgData['response_type'] = 'in_channel';
