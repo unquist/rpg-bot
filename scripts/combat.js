@@ -258,14 +258,23 @@
   			//ready to start combat?
   			if(numRegisteredCombatants == numTotalCombatants)
   			{
-  				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
-  				reply += "\nAll Combatants accounted for.";
-  				reply += "\nHere is the combat order:";
-  				
-  				combatantsArray = combatantsArray.sort(combatantSortByInit);
+  			  combatantsArray = combatantsArray.sort(combatantSortByInit);
   				robot.brain.set('combatantsArray',combatantsArray);
   				robot.brain.set('currentTurnIndex',0);
   				var firstPlayer = combatantsArray[0];
+  			  
+  				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
+  				reply += "\nAll Combatants accounted for.";
+  				
+  				if(firstPlayer.type == PC_TYPE) {
+					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
+				  } else if (firstPlayer.type == MONSTER_TYPE) {
+					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
+				  }	
+  				
+  				reply += "\nHere is the combat order:";
+  				
+  				
   				for(var k = 0; k < combatantsArray.length; k++)
   				{
   					var order = k + 1;
@@ -277,11 +286,7 @@
   				}
   				
   				
-  				if(firstPlayer.type == PC_TYPE) {
-					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				  } else if (firstPlayer.type == MONSTER_TYPE) {
-					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				  }	
+  			
   				
   				return reply; 
   			}
@@ -362,14 +367,23 @@
 			//ready to start combat?
 			if(numRegisteredCombatants == numTotalCombatants)
 			{
-				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
-				reply += "\nAll Combatants accounted for.";
-				reply += "\nHere is the combat order:";
-				
-				combatantsArray = combatantsArray.sort(combatantSortByInit);
+			  
+			  combatantsArray = combatantsArray.sort(combatantSortByInit);
 				robot.brain.set('combatantsArray',combatantsArray);
 				robot.brain.set('currentTurnIndex',0);
 				var firstPlayer = combatantsArray[0];
+			  
+				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
+				reply += "\nAll Combatants accounted for.";
+				if(firstPlayer.type == PC_TYPE) {
+					reply += "\n*" + firstPlayer.name + ", you're up first!*";
+				} else if (firstPlayer.type == MONSTER_TYPE) {
+					reply += "\n*" + firstPlayer.name + ", you're up first!*";
+				}	
+	
+				reply += "\nHere is the combat order:";
+				
+		
 				for(var k = 0; k < combatantsArray.length; k++)
 				{
 					var order = k + 1;
@@ -379,13 +393,7 @@
 						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					}					
 				}
-				
-				if(firstPlayer.type == PC_TYPE) {
-					reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				} else if (firstPlayer.type == MONSTER_TYPE) {
-					reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				}	
-				
+
 				return reply; 
 			}
 			else
