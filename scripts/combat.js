@@ -53,7 +53,7 @@
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat add [BONUS]_* - Use this to add a player to a combat that has already started. BONUS is your Dex. initiative bonus.";
 			reply += "\n\n*_/combat add-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can use this to add new monsters to a fight that has already started.";
-			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat.";
+			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
 			return reply;
@@ -152,7 +152,14 @@
 			}
 			//combat needs to end
 			
-			robot.brain.set('combat_flag', 0);
+			combatCleanupAfterEnd();
+			
+			robot.logger.debug("Ending combat.");
+			return callerName+" decided that enough is enough.\nEnding Combat (all combat data cleared).";
+		};
+		
+		var combatCleanupAfterEnd = function(){
+		  robot.brain.set('combat_flag', 0);
 			//TODO: any other cleanup work (like removing persistent variables)
 			delete robot.brain.data._private['numRegisteredCombatants'];
 			delete robot.brain.data._private['numTotalCombatants'];
@@ -168,9 +175,6 @@
 				}
 			}
 			delete robot.brain.data._private['combatantsArray'];
-			
-			robot.logger.debug("Ending combat.");
-			return callerName+" decided that enough is enough.\nEnding Combat (all combat data cleared).";
 		};
 		
 
@@ -838,7 +842,7 @@
   		}
   		else if(combatantsToBeKilled.length == 1)
   		{
-  		  reply += combatantsToBeKilled[0].name + " "  + getRandomDeathEuphemism() + ".\nHere's who's still standing:";
+  		  reply += combatantsToBeKilled[0].name + " "  + getRandomDeathEuphemism() + "\n";
   		}
   		else
   		{
@@ -847,7 +851,39 @@
   		    reply += combatantsToBeKilled[k].name + " "  + getRandomDeathEuphemism() + ".\n";
   		  }
   		  
-  		  reply += "Here's who's still standing:";
+  		}
+  		
+  		//now we need to check and see if that removed enough combatants to remove the total to one or zero.
+  		if(combatantsArray.length == 0)
+  		{
+  		  //should be an extreme edge case.
+  		  reply += "Mutually assured destrution: all combatants are dead!\nEnding combat and clearing combat data.\n";
+  		  combatCleanupAfterEnd();
+  		  return reply;
+  		}
+  		else if(combatantsArray.length == 1)
+  		{
+  		  reply += "*_" + combatantsArray[0].name + "_* is the only one still standing when the dust clears.\n";
+  			reply += "Ending combat and clearing combat data.\n";
+  			combatCleanupAfterEnd();
+  		  return reply;
+  		}
+  		
+  		
+  		//now check if the number of enemies remaining is zero
+  		var numMonstersRemaining = 0
+			for(var k = 0; k < combatantsArray.length; k++)
+			{
+			  if(combatantsArray[k].type == MONSTER_TYPE)
+			  {
+			    numMonstersRemaining +=1;
+			  }
+			}
+  		if(numMonstersRemaining < 1)
+  		{
+  		  reply += "All hostile monsters eliminated!\nEnding combat and clearing combat data.\n";
+  		  combatCleanupAfterEnd();
+  		  return reply;
   		}
   		
   		for(var k = 0; k < combatantsArray.length; k++)
