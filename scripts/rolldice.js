@@ -240,8 +240,11 @@
 			  }
 
 			  if(label && ! bonus) {
-			      bonus = label;
-			      label = "";
+			      //if label is just a number swap, otherwise keep it
+			      if(!isNaN(parseFloat(label)) && isFinite(label)) {
+				  bonus = label;
+				  label = "";
+			      }
 			  }
 
 			  var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage,label);
