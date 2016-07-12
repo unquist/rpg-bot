@@ -842,13 +842,13 @@
   		}
   		else if(combatantsToBeKilled.length == 1)
   		{
-  		  reply += combatantsToBeKilled[0].name + " "  + getRandomDeathEuphemism() + "\n";
+  		  reply += "_*" + combatantsToBeKilled[0].name + "*_ "  + getRandomDeathEuphemism() + "\n";
   		}
   		else
   		{
   		  for(var k = 0; k < combatantsToBeKilled.length; k++)
   		  {
-  		    reply += combatantsToBeKilled[k].name + " "  + getRandomDeathEuphemism() + ".\n";
+  		    reply += "_*" + combatantsToBeKilled[k].name + "*_ "  + getRandomDeathEuphemism() + ".\n";
   		  }
   		  
   		}
