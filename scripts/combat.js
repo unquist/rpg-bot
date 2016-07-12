@@ -359,7 +359,7 @@
 			{
 				var index = k + 1;
 				numCombatantsIndex += 1;
-				var thisMonsterName = enemy_name.getRandomEnemyName() + " the " + monsterName;
+				var thisMonsterName = enemy_name.getRandomEnemyName() + " (" + monsterName +")";
 				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE);
 				combatantsArray.push(newCombatant);
 			}
