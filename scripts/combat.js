@@ -1152,6 +1152,8 @@
 			command = data.command;
 		   
 			token = data.token;
+			robot.logger.debug("received token:["+token+"]");
+			//robot.logger.debug("stored token is:["+process.env.)
 			//username = data.user_name;
 			username = getRealNameFromId(data.user_id);
 			channel_name = data.channel_name;

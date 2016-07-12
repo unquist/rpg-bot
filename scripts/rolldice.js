@@ -232,6 +232,10 @@
 		  command = data.command;
       //text = data.text;     
 		  token = data.token;
+		  
+		  robot.logger.debug("received token:["+token+"]");
+		  robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
+		  
 		  username = data.user_name;
 		  userId = data.user_id;
 		  realName = getRealNameFromId(userId);
