@@ -38,13 +38,13 @@
       helpText += "\nX is the number of dice, and Y is the number of sides.";
       helpText += "\nOnly the first paramter, e.g. XdY, is required.";
       helpText += "\nDice roller will recognize a critical hit (natural 20) and miss (natural 1) when rolling a 1d20.";
-      helpText += "\nThe minimum value that dice roller will return is always 1.";
+      helpText += "\nYou can string together as many dice rolls as you want (see example below).";
       helpText += "\n\nExamples:";
-      helpText += "\n/roll 2d6    (Rolls two six-sided dice)";
-      helpText += "\n/roll 3d20+2    (Rolls three twenty-sided dice and adds two to the result)";
+      helpText += "\n/roll 3d6+2    (Rolls three six-sided dice and adds two to the result)";
       helpText += "\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)";
       helpText += "\n/roll 1d4 dis    (Rolls a single four-sided die twice and takes the lower result.)";
-      return helpText;
+      helpText += "\n/roll 1d20+1 to hit with a short sword 2d8 slashing damage    (First rolls one twenty-sided die and adds a +1 bonus and returns the result, then rolls two eight sided dice and returns the result.)";
+	  return helpText;
       
         
     };
