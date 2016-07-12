@@ -236,6 +236,11 @@
 		  robot.logger.debug("received token:["+token+"]");
 		  robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
 		  
+		  if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
+		  {
+			  return res.send("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?");
+		  }
+		  
 		  username = data.user_name;
 		  userId = data.user_id;
 		  realName = getRealNameFromId(userId);
