@@ -240,7 +240,10 @@
 		  {
 			  return res.send("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?");
 		  }
-		  
+		  else
+		  {
+			  robot.logger.debug("Request authenticated.");
+		  }
 		  username = data.user_name;
 		  userId = data.user_id;
 		  realName = getRealNameFromId(userId);
