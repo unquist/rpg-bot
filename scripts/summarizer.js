@@ -20,7 +20,7 @@
             return Math.round(Math.random() * (sides - 1)) + 1;
         };
 		
-		robot.respond(/^(.*)(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
+		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
 			robot.logger.debug(util.inspect(msg));
 			return msg.reply("Test");
