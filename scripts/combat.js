@@ -266,9 +266,11 @@
   				robot.brain.set('combatantsArray',combatantsArray);
   				robot.brain.set('currentTurnIndex',0);
   				var firstPlayer = combatantsArray[0];
-  			  
+				
+				
+			  
   				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
-  				reply += "\nAll Combatants accounted for.";
+  				reply += "\nCombat started:.";
   				
   				if(firstPlayer.type == PC_TYPE) {
 					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
