@@ -30,7 +30,7 @@
 			
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
 			.then(function (res) {
-				robot.logger.debug("Successfully retrieved channel history. Result was " + inspect(res));
+				robot.logger.debug("Successfully retrieved channel history. Result was " + util.inspect(res));
 			})
 			.catch(function (err) {
 				robot.logger.debug("Couldn't get channel history: " + err);
