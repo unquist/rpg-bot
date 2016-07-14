@@ -26,7 +26,7 @@
 		
 		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
-			robot.logger.debug(util.inspect(msg));
+			//robot.logger.debug(util.inspect(msg));
 			
 			
 			var timeNow = new Date();
@@ -40,11 +40,12 @@
 			
 			//utc:
 			//var utcTime = timeNow.getTime() / 1000;
-			var utcTargetPastTime = targetPastTime.getTime();
+			var utcTargetPastTime = (targetPastTime.getTime())/1000;
 			
 			var params = {
 				channel: campaignChannelId,
-				oldest: utcTargetPastTime
+				oldest: utcTargetPastTime,
+				count: 1000
 			};
 			
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
