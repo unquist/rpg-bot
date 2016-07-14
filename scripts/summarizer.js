@@ -22,7 +22,7 @@
 		
 		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
-			//robot.logger.debug(util.inspect(msg));
+			robot.logger.debug(util.inspect(msg));
 			
 			var params = {
 				channel: msg.message.room
