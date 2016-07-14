@@ -16,6 +16,15 @@
     module.exports = function(robot) {
         var util = require("util");
 		
+		var getRealNameFromId = function(userId){
+			var user = robot.brain.data.users[userId];
+			if(user == null)
+			{
+				return "<Unknown User>"
+			}
+            return user.real_name;
+		};
+		
 		//TODO: move this to something more modular. Maybe an environment variable?
 		var summaryChannelId = 'C1RJ8KRD5';
 		var campaignChannelId = 'C1D2ZTKF0';
@@ -56,7 +65,7 @@
 				for(var k = 0; k < res.messages.length; k++)
 				{
 					var archivedMessage = res.messages[k];
-					robot.logger.debug("msg[] -> user:["+archivedMessage.user+"] text:["+archivedMessage.text+"]");
+					robot.logger.debug("msg[] -> user:["+getRealNameFromId(archivedMessage.user)+"] text:["+archivedMessage.text+"]");
 				}
 							
 				var msgData = {
