@@ -49,7 +49,7 @@
 				
 				if(name == "<Unknown User>")
 				{
-					util.inspect(archivedMessage);
+					robot.logger.debug(util.inspect(archivedMessage));
 				}
 				
 				//robot.logger.debug("Msg["+k+"] -> user_id:["+archivedMessage.user+"] user:["+name+"] txt:["+txt+"]");
