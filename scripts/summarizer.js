@@ -31,7 +31,7 @@
 			
 			var timeNow = new Date();
 			var targetPastTime = new Date();
-			var numberOfTimeUnits = Number(msg.match[2] || 0;
+			var numberOfTimeUnits = Number(msg.match[2]) || 0;
 			var typeOfTimeUnits = msg.match[3] || "hour";
 			
 			robot.logger.debug("User ["+callerName+"] asked for the log for ["+numberOfTimeUnits+"] ["+typeOfTimeUnits+"].");
