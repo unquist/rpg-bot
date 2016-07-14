@@ -47,11 +47,18 @@
 				oldest: utcTargetPastTime,
 				count: 1000
 			};
-			
+						
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
 			.then(function (res) {
-				robot.logger.debug("Successfully retrieved channel history. Result was " + util.inspect(res));
+				robot.logger.debug("Successfully retrieved channel history.");
 				//create the message with attachment object
+				var new 
+				for(var k = 0; k < res.messages.length; k++)
+				{
+					var archivedMessage = res.messages[k];
+					robot.logger.debug("msg[] -> user:["+archivedMessage.user+"] text:["+archivedMessage.text+"]");
+				}
+							
 				var msgData = {
 					channel: summaryChannelId,
 					text: "Summary test"
