@@ -75,10 +75,10 @@
 					continue;
 				}
 				
-				summaryMessage += "*"+name+"*: " + txt + "\n\n";
+				
 			}
-							
-		}
+			return filteredMessages;				
+		};
 		
 		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
@@ -126,6 +126,10 @@
 				robot.logger.debug("Successfully retrieved channel history.");
 				//create the message with attachment object
 				var summaryMessage = ""; 
+				
+				messageFilter(res.messages);
+				
+				//summaryMessage += "*"+name+"*: " + txt + "\n\n";
 				
 				var msgData = {
 					channel: "@"+callerName,
