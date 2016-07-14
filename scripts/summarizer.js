@@ -22,7 +22,11 @@
 			{
 				return "<Unknown User>"
 			}
-            return user.real_name;
+			else if(user.real_name == "")
+			{
+				return "SYSTEM";
+			}
+		    return user.real_name;
 		};
 		
 		//TODO: move this to something more modular. Maybe an environment variable?
@@ -61,16 +65,31 @@
 			.then(function (res) {
 				robot.logger.debug("Successfully retrieved channel history.");
 				//create the message with attachment object
-				//var new 
+				var summaryMessage = ""; 
 				for(var k = 0; k < res.messages.length; k++)
 				{
 					var archivedMessage = res.messages[k];
-					robot.logger.debug("msg[] -> user:["+getRealNameFromId(archivedMessage.user)+"] text:["+archivedMessage.text+"]");
+					var name = getRealNameFromId(archivedMessage.user);
+					//throw away any system messages
+					if(name == "SYSTEM")
+					{
+						continue;
+					}
+					
+					var txt = archivedMessage.text;
+					
+					//throw away any text that starts with quotation formatting
+					if(txt.indexOf("&gt;") != -1)
+					{
+						continue;
+					}
+					
+					summaryMessage += "*"+name+"*: " + txt + "\n";
 				}
 							
 				var msgData = {
 					channel: summaryChannelId,
-					text: "Summary test"
+					text: summaryMessage
 				};
 
 				//post the message
