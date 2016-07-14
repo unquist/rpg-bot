@@ -84,7 +84,7 @@
 						continue;
 					}
 					
-					if(archivedMessage.subtype = "me_message")
+					if(archivedMessage.subtype == "me_message")
 					{
 						txt = "_"+txt+"_";
 					}
