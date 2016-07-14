@@ -43,7 +43,7 @@
 					text: "Summary test"
 				};
 
-				# post the message
+				//post the message
 				robot.adapter.customMessage(msgData);
 			})
 			.catch(function (err) {
