@@ -52,7 +52,7 @@
 			.then(function (res) {
 				robot.logger.debug("Successfully retrieved channel history.");
 				//create the message with attachment object
-				var new 
+				//var new 
 				for(var k = 0; k < res.messages.length; k++)
 				{
 					var archivedMessage = res.messages[k];
