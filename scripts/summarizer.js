@@ -84,7 +84,12 @@
 						continue;
 					}
 					
-					summaryMessage += "*"+name+"*: " + txt + "\n";
+					if(archivedMessage.subtype = "me_message")
+					{
+						txt = "_"+txt+"_";
+					}
+					
+					summaryMessage += "*"+name+"*: " + txt + "\n\n";
 				}
 							
 				var msgData = {
