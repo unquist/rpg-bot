@@ -22,10 +22,27 @@
 		
 		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
-			robot.logger.debug(util.inspect(msg));
+			//robot.logger.debug(util.inspect(msg));
+			
+			var params = {
+				channel: msg.message.room
+			};
+			
+			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
+			.then(function (res) {
+				robot.logger.debug("Successfully retrieved channel history. Result was " + inspect(res));
+			})
+			.catch(function (err) {
+				robot.logger.debug("Couldn't get channel history: " + err);
+			});
+			
 			return msg.reply("Test");
         });
 		
+		
+		var getChannelHistory = function (msgObj, robot) {
+
+		}
 		
 /*End function definitions*/
 	};
