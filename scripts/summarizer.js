@@ -66,7 +66,7 @@
 				robot.logger.debug("Successfully retrieved channel history.");
 				//create the message with attachment object
 				var summaryMessage = ""; 
-				for(var k = 0; k < res.messages.length; k++)
+				for(var k = res.messages.length-1; k >= 0; k--)
 				{
 					var archivedMessage = res.messages[k];
 					var name = getRealNameFromId(archivedMessage.user);
