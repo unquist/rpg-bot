@@ -40,7 +40,7 @@
 			
 			//utc:
 			//var utcTime = timeNow.getTime() / 1000;
-			var utcTargetPastTime = targetPastTime.getTime() /1000;
+			var utcTargetPastTime = targetPastTime.getTime();
 			
 			var params = {
 				channel: campaignChannelId,
