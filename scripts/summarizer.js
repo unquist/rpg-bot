@@ -25,7 +25,7 @@
 			robot.logger.debug(util.inspect(msg));
 			
 			var params = {
-				channel: msg.message.room
+				channel: msg.message.rawMessage.channel
 			};
 			
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
