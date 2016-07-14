@@ -104,7 +104,7 @@
 					break;
 				case "day":
 				case "days":
-					targetPastTime.setDays(timeNow.getDays()-numberOfTimeUnits);
+					targetPastTime.setDate(timeNow.getDate()-numberOfTimeUnits);
 					break;
 				default:
 					return msg.reply("I didn't recognize ["+typeOfTimeUnits+"]. Valid units are `minutes`, `hours` or `days`.");
