@@ -47,14 +47,17 @@
 				var name = getRealNameFromId(archivedMessage.user);
 				var txt = archivedMessage.text;
 				
-				robot.logger.debug("Msg["+k+"] -> user_id:["+archivedMessage.user+"] user:["+name+"] txt:["+txt+"]");
+				if(name == "<Unknown User>")
+				{
+					util.inspect(archivedMessage);
+				}
+				
+				//robot.logger.debug("Msg["+k+"] -> user_id:["+archivedMessage.user+"] user:["+name+"] txt:["+txt+"]");
 				//throw away any system messages
 				if(name == "SYSTEM")
 				{
 					continue;
 				}
-				
-				
 				
 				//regex will find text enclosed by 1 or 3 backticks, or italicized
 				var match = txt.match(/`{1}([^`]+)`{1}|`{3}([^`]+)`{3}|_{1}([^_]+)_{1}/i);
@@ -62,7 +65,7 @@
 				if(match != null)
 				{
 					//found a match, so this message goes into the array.
-					robot.logger.debug("Matched regex; insert into array and continue.");
+					//robot.logger.debug("Matched regex; insert into array and continue.");
 					filteredMessages.push(archivedMessage);
 					continue;
 				}
@@ -70,7 +73,7 @@
 				//we also want to save "/me" messages
 				if(archivedMessage.subtype == "me_message")
 				{
-					robot.logger.debug("Found /me message. Insert into arrary and continue");
+					//robot.logger.debug("Found /me message. Insert into arrary and continue");
 					filteredMessages.push(archivedMessage);
 					continue;
 				}
