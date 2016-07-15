@@ -78,6 +78,12 @@
 					continue;
 				}
 				
+				//we want to show combat start and end messages
+				if(archivedMessage.subtype == "bot_message")
+				{
+				
+				}
+				
 				
 			}
 			return filteredMessages;				

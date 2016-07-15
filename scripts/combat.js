@@ -42,6 +42,29 @@
       return user.real_name;
     };
 		
+		var countCombatantTypes = function(combatantsArray)
+		{
+			var combatantTypes = {};
+			
+			for(int k = 0; k < combatantsArray.length; k++)
+			{
+				var combatant = combatantsArray[k];
+				var combatantType = combatant.monsterType;
+				if(combatantType in combatantTypes)
+				{
+					var currentCount = Number(combatantTypes[combatantType]);
+					currentCount += 1;
+					combatantTypes[combatantType] = currentCount;
+				}
+				else
+				{
+					combatantTypes[combatantType] = 1;
+				}
+			}
+			
+			return combatantTypes;
+		};
+		
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
@@ -76,12 +99,13 @@
             return randint(sides);
         };
 		
-		function Combatant (name,id,init,type) {
+		function Combatant (name,id,init,type,monsterType) {
 			this.name = name;
 			this.id = id;
 			this.tieBreaker = rolldie(10000);
 			this.init = Number(init);
 			this.type = Number(type);
+			this.monsterType = monsterType;
 		};
  	
 		var combatantSortByName = function(a,b) {
@@ -219,30 +243,30 @@
 
 		var combatInit = function(callerName, bonus) {
 		    var combat_started = robot.brain.get('combat_flag');
-			  var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
-			  //array of players
-			  var combatantsArray = robot.brain.get('combatantsArray');
-			  var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
 			
 			
-			  if(combat_started != 0 && combat_started != 1)
-  			{
-  				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			  	robot.brain.set('combat_flag', 0);
-				  return "No combat started "+callerName+". Begin with `/combat start`";
-			  }  
-			  if(combat_started == 0)
-			  {
-				  return "Don't get trigger happy "+callerName+". Need to start combat before you roll initiative...";
-		    }
-			  else if(numTotalCombatants == numRegisteredCombatants)
-			  {
-				  return "This combat is full up "+callerName+".";
-		  	}
-			  else if(robot.brain.get(callerName+"_initScore") != null)
-  			{
-  				return callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use *_/combat setinit [init]_* to manually fix your initiative, up until the start of combat.";
-  			}
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return "No combat started "+callerName+". Begin with `/combat start`";
+			}  
+			if(combat_started == 0)
+			{
+				return "Don't get trigger happy "+callerName+". Need to start combat before you roll initiative...";
+			}
+			else if(numTotalCombatants == numRegisteredCombatants)
+			{
+				return "This combat is full up "+callerName+".";
+			}
+			else if(robot.brain.get(callerName+"_initScore") != null)
+			{
+				return callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies. You can use *_/combat setinit [init]_* to manually fix your initiative, up until the start of combat.";
+			}
   			
   			
   			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
@@ -251,7 +275,7 @@
   			var initScore = initRoll + bonus;
 			numRegisteredCombatants += 1;
 			
-  			var newCombatant = new Combatant(callerName,numRegisteredCombatants,initScore,PC_TYPE);
+  			var newCombatant = new Combatant(callerName,numRegisteredCombatants,initScore,PC_TYPE,"PC");
   			robot.brain.set(callerName+"_initScore",initScore);
   			
   			combatantsArray.push(newCombatant);
@@ -262,15 +286,41 @@
   			//ready to start combat?
   			if(numRegisteredCombatants == numTotalCombatants)
   			{
-  			  combatantsArray = combatantsArray.sort(combatantSortByInit);
+				combatantsArray = combatantsArray.sort(combatantSortByInit);
   				robot.brain.set('combatantsArray',combatantsArray);
   				robot.brain.set('currentTurnIndex',0);
   				var firstPlayer = combatantsArray[0];
 				
+				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
 				
-			  
-  				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
-  				reply += "\nCombat started:.";
+				reply += "\nAll Combatants accounted for, starting combat.\n";
+				var combatantTypes = countCombatantTypes(combatantsArray);
+				
+				var numberOfPCs = Number(combatantTypes['PC']);
+				var PCsCounted = 0;
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					if(combatantsArray[k].type == PC_TYPE)
+					{
+						PCsCounted += 1;
+						if(PCsCounted < numberOfPCs)
+						{
+							reply += combatantsArray[k].name + ", ";
+						}
+						else
+						{
+							reply += "and " + combatantsArray[k].name + " ";
+						}
+					}
+				}
+				reply += " are fighting";
+				for(var type in combatantTypes)
+				{
+					reply += " " + combatantTypes[type] + type + "s";
+				}
+			    reply += ".\n";
+  				
+  				
   				
   				if(firstPlayer.type == PC_TYPE) {
 					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
@@ -362,7 +412,7 @@
 				var index = k + 1;
 				numCombatantsIndex += 1;
 				var thisMonsterName = enemy_name.getRandomEnemyName() + " (" + monsterName +")";
-				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE);
+				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,monsterName);
 				combatantsArray.push(newCombatant);
 			}
 			
@@ -380,7 +430,35 @@
 				var firstPlayer = combatantsArray[0];
 			  
 				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
-				reply += "\nAll Combatants accounted for.";
+								
+				reply += "\nAll Combatants accounted for, starting combat.\n";
+				var combatantTypes = countCombatantTypes(combatantsArray);
+				
+				var numberOfPCs = Number(combatantTypes['PC']);
+				var PCsCounted = 0;
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					if(combatantsArray[k].type == PC_TYPE)
+					{
+						PCsCounted += 1;
+						if(PCsCounted < numberOfPCs)
+						{
+							reply += combatantsArray[k].name + ", ";
+						}
+						else
+						{
+							reply += "and " + combatantsArray[k].name + " ";
+						}
+					}
+				}
+				reply += " are fighting";
+				for(var type in combatantTypes)
+				{
+					reply += " " + combatantTypes[type] + type + "s";
+				}
+			    reply += ".\n";			
+				
+				
 				if(firstPlayer.type == PC_TYPE) {
 					reply += "\n*" + firstPlayer.name + ", you're up first!*";
 				} else if (firstPlayer.type == MONSTER_TYPE) {
