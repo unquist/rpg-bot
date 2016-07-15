@@ -240,7 +240,7 @@
 			   
 		};
 		
-		var constructInitReplyMessage(combatantsArray,firstPlayer)
+		var constructInitReplyMessage = function(combatantsArray,firstPlayer)
 		{
 			var reply = "All Combatants accounted for. *Begin combat*!\n";
 			var combatantTypes = countCombatantTypes(combatantsArray);
@@ -317,7 +317,7 @@
 			
 
 			return reply; 
-		}
+		};
 
 		var combatInit = function(callerName, bonus) {
 		    var combat_started = robot.brain.get('combat_flag');
