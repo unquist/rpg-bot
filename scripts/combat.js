@@ -251,6 +251,7 @@
 			
 			var numberOfPCs = Number(combatantTypes['PC']);
 			var PCsCounted = 0;
+			
 			if(numberOfPCs == 1)
 			{
 				for(var k = 0; k < combatantsArray.length; k++)
@@ -299,7 +300,10 @@
 			
 			//add a final "and"
 			var lastCommaIndex = reply.lastIndexOf(",");
-			reply = reply.substring(0,lastCommaIndex) + ", and" + reply.substring(lastCommaIndex + 1, reply.length);
+			if(lastCommaIndex != -1)
+			{
+				reply = reply.substring(0,lastCommaIndex) + ", and" + reply.substring(lastCommaIndex + 1, reply.length);
+			}
 			reply += ".\n<SPLIT>";
 			
 			
