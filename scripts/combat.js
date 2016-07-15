@@ -46,7 +46,7 @@
 		{
 			var combatantTypes = {};
 			
-			for(int k = 0; k < combatantsArray.length; k++)
+			for(var k = 0; k < combatantsArray.length; k++)
 			{
 				var combatant = combatantsArray[k];
 				var combatantType = combatant.monsterType;
