@@ -145,6 +145,7 @@
 			delete robot.brain.data._private['numTotalCombatants'];
 			delete robot.brain.data._private['combatantsArray'];
 			delete robot.brain.data._private['currentTurnIndex'];
+			delete robot.brain.data._private['pc_graveyard'];
 			var key;
 			for (key in robot.brain.data._private) 
 			{
@@ -188,6 +189,7 @@
 			delete robot.brain.data._private['numRegisteredCombatants'];
 			delete robot.brain.data._private['numTotalCombatants'];
 			delete robot.brain.data._private['currentTurnIndex'];
+			delete robot.brain.data._private['pc_graveyard'];
 			
 			var combatantsArray = robot.brain.get('combatantsArray');
 			if(combatantsArray != null)
@@ -234,6 +236,8 @@
 			   var numTotalCombatants = numCombatants;
 			   robot.brain.set('numTotalCombatants',numTotalCombatants);
 			   
+			   //create an empty graveyard for PCs
+			   robot.brain.set('pc_graveyard', new Array());
 			   
 			   robot.brain.set('combat_flag', 1);
 			   return callerName+" started combat with " + numCombatants + " belligerents.\nEveryone in @channel roll for initiative with the _/combat init [BONUS]_ command!";
@@ -856,13 +860,12 @@
 		};
 		
 		
-	  var combatKill = function(callerName,combatantIdArray) {
+	var combatKill = function(callerName,combatantIdArray) {
 		var combat_started = robot.brain.get('combat_flag');
 
-		
 		if(combat_started != 0 && combat_started != 1)
 		{
-  			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
 			robot.brain.set('combat_flag', 0);
 			return "No combat started "+callerName+". Begin with `/combat start`";
 		}  
@@ -870,236 +873,248 @@
 		{
 			return "Don't get trigger happy "+callerName+". Need to start combat and roll initiative before you remove anyone...";
 		}
-	 
-	 robot.logger.debug("Kill request from " + callerName + " for IDs [" + combatantIdArray + "]");   
-	 
-	 
-	 var combatantsToBeKilled = new Array();
-    for(var k = 0; k < combatantIdArray.length; k++)
-    {
-      try{
-        var tempCombatantToBeKilled = killPlayerWithId(callerName,combatantIdArray[k]);
-        if(tempCombatantToBeKilled == -1)
-        {
-          robot.logger.debug("Didn't find player with ID ["+combatantIdArray[k]+"]");
-        }
-        else
-        {
-          combatantsToBeKilled.push(tempCombatantToBeKilled);
-        }
-      }
-      catch (error)
-      {
-        robot.logger.debug("Caught error while trying to kill player: ["+error.essage+"]");
-        return "Error occured during kill request: ["+error.essage+"]";
-      }
-
-    }
-    var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
-		//array of players
-		var combatantsArray = robot.brain.get('combatantsArray');
-		var numTotalCombatants = robot.brain.get('numTotalCombatants');
-    
-    var currentTurnIndex = robot.brain.get('currentTurnIndex');
-  	var currentPlayer = combatantsArray[currentTurnIndex];
-    
-  		//now construct our response message.
-  		var reply = "";
-  		if(combatantsToBeKilled.length < 1)
-  		{
-  		  return "No valid Ids found. No combatants removed from combat."; 
-  		}
-  		else if(combatantsToBeKilled.length == 1)
-  		{
-  		  reply += "_*" + combatantsToBeKilled[0].name + "*_ "  + getRandomDeathEuphemism() + "\n";
-  		}
-  		else
-  		{
-  		  for(var k = 0; k < combatantsToBeKilled.length; k++)
-  		  {
-  		    reply += "_*" + combatantsToBeKilled[k].name + "*_ "  + getRandomDeathEuphemism() + ".\n";
-  		  }
-  		  
-  		}
-  		
-  		//now we need to check and see if that removed enough combatants to remove the total to one or zero.
-  		if(combatantsArray.length == 0)
-  		{
-  		  //should be an extreme edge case.
-  		  reply += "Mutually assured destrution: all combatants are dead!\nEnding combat and clearing combat data.\n";
-  		  combatCleanupAfterEnd();
-  		  return reply;
-  		}
-  		else if(combatantsArray.length == 1)
-  		{
-  		  reply += "*_" + combatantsArray[0].name + "_* is the only one still standing when the dust clears.\n";
-  			reply += "Ending combat and clearing combat data.\n";
-  			combatCleanupAfterEnd();
-  		  return reply;
-  		}
-  		
-  		
-  		//now check if the number of enemies remaining is zero
-  		var numMonstersRemaining = 0
-			for(var k = 0; k < combatantsArray.length; k++)
-			{
-			  if(combatantsArray[k].type == MONSTER_TYPE)
-			  {
-			    numMonstersRemaining +=1;
-			  }
-			}
-  		if(numMonstersRemaining < 1)
-  		{
-  		  reply += "All hostile monsters eliminated!\nEnding combat and clearing combat data.\n";
-  		  combatCleanupAfterEnd();
-  		  return reply;
-  		}
-  		
-  		for(var k = 0; k < combatantsArray.length; k++)
-  		{
-  			var order = k + 1;
-  			if(currentTurnIndex == k)
-  			{
-  				if(combatantsArray[k].type == PC_TYPE) {
-  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-  					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-  				}
-  				
-  			}
-  			else
-  			{
-  				if(combatantsArray[k].type == PC_TYPE) {
-  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-  				} else if (combatantsArray[k].type == MONSTER_TYPE) {
-  					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-  				}
-  			}
-  		}
-  		return reply;		
-		};
-
-	  
-		//kill off a comnatant and return their Combatant object
-		var killPlayerWithId = function(callerName,combatantId) {
 		
-		var combat_started = robot.brain.get('combat_flag');
+		robot.logger.debug("Kill request from " + callerName + " for IDs [" + combatantIdArray + "]");   
+		
+		
+		var combatantsToBeKilled = new Array();
+		for(var k = 0; k < combatantIdArray.length; k++)
+		{
+			try{
+				var tempCombatantToBeKilled = killPlayerWithId(callerName,combatantIdArray[k]);
+				if(tempCombatantToBeKilled == -1)
+				{
+					robot.logger.debug("Didn't find player with ID ["+combatantIdArray[k]+"]");
+				}
+				else
+				{
+					combatantsToBeKilled.push(tempCombatantToBeKilled);
+				}
+			}
+			catch (error)
+			{
+				robot.logger.debug("Caught error while trying to kill player: ["+error.essage+"]");
+				return "Error occured during kill request: ["+error.essage+"]";
+			}
+
+		}
 		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 		//array of players
 		var combatantsArray = robot.brain.get('combatantsArray');
 		var numTotalCombatants = robot.brain.get('numTotalCombatants');
 		
-		var indexOfCombatantToBeKilled = -1;
-		for(var i = 0; i< combatantsArray.length; i++)
+		var currentTurnIndex = robot.brain.get('currentTurnIndex');
+		var currentPlayer = combatantsArray[currentTurnIndex];
+		
+		//now construct our response message.
+		var reply = "";
+		if(combatantsToBeKilled.length < 1)
 		{
-			var currentCombatant = combatantsArray[i];
-			if(currentCombatant.id == combatantId)
+			return "No valid Ids found. No combatants removed from combat."; 
+		}
+		else if(combatantsToBeKilled.length == 1)
+		{
+			reply += "_*" + combatantsToBeKilled[0].name + "*_ "  + getRandomDeathEuphemism() + "\n";
+		}
+		else
+		{
+			for(var k = 0; k < combatantsToBeKilled.length; k++)
 			{
-				indexOfCombatantToBeKilled = i;
-				break;
+				reply += "_*" + combatantsToBeKilled[k].name + "*_ "  + getRandomDeathEuphemism() + ".\n";
+			}
+			
+		}
+		
+		//now we need to check and see if that removed enough combatants to remove the total to one or zero.
+		if(combatantsArray.length == 0)
+		{
+			//should be an extreme edge case.
+			reply += "Mutually assured destrution: all combatants are dead!\nEnding combat and clearing combat data.\n";
+			combatCleanupAfterEnd();
+			return reply;
+		}
+		else if(combatantsArray.length == 1)
+		{
+			reply += "*_" + combatantsArray[0].name + "_* is the only one still standing when the dust clears.\n";
+			
+			var graveYardArray = robot.brain.get('pc_graveyard');
+			if(graveYardArray.length > 0)
+			{
+				reply +=  "";
+			}
+			
+			reply += "Ending combat and clearing combat data.\n";
+			combatCleanupAfterEnd();
+			return reply;
+		}
+		
+		
+		//now check if the number of enemies remaining is zero
+		var numMonstersRemaining = 0
+		for(var k = 0; k < combatantsArray.length; k++)
+		{
+			if(combatantsArray[k].type == MONSTER_TYPE)
+			{
+				numMonstersRemaining +=1;
 			}
 		}
-		
-		if(indexOfCombatantToBeKilled == -1)
+		if(numMonstersRemaining < 1)
 		{
-			return -1;
+			reply += "All hostile monsters eliminated!\nEnding combat and clearing combat data.\n";
+			combatCleanupAfterEnd();
+			return reply;
 		}
 		
-		var combatantToBeKilled = combatantsArray[indexOfCombatantToBeKilled];
-		
-		//we've located the correct player. Need to remove from array, erase any redis data.
-	
-	  //PCs have special redis data to prevent them from rolling init too many times. Need to erase it.	
-		if(combatantToBeKilled.type == PC_TYPE) {
-		  try
-		  {
-		    var key = combatantToBeKilled.name+"_initScore";
-		    robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
-		    if(hasProp.call(robot.brain.data._private, key))
-		    {
-		      delete robot.brain.data._private[key];
-		    }
-		  }
-		  catch(err)
-		  {
-		    robot.logger.debug("Caught error trying to delete key in Kill function ->" + err.message);
-		  }
-		} 
-		
-		
-		//if we don't have everyone, just reduce the number of registered combatants by 1.  
-		if(numRegisteredCombatants < numTotalCombatants)
-	  {
-			numRegisteredCombatants -= 1;
-			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-			combatantsArray.splice(indexOfCombatantToBeKilled,1);
-			robot.brain.set('combatantsArray',combatantsArray);
-			var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
-			return combatantToBeKilled;;
+		for(var k = 0; k < combatantsArray.length; k++)
+		{
+			var order = k + 1;
+			if(currentTurnIndex == k)
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+				}
+				
+			}
+			else
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+				}
+			}
 		}
-		else 
-  	{
-  	  // If the fight has already started, decremement both the registered fighters and the total number. 
-  	  // Need to keep the turn counter correct too.
-  	  // We shouldn't need to reshuffle the array b/c it's already in the correct order.
-  	  numRegisteredCombatants -= 1;
-  	  numTotalCombatants -= 1;
-  	  robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-  	  robot.brain.set('numTotalCombatants',numTotalCombatants);
-  	  
-  		var currentTurnIndex = robot.brain.get('currentTurnIndex');
-  		var currentPlayer = combatantsArray[currentTurnIndex];
-  		
-  		
-  		//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
-  		if(currentPlayer.id == combatantToBeKilled.id)
-  		{
-  		
-  		  //set the index to whomever comes after them.
-  		  var newCurrentPlayer;
-  		  if((currentTurnIndex+1) > combatantsArray.length)
-  		  {
-  		    newCurrentPlayer = combatantsArray[0];
-  		  }
-  		  else
-  		  {
-  		    newCurrentPlayer = combatantsArray[currentTurnIndex+1];
-  		  }
-  		  
-  		  //remove the killed player from the combatantsArray
-  	  	combatantsArray.splice(indexOfCombatantToBeKilled,1);
-  		  robot.brain.set('combatantsArray',combatantsArray);
-  		  for(var k = 0; k < combatantsArray.length; k++)
-  	    {
-  	      if(combatantsArray[k].id == newCurrentPlayer.id)
-  	      {
-  	        currentTurnIndex = k;
-  	        robot.brain.set('currentTurnIndex',currentTurnIndex);
-  	        break;
-  	      }
-  	    }
-  		}
-  		else
-  	  {
-  	    //remove the killed player from the combatantsArray
-  		  combatantsArray.splice(indexOfCombatantToBeKilled,1);
-  		  robot.brain.set('combatantsArray',combatantsArray);
-  		  
-  	    //we know who's turn it should be. Just need to reset the turn index to the correct value.
-  	    for(var k = 0; k < combatantsArray.length; k++)
-  	    {
-  	      if(combatantsArray[k].id == currentPlayer.id)
-  	      {
-  	        currentTurnIndex = k;
-  	        robot.brain.set('currentTurnIndex',currentTurnIndex);
-  	        break;
-  	      }
-  	    }
-  	  }
-  	  
-  	  return combatantToBeKilled;
-		}
-		  
+		return reply;		
+	};
+
+	  
+		//kill off a comnatant and return their Combatant object
+		var killPlayerWithId = function(callerName,combatantId) {
+		
+			var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			var indexOfCombatantToBeKilled = -1;
+			for(var i = 0; i< combatantsArray.length; i++)
+			{
+				var currentCombatant = combatantsArray[i];
+				if(currentCombatant.id == combatantId)
+				{
+					indexOfCombatantToBeKilled = i;
+					break;
+				}
+			}
+			
+			if(indexOfCombatantToBeKilled == -1)
+			{
+				return -1;
+			}
+			
+			var combatantToBeKilled = combatantsArray[indexOfCombatantToBeKilled];
+			
+			//we've located the correct player. Need to remove from array, erase any redis data.
+			
+			//PCs have special redis data to prevent them from rolling init too many times. Need to erase it.	
+			if(combatantToBeKilled.type == PC_TYPE) 
+			{
+				try
+				{
+					var key = combatantToBeKilled.name+"_initScore";
+					robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+					if(hasProp.call(robot.brain.data._private, key))
+					{
+						delete robot.brain.data._private[key];
+					}
+					var graveYardArray = robot.brain.get('pc_graveyard');
+					graveYardArray.push(combatantToBeKilled);
+					robot.brain.set('pc_graveyard',graveYardArray);
+				}
+				catch(err)
+				{
+					robot.logger.debug("Caught error trying to delete key in Kill function ->" + err.message);
+				}
+				
+			} 
+			
+			
+			//if we don't have everyone, just reduce the number of registered combatants by 1.  
+			if(numRegisteredCombatants < numTotalCombatants)
+			{
+				numRegisteredCombatants -= 1;
+				robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+				combatantsArray.splice(indexOfCombatantToBeKilled,1);
+				robot.brain.set('combatantsArray',combatantsArray);
+				var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
+				return combatantToBeKilled;;
+			}
+			else 
+			{
+				// If the fight has already started, decremement both the registered fighters and the total number. 
+				// Need to keep the turn counter correct too.
+				// We shouldn't need to reshuffle the array b/c it's already in the correct order.
+				numRegisteredCombatants -= 1;
+				numTotalCombatants -= 1;
+				robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+				robot.brain.set('numTotalCombatants',numTotalCombatants);
+				
+				var currentTurnIndex = robot.brain.get('currentTurnIndex');
+				var currentPlayer = combatantsArray[currentTurnIndex];
+				
+				
+				//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
+				if(currentPlayer.id == combatantToBeKilled.id)
+				{
+					
+					//set the index to whomever comes after them.
+					var newCurrentPlayer;
+					if((currentTurnIndex+1) > combatantsArray.length)
+					{
+						newCurrentPlayer = combatantsArray[0];
+					}
+					else
+					{
+						newCurrentPlayer = combatantsArray[currentTurnIndex+1];
+					}
+					
+					//remove the killed player from the combatantsArray
+					combatantsArray.splice(indexOfCombatantToBeKilled,1);
+					robot.brain.set('combatantsArray',combatantsArray);
+					for(var k = 0; k < combatantsArray.length; k++)
+					{
+						if(combatantsArray[k].id == newCurrentPlayer.id)
+						{
+							currentTurnIndex = k;
+							robot.brain.set('currentTurnIndex',currentTurnIndex);
+							break;
+						}
+					}
+				}
+				else
+				{
+					//remove the killed player from the combatantsArray
+					combatantsArray.splice(indexOfCombatantToBeKilled,1);
+					robot.brain.set('combatantsArray',combatantsArray);
+					
+					//we know who's turn it should be. Just need to reset the turn index to the correct value.
+					for(var k = 0; k < combatantsArray.length; k++)
+					{
+						if(combatantsArray[k].id == currentPlayer.id)
+						{
+							currentTurnIndex = k;
+							robot.brain.set('currentTurnIndex',currentTurnIndex);
+							break;
+						}
+					}
+				}
+				
+				return combatantToBeKilled;
+			}
+		
 		};
 		
 		
