@@ -938,9 +938,25 @@
 			reply += "*_" + combatantsArray[0].name + "_* is the only one still standing when the dust clears.\n";
 			
 			var graveYardArray = robot.brain.get('pc_graveyard');
-			if(graveYardArray.length > 0)
+			if(graveYardArray.length == 1)
 			{
-				reply +=  "";
+				reply += graveYardArray[k].name + " was killed during the fight.\n";
+			}
+			else if(graveYardArray.length > 1)
+			{
+				
+				for(var k = 0; k < graveYardArray.length; k++)
+				{
+					reply += graveYardArray[k].name + ", ";					
+				}
+				//chop off the last comma.
+				reply = reply.substring(0,reply.length-2);
+				
+				
+				//add a final "and"
+				var lastCommaIndex = reply.lastIndexOf(",");
+				reply = reply.substring(0,lastCommaIndex) + ", and" + reply.substring(lastCommaIndex + 1, reply.length);
+				reply += " were killed during the fight.\n";
 			}
 			
 			reply += "Ending combat and clearing combat data.\n";
@@ -960,11 +976,35 @@
 		}
 		if(numMonstersRemaining < 1)
 		{
-			reply += "All hostile monsters eliminated!\nEnding combat and clearing combat data.\n";
+			reply += "All hostile monsters eliminated!\n"
+			
+			var graveYardArray = robot.brain.get('pc_graveyard');
+			if(graveYardArray.length == 1)
+			{
+				reply += graveYardArray[k].name + " was killed during the fight.\n";
+			}
+			else if(graveYardArray.length > 1)
+			{
+				
+				for(var k = 0; k < graveYardArray.length; k++)
+				{
+					reply += graveYardArray[k].name + ", ";					
+				}
+				//chop off the last comma.
+				reply = reply.substring(0,reply.length-2);
+				
+				
+				//add a final "and"
+				var lastCommaIndex = reply.lastIndexOf(",");
+				reply = reply.substring(0,lastCommaIndex) + ", and" + reply.substring(lastCommaIndex + 1, reply.length);
+				reply += " were killed during the fight.\n";
+			}
+			
+			reply += "Ending combat and clearing combat data.\n";
 			combatCleanupAfterEnd();
 			return reply;
 		}
-		
+		reply += "Here is the current order:\n";
 		for(var k = 0; k < combatantsArray.length; k++)
 		{
 			var order = k + 1;
