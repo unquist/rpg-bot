@@ -291,34 +291,47 @@
   				robot.brain.set('currentTurnIndex',0);
   				var firstPlayer = combatantsArray[0];
 				
-				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.";
+				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.<SPLIT>";
 				
-				reply += "\nAll Combatants accounted for, starting combat.\n";
+				reply += "All Combatants accounted for, starting combat!\n";
 				var combatantTypes = countCombatantTypes(combatantsArray);
 				
 				var numberOfPCs = Number(combatantTypes['PC']);
 				var PCsCounted = 0;
-				for(var k = 0; k < combatantsArray.length; k++)
+				if(numberOfPCs == 1)
 				{
-					if(combatantsArray[k].type == PC_TYPE)
+					for(var k = 0; k < combatantsArray.length; k++)
 					{
-						PCsCounted += 1;
-						if(PCsCounted < numberOfPCs)
+						if(combatantsArray[k].type == PC_TYPE)
 						{
-							reply += combatantsArray[k].name + ", ";
-						}
-						else
-						{
-							reply += "and " + combatantsArray[k].name + " ";
+							reply += "*" + combatantsArray[k].name + "* is fighting";
 						}
 					}
 				}
-				reply += " are fighting";
+				else
+				{
+					for(var k = 0; k < combatantsArray.length; k++)
+					{
+						if(combatantsArray[k].type == PC_TYPE)
+						{
+							PCsCounted += 1;
+							if(PCsCounted < numberOfPCs)
+							{
+								reply += "*" + combatantsArray[k].name + "*, ";
+							}
+							else
+							{
+								reply += "and *" + combatantsArray[k].name + "* ";
+							}
+						}
+					}
+					reply += " are fighting";
+				}
 				for(var type in combatantTypes)
 				{
-					reply += " " + combatantTypes[type] + type + "s";
+					reply += " " + combatantTypes[type] + " " + type + "s";
 				}
-			    reply += ".\n";
+			    reply += ".\n<SPLIT>";
   				
   				
   				
@@ -341,9 +354,7 @@
 					}
   				}
   				
-  				
-  			
-  				
+
   				return reply; 
   			}
   			else
@@ -429,34 +440,47 @@
 				robot.brain.set('currentTurnIndex',0);
 				var firstPlayer = combatantsArray[0];
 			  
-				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".";
+				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".<SPLIT>";
 								
-				reply += "\nAll Combatants accounted for, starting combat.\n";
+				reply += "All Combatants accounted for, starting combat!\n";
 				var combatantTypes = countCombatantTypes(combatantsArray);
 				
 				var numberOfPCs = Number(combatantTypes['PC']);
 				var PCsCounted = 0;
-				for(var k = 0; k < combatantsArray.length; k++)
+				if(numberOfPCs == 1)
 				{
-					if(combatantsArray[k].type == PC_TYPE)
+					for(var k = 0; k < combatantsArray.length; k++)
 					{
-						PCsCounted += 1;
-						if(PCsCounted < numberOfPCs)
+						if(combatantsArray[k].type == PC_TYPE)
 						{
-							reply += combatantsArray[k].name + ", ";
-						}
-						else
-						{
-							reply += "and " + combatantsArray[k].name + " ";
+							reply += "*" + combatantsArray[k].name + "* is fighting";
 						}
 					}
 				}
-				reply += " are fighting";
+				else
+				{
+					for(var k = 0; k < combatantsArray.length; k++)
+					{
+						if(combatantsArray[k].type == PC_TYPE)
+						{
+							PCsCounted += 1;
+							if(PCsCounted < numberOfPCs)
+							{
+								reply += "*" +combatantsArray[k].name + "*, ";
+							}
+							else
+							{
+								reply += "and *" + combatantsArray[k].name + "* ";
+							}
+						}
+					}
+					reply += " are fighting";
+				}
 				for(var type in combatantTypes)
 				{
-					reply += " " + combatantTypes[type] + type + "s";
+					reply += " " + combatantTypes[type] + " " + type + "s";
 				}
-			    reply += ".\n";			
+			    reply += ".\n<SPLIT>";			
 				
 				
 				if(firstPlayer.type == PC_TYPE) {
@@ -1221,7 +1245,38 @@
 		  return msgData;
 		}
 		
-
+		var getFormattedJSONMultiAttachment = function(messageArray,channel,inChannel) {
+		
+		  var msgData = {
+				
+				"attachments": []
+          };
+		  
+		  for(var k = 0; k < messageArray.length; k++)
+		  {
+			msgData['attachments'].push({
+				"fallback": messageArray[k],
+				"color": "#cc3300",
+				"footer": "Combat Script",
+				"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
+				"text": messageArray[k],
+				"channel":channel,
+				"mrkdwn_in": ["text"]
+			});
+		  }
+		  
+		  if(inChannel)
+		  {
+			msgData['response_type'] = 'in_channel';
+		  }
+		  else
+		  {
+			msgData['response_type'] = 'ephemeral';
+		  }
+		  
+		  return msgData;
+		}
+		
 		robot.router.post('/hubot/combat', function(req, res) {
 			robot.logger.debug("Received a POST request to /hubot/combat");
 			  
@@ -1291,7 +1346,8 @@
 							bonus = parameters.match(/\d+/i) || 0;
 						}
 						reply = combatInit(username,Number(bonus));
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
 						return res.json(msgData);
 						break;
 					case "init-dm":
@@ -1325,7 +1381,8 @@
 						{
 							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 						}
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
 						return res.json(msgData);
 						break;
 					case "add":
