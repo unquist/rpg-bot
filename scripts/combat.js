@@ -262,6 +262,10 @@
 					}
 				}
 			}
+			else if(numberOfPCs == 2)
+			{
+				reply += "*" + combatantsArray[0].name + "* and *" + combatantsArray[1].name + "* are fighting";
+			}
 			else
 			{
 				for(var k = 0; k < combatantsArray.length; k++)
@@ -281,10 +285,12 @@
 				}
 				reply += " are fighting";
 			}
+			var countMonsterTypes = 0;
 			for(var type in combatantTypes)
 			{
 				if(type != "PC")
 				{
+					countMonsterTypes += 1;
 					if(Number(combatantTypes[type]) > 1)
 					{
 						reply += " " + combatantTypes[type] + " " + type + "s,";
@@ -296,8 +302,9 @@
 				}
 			}
 			//chop off the last comma.
+			robot.logger.debug("reply before pruning:["+reply+"]");
 			reply = reply.substring(0,reply.length-1);
-			
+			robot.logger.debug
 			//add a final "and"
 			var lastCommaIndex = reply.lastIndexOf(",");
 			if(lastCommaIndex != -1)
