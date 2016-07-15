@@ -240,6 +240,84 @@
 			   
 		};
 		
+		var constructInitReplyMessage(combatantsArray,firstPlayer)
+		{
+			var reply = "All Combatants accounted for. *Begin combat*!\n";
+			var combatantTypes = countCombatantTypes(combatantsArray);
+			
+			var numberOfPCs = Number(combatantTypes['PC']);
+			var PCsCounted = 0;
+			if(numberOfPCs == 1)
+			{
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					if(combatantsArray[k].type == PC_TYPE)
+					{
+						reply += "*" + combatantsArray[k].name + "* is fighting";
+					}
+				}
+			}
+			else
+			{
+				for(var k = 0; k < combatantsArray.length; k++)
+				{
+					if(combatantsArray[k].type == PC_TYPE)
+					{
+						PCsCounted += 1;
+						if(PCsCounted < numberOfPCs)
+						{
+							reply += "*" + combatantsArray[k].name + "*, ";
+						}
+						else
+						{
+							reply += "and *" + combatantsArray[k].name + "* ";
+						}
+					}
+				}
+				reply += " are fighting";
+			}
+			for(var type in combatantTypes)
+			{
+				if(type != "PC")
+				{
+					if(Number(combatantTypes[type]) > 1)
+					{
+						reply += " " + combatantTypes[type] + " " + type + "s,";
+					}
+					else
+					{
+						reply += " " + combatantTypes[type] + " " + type + ",";
+					}						
+				}
+			}
+			//chop off the last comma.
+			reply = reply.substring(0,reply.length-2);
+			reply += ".\n<SPLIT>";
+			
+			
+			
+			if(firstPlayer.type == PC_TYPE) {
+				  reply += "\n*" + firstPlayer.name + ", you're up first!*";
+			  } else if (firstPlayer.type == MONSTER_TYPE) {
+				  reply += "\n*" + firstPlayer.name + ", you're up first!*";
+			  }	
+			
+			reply += "\nHere is the combat order:";
+			
+			
+			for(var k = 0; k < combatantsArray.length; k++)
+			{
+				var order = k + 1;
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+				}
+			}
+			
+
+			return reply; 
+		}
 
 		var combatInit = function(callerName, bonus) {
 		    var combat_started = robot.brain.get('combat_flag');
@@ -293,69 +371,10 @@
 				
 				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.<SPLIT>";
 				
-				reply += "All Combatants accounted for, starting combat!\n";
-				var combatantTypes = countCombatantTypes(combatantsArray);
+				reply += constructInitReplyMessage(combatantsArray,firstPlayer);
 				
-				var numberOfPCs = Number(combatantTypes['PC']);
-				var PCsCounted = 0;
-				if(numberOfPCs == 1)
-				{
-					for(var k = 0; k < combatantsArray.length; k++)
-					{
-						if(combatantsArray[k].type == PC_TYPE)
-						{
-							reply += "*" + combatantsArray[k].name + "* is fighting";
-						}
-					}
-				}
-				else
-				{
-					for(var k = 0; k < combatantsArray.length; k++)
-					{
-						if(combatantsArray[k].type == PC_TYPE)
-						{
-							PCsCounted += 1;
-							if(PCsCounted < numberOfPCs)
-							{
-								reply += "*" + combatantsArray[k].name + "*, ";
-							}
-							else
-							{
-								reply += "and *" + combatantsArray[k].name + "* ";
-							}
-						}
-					}
-					reply += " are fighting";
-				}
-				for(var type in combatantTypes)
-				{
-					reply += " " + combatantTypes[type] + " " + type + "s";
-				}
-			    reply += ".\n<SPLIT>";
-  				
-  				
-  				
-  				if(firstPlayer.type == PC_TYPE) {
-					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				  } else if (firstPlayer.type == MONSTER_TYPE) {
-					  reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				  }	
-  				
-  				reply += "\nHere is the combat order:";
-  				
-  				
-  				for(var k = 0; k < combatantsArray.length; k++)
-  				{
-  					var order = k + 1;
-					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-					}
-  				}
-  				
-
-  				return reply; 
+				return reply;
+				
   			}
   			else
   			{
@@ -435,73 +454,15 @@
 			if(numRegisteredCombatants == numTotalCombatants)
 			{
 			  
-			  combatantsArray = combatantsArray.sort(combatantSortByInit);
+				combatantsArray = combatantsArray.sort(combatantSortByInit);
 				robot.brain.set('combatantsArray',combatantsArray);
 				robot.brain.set('currentTurnIndex',0);
 				var firstPlayer = combatantsArray[0];
 			  
 				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".<SPLIT>";
 								
-				reply += "All Combatants accounted for, starting combat!\n";
-				var combatantTypes = countCombatantTypes(combatantsArray);
-				
-				var numberOfPCs = Number(combatantTypes['PC']);
-				var PCsCounted = 0;
-				if(numberOfPCs == 1)
-				{
-					for(var k = 0; k < combatantsArray.length; k++)
-					{
-						if(combatantsArray[k].type == PC_TYPE)
-						{
-							reply += "*" + combatantsArray[k].name + "* is fighting";
-						}
-					}
-				}
-				else
-				{
-					for(var k = 0; k < combatantsArray.length; k++)
-					{
-						if(combatantsArray[k].type == PC_TYPE)
-						{
-							PCsCounted += 1;
-							if(PCsCounted < numberOfPCs)
-							{
-								reply += "*" +combatantsArray[k].name + "*, ";
-							}
-							else
-							{
-								reply += "and *" + combatantsArray[k].name + "* ";
-							}
-						}
-					}
-					reply += " are fighting";
-				}
-				for(var type in combatantTypes)
-				{
-					reply += " " + combatantTypes[type] + " " + type + "s";
-				}
-			    reply += ".\n<SPLIT>";			
-				
-				
-				if(firstPlayer.type == PC_TYPE) {
-					reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				} else if (firstPlayer.type == MONSTER_TYPE) {
-					reply += "\n*" + firstPlayer.name + ", you're up first!*";
-				}	
-	
-				reply += "\nHere is the combat order:";
-				
-		
-				for(var k = 0; k < combatantsArray.length; k++)
-				{
-					var order = k + 1;
-					if(combatantsArray[k].type == PC_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-					}					
-				}
-
+				reply += constructInitReplyMessage(combatantsArray,firstPlayer);
+			
 				return reply; 
 			}
 			else
