@@ -629,9 +629,9 @@
 			robot.brain.set('currentTurnIndex',currentTurnIndex);
 			var reply = ""
 			if(combatantsArray[currentTurnIndex].type == PC_TYPE) {
-				reply = "Next turn started. " +combatantsArray[currentTurnIndex].name+" is up!";
+				reply = "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
 			} else if (combatantsArray[currentTurnIndex].type == MONSTER_TYPE) {
-				reply = "Next turn started. " +combatantsArray[currentTurnIndex].name+" is up!";
+				reply = "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
 			}
 			
 			//now list out the number of monsters left, and the current status.
