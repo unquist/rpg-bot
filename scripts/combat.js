@@ -944,7 +944,7 @@
 			var graveYardArray = robot.brain.get('pc_graveyard');
 			if(graveYardArray.length == 1)
 			{
-				reply += graveYardArray[k].name + " was killed during the fight.\n";
+				reply += graveYardArray[0].name + " was killed during the fight.\n";
 			}
 			else if(graveYardArray.length > 1)
 			{
