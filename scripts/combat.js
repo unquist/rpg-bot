@@ -295,7 +295,7 @@
 			
 			//add a final "and"
 			var lastCommaIndex = reply.lastIndexOf(",");
-			reply = reply.substring(0,lastCommaIndex) + ", and " + reply.substring(lastCommaIndex + 1, reply.length);
+			reply = reply.substring(0,lastCommaIndex) + ", and" + reply.substring(lastCommaIndex + 1, reply.length);
 			reply += ".\n<SPLIT>";
 			
 			
