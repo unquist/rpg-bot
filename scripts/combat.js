@@ -291,7 +291,7 @@
 				}
 			}
 			//chop off the last comma.
-			reply = reply.substring(0,reply.length-2);
+			reply = reply.substring(0,reply.length-1);
 			reply += ".\n<SPLIT>";
 			
 			
@@ -1215,15 +1215,21 @@
 		  
 		  for(var k = 0; k < messageArray.length; k++)
 		  {
-			msgData['attachments'].push({
+			var attachment = {
 				"fallback": messageArray[k],
 				"color": "#cc3300",
 				"footer": "Combat Script",
-				"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
 				"text": messageArray[k],
 				"channel":channel,
 				"mrkdwn_in": ["text"]
-			});
+			}
+			
+			if( (k+1) == messageArray.length)
+			{
+				attachment["footer_icon"] = "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif";
+			}
+			
+			msgData['attachments'].push(attachment);
 		  }
 		  
 		  if(inChannel)
