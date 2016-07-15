@@ -292,6 +292,10 @@
 			}
 			//chop off the last comma.
 			reply = reply.substring(0,reply.length-1);
+			
+			//add a final "and"
+			var lastCommaIndex = reply.lastIndexOf(",");
+			reply = reply.substring(0,lastCommaIndex) + ", and " + reply.substring(lastCommaIndex + 1, reply.length);
 			reply += ".\n<SPLIT>";
 			
 			
@@ -1218,7 +1222,6 @@
 			var attachment = {
 				"fallback": messageArray[k],
 				"color": "#cc3300",
-				"footer": "Combat Script",
 				"text": messageArray[k],
 				"channel":channel,
 				"mrkdwn_in": ["text"]
@@ -1227,6 +1230,7 @@
 			if( (k+1) == messageArray.length)
 			{
 				attachment["footer_icon"] = "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif";
+				attachment["footer"] = "Combat Script";
 			}
 			
 			msgData['attachments'].push(attachment);
