@@ -45,6 +45,7 @@
 			{
 				var archivedMessage = messages[k];
 				var name = getRealNameFromId(archivedMessage.user);
+				archivedMessage['real_name'] = name;
 				var txt = archivedMessage.text;
 				
 				if(name == "<Unknown User>")
@@ -81,7 +82,19 @@
 				//we want to show combat start and end messages
 				if(archivedMessage.subtype == "bot_message")
 				{
-				
+					var attachments = archivedMessage.attachments;
+					for(var k = 0; k < attachments.length; k++)
+					{
+						var attachment = attachments[k];
+						var attachmentText = attachment['text'];
+						if(indexOf("All Combatants accounted for.") != -1)
+						{
+							archivedMessage['real_name'] = "Conan-bot";
+							archivedMessage['text'] = attachmentText;
+							filteredMessages.push(archivedMessage);
+							break;
+						}
+					}
 				}
 				
 				
@@ -136,7 +149,7 @@
 				//create the message with attachment object
 				var summaryMessage = ""; 
 				
-				messageFilter(res.messages);
+				var filteredMessages = messageFilter(res.messages);
 				
 				//summaryMessage += "*"+name+"*: " + txt + "\n\n";
 				
