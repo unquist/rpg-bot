@@ -86,9 +86,9 @@
 				if(archivedMessage.subtype == "bot_message")
 				{
 					var attachments = archivedMessage.attachments;
-					for(var k = 0; k < attachments.length; k++)
+					for(var i = 0; i < attachments.length; i++)
 					{
-						var attachment = attachments[k];
+						var attachment = attachments[i];
 						var attachmentText = attachment['text'];
 						if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
 						{
