@@ -151,7 +151,7 @@
 				var filteredMessages = messageFilter(res.messages);
 				
 				for(var k = 0; k < filteredMessages.length; k++)
-				}
+				{
 					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
 				}
 				var msgData = {
