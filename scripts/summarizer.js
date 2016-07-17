@@ -129,6 +129,8 @@
 		
 		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
 		{
+			var timeNow = new Date();
+			var targetPastTime = new Date();
 			switch(typeOfTimeUnits)
 			{
 				case "minute":
@@ -188,8 +190,7 @@
 		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
 			//robot.logger.debug(util.inspect(msg));
-			var timeNow = new Date();
-			var targetPastTime = new Date();
+	
 			var numberOfTimeUnits = Number(msg.match[2]) || 0;
 			var typeOfTimeUnits = msg.match[3] || "hour";
 			
