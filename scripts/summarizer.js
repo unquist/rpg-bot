@@ -87,13 +87,14 @@
 					{
 						var attachment = attachments[k];
 						var attachmentText = attachment['text'];
-						if(indexOf("All Combatants accounted for.") != -1)
+						if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
 						{
 							archivedMessage['real_name'] = "Conan-bot";
 							archivedMessage['text'] = attachmentText;
 							filteredMessages.push(archivedMessage);
 							break;
 						}
+						
 					}
 				}
 				
@@ -105,8 +106,6 @@
 		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
 			//robot.logger.debug(util.inspect(msg));
-			
-			
 			var timeNow = new Date();
 			var targetPastTime = new Date();
 			var numberOfTimeUnits = Number(msg.match[2]) || 0;
@@ -151,8 +150,10 @@
 				
 				var filteredMessages = messageFilter(res.messages);
 				
-				//summaryMessage += "*"+name+"*: " + txt + "\n\n";
-				
+				for(var k = 0; k < filteredMessages.length; k++)
+				}
+					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
+				}
 				var msgData = {
 					channel: "@"+callerName,
 					text: summaryMessage
