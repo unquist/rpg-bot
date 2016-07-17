@@ -13,15 +13,16 @@
 //   unquist
 
 (function() {
-    var HubotCron = require('hubot-cronjob');
+
 	
 	module.exports = function(robot) {
 		
+		var HubotCron = require('hubot-cronjob');
+		robot.logger.debug("Initializing cron job");
 		var fn, pattern, timezone;
 		pattern = '* 2 * * * *';
 		timezone = 'America/New_York';
 		fn = function(err) {
-			
 			robot.logger.debug("Summarizer update run!");
 		};
 		new HubotCron(pattern, timezone, fn);
