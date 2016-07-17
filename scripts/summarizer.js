@@ -17,15 +17,6 @@
 	
 	module.exports = function(robot) {
 		
-		var HubotCron = require('hubot-cronjob');
-		robot.logger.debug("Initializing cron job");
-		var fn, pattern, timezone;
-		pattern = '* 2 * * * *';
-		timezone = 'America/New_York';
-		fn = function(err) {
-			robot.logger.debug("Summarizer update run!");
-		};
-		new HubotCron(pattern, timezone, fn);
 
         var util = require("util");
 		
@@ -45,6 +36,24 @@
 		//TODO: move this to something more modular. Maybe an environment variable?
 		var summaryChannelId = 'C1RJ8KRD5';
 		var campaignChannelId = 'C1D2ZTKF0';
+		
+		var HubotCron = require('hubot-cronjob');
+		robot.logger.debug("Initializing cron job");
+		var fn, pattern, timezone;
+		pattern = '* 2 * * * *';
+		timezone = 'America/New_York';
+		fn = function(err) {
+			var msgData = {
+				channel: summaryChannelId,
+				text: 'cron'
+			};
+
+			//post the message
+			robot.adapter.customMessage(msgData);
+		};
+		new HubotCron(pattern, timezone, fn);
+
+		
 		
 		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
