@@ -40,21 +40,14 @@
 		var HubotCron = require('hubot-cronjob');
 		robot.logger.debug("Initializing cron job");
 		var fn, pattern, timezone;
-		pattern = '* */2 * * * *';
+		pattern = '* */15 * * * *';
 		timezone = 'America/New_York';
 		fn = function(err) {
-			var msgData = {
-				channel: summaryChannelId,
-				text: 'cron'
-			};
-
-			//post the message
-			//robot.adapter.customMessage(msgData);
+			robot.logger.debug("Executing postSummary cron job");
+			postSummary("CRON",15,minutes);
 		};
-		//new HubotCron(pattern, timezone, fn);
+		new HubotCron(pattern, timezone, fn);
 
-		
-		
 		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
         };
@@ -134,16 +127,8 @@
 			return filteredMessages;				
 		};
 		
-		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
-            var callerName = msg.message.user.name;
-			//robot.logger.debug(util.inspect(msg));
-			var timeNow = new Date();
-			var targetPastTime = new Date();
-			var numberOfTimeUnits = Number(msg.match[2]) || 0;
-			var typeOfTimeUnits = msg.match[3] || "hour";
-			
-			robot.logger.debug("User ["+callerName+"] asked for the log for ["+numberOfTimeUnits+"] ["+typeOfTimeUnits+"].");
-			
+		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
+		{
 			switch(typeOfTimeUnits)
 			{
 				case "minute":
@@ -161,7 +146,6 @@
 				default:
 					return msg.reply("I didn't recognize ["+typeOfTimeUnits+"]. Valid units are `minutes`, `hours` or `days`.");
 			}
-			
 					
 			//utc:
 			//var utcTime = timeNow.getTime() / 1000;
@@ -170,7 +154,7 @@
 			var params = {
 				channel: campaignChannelId,
 				oldest: utcTargetPastTime,
-				count: 100
+				count: 1000
 			};
 						
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
@@ -197,6 +181,22 @@
 			.catch(function (err) {
 				robot.logger.debug("Couldn't get channel history: " + err);
 			});
+			
+			return;
+		};
+		
+		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
+            var callerName = msg.message.user.name;
+			//robot.logger.debug(util.inspect(msg));
+			var timeNow = new Date();
+			var targetPastTime = new Date();
+			var numberOfTimeUnits = Number(msg.match[2]) || 0;
+			var typeOfTimeUnits = msg.match[3] || "hour";
+			
+			robot.logger.debug("User ["+callerName+"] asked for the log for ["+numberOfTimeUnits+"] ["+typeOfTimeUnits+"].");
+			
+			postSummary(callerName,numberOfTimeUnits,typeOfTimeUnits);
+
 			
 			return;
         });
