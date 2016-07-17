@@ -48,10 +48,12 @@
 				archivedMessage['real_name'] = name;
 				var txt = archivedMessage.text;
 				
+				/*
 				if(name == "<Unknown User>")
 				{
 					robot.logger.debug(util.inspect(archivedMessage));
 				}
+				*/
 				
 				//robot.logger.debug("Msg["+k+"] -> user_id:["+archivedMessage.user+"] user:["+name+"] txt:["+txt+"]");
 				//throw away any system messages
