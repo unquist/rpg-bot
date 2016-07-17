@@ -143,7 +143,7 @@
 			var params = {
 				channel: campaignChannelId,
 				oldest: utcTargetPastTime,
-				count: 1000
+				count: 100
 			};
 						
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
