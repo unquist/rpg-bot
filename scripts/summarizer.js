@@ -49,9 +49,9 @@
 			};
 
 			//post the message
-			robot.adapter.customMessage(msgData);
+			//robot.adapter.customMessage(msgData);
 		};
-		new HubotCron(pattern, timezone, fn);
+		//new HubotCron(pattern, timezone, fn);
 
 		
 		
