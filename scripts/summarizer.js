@@ -63,6 +63,11 @@
 					continue;
 				}
 				
+				if(txt.indexOf("&gt") != -1)
+				{
+					continue;
+				}
+				
 				//regex will find text enclosed by 1 or 3 backticks, or italicized
 				var match = txt.match(/`{1}([^`]+)`{1}|`{3}([^`]+)`{3}|_{1}([^_]+)_{1}/i);
 			 
