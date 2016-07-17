@@ -40,11 +40,11 @@
 		var HubotCron = require('hubot-cronjob');
 		robot.logger.debug("Initializing cron job");
 		var fn, pattern, timezone;
-		pattern = '* */15 * * * *';
+		pattern = '1 */15 * * * *';
 		timezone = 'America/New_York';
 		fn = function(err) {
 			robot.logger.debug("Executing postSummary cron job");
-			postSummary("CRON",15,minutes);
+			postSummary("CRON",15,'minutes');
 		};
 		new HubotCron(pattern, timezone, fn);
 
