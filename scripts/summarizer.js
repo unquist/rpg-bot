@@ -40,7 +40,7 @@
 		var HubotCron = require('hubot-cronjob');
 		robot.logger.debug("Initializing cron job");
 		var fn, pattern, timezone;
-		pattern = '* 2 * * * *';
+		pattern = '* */2 * * * *';
 		timezone = 'America/New_York';
 		fn = function(err) {
 			var msgData = {
