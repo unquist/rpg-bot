@@ -13,7 +13,21 @@
 //   unquist
 
 (function() {
-    module.exports = function(robot) {
+    var HubotCron = require('hubot-cronjob');
+	
+	module.exports = function(robot) {
+		
+		var fn, pattern, timezone;
+		pattern = '0 11 * * 1-5';
+		timezone = 'America/New_York';
+		fn = updateSummarizer.bind(null, function(err) {
+			if (err) {
+				return console.error(err);
+			}
+			robot.logger.debug("Summarizer update run!");
+		});
+		new HubotCron(pattern, timezone, fn);
+
         var util = require("util");
 		
 		var getRealNameFromId = function(userId){
