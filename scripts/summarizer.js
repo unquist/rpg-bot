@@ -41,6 +41,7 @@
 		var messageFilter = function(messages)
 		{
 			var filteredMessages = new Array();
+			robot.logger.debug("messageFilter function recieved ["+messages.length+"] messages.");
 			for(var k = 0; k < messages.length; k++)
 			{
 				var archivedMessage = messages[k];
@@ -102,6 +103,7 @@
 				
 				
 			}
+			robot.logger.debug("message filter function returning ["+filteredMessages.length+"] messages");
 			return filteredMessages;				
 		};
 		
@@ -156,6 +158,7 @@
 				{
 					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
 				}
+				robot.logger.debug("sending a message with length ["+summaryMessage.length+"] to channel [@"+callerName+"]");
 				var msgData = {
 					channel: "@"+callerName,
 					text: summaryMessage
