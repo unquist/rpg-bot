@@ -158,9 +158,9 @@
 				{
 					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
 				}
-				robot.logger.debug("sending a message with length ["+summaryMessage.length+"] to channel [@"+callerName+"]");
+				robot.logger.debug("sending a message with length ["+summaryMessage.length+"] to channel ["+summaryChannelId+"]");
 				var msgData = {
-					channel: "@"+callerName,
+					channel: summaryChannelId,
 					text: summaryMessage
 				};
 
