@@ -23,7 +23,7 @@
 		fn = function(err) {
 			
 			robot.logger.debug("Summarizer update run!");
-		});
+		};
 		new HubotCron(pattern, timezone, fn);
 
         var util = require("util");
