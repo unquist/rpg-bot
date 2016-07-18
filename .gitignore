@@ -3,3 +3,4 @@ node_modules
 .hubot_history
 slack_start.sh
 deploy.sh
+google-generated-creds.json

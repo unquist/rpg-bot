@@ -10,5 +10,6 @@
   "hubot-rules",
   "hubot-shipit",
   "hubot-brain-inspect",
-  "google-spreadsheet"
+  "google-spreadsheet",
+  "hubot-slack-api"
 ]
