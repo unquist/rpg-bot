@@ -126,18 +126,21 @@
 					if(archivedMessage.subtype == "bot_message")
 					{
 						var attachments = archivedMessage.attachments;
-						for(var i = 0; i < attachments.length; i++)
+						if(attachments != null)
 						{
-							var attachment = attachments[i];
-							var attachmentText = attachment['text'];
-							if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
+							for(var i = 0; i < attachments.length; i++)
 							{
-								archivedMessage['real_name'] = "Conan-bot";
-								archivedMessage['text'] = attachmentText;
-								filteredMessages.push(archivedMessage);
-								break;
+								var attachment = attachments[i];
+								var attachmentText = attachment['text'];
+								if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
+								{
+									archivedMessage['real_name'] = "Conan-bot";
+									archivedMessage['text'] = attachmentText;
+									filteredMessages.push(archivedMessage);
+									break;
+								}
+								
 							}
-							
 						}
 					}
 					
