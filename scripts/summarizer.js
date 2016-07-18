@@ -70,78 +70,85 @@
 		//filters a message array, and returns the array. Since we assume slack will give us messages in the reverse order, this array re-sorts oldest-to-newest
 		var messageFilter = function(messages)
 		{
-			var sortedMessages = messages.sort(sortMessagesChronologically);
-			var filteredMessages = new Array();
-			robot.logger.debug("messageFilter function recieved ["+sortedMessages.length+"] messages.");
-			for(var k = 0; k < sortedMessages.length; k++)
+			try
 			{
-				var archivedMessage = sortedMessages[k];
-				var name = getRealNameFromId(archivedMessage.user);
-				archivedMessage['real_name'] = name;
-				var txt = archivedMessage.text;
-				
-				/*
-				if(name == "<Unknown User>")
+				var sortedMessages = messages.sort(sortMessagesChronologically);
+				var filteredMessages = new Array();
+				robot.logger.debug("messageFilter function recieved ["+sortedMessages.length+"] messages.");
+				for(var k = 0; k < sortedMessages.length; k++)
 				{
-					robot.logger.debug(util.inspect(archivedMessage));
-				}
-				*/
-				
-				//robot.logger.debug("Msg["+k+"] -> user_id:["+archivedMessage.user+"] user:["+name+"] txt:["+txt+"]");
-				//throw away any system messages
-				if(name == "SYSTEM")
-				{
-					continue;
-				}
-				
-				if(txt.indexOf("&gt") != -1)
-				{
-					continue;
-				}
-				
-				//regex will find text enclosed by 1 or 3 backticks, or italicized
-				var match = txt.match(/`{1}([^`]+)`{1}|`{3}([^`]+)`{3}|_{1}([^_]+)_{1}/i);
-			 
-				if(match != null)
-				{
-					//found a match, so this message goes into the array.
-					//robot.logger.debug("Matched regex; insert into array and continue.");
-					filteredMessages.push(archivedMessage);
-					continue;
-				}
-				
-				//we also want to save "/me" messages
-				if(archivedMessage.subtype == "me_message")
-				{
-					//robot.logger.debug("Found /me message. Insert into arrary and continue");
-					archivedMessage.text = "_" + archivedMessage.text + "_";
-					filteredMessages.push(archivedMessage);
-					continue;
-				}
-				
-				//we want to show combat start and end messages
-				if(archivedMessage.subtype == "bot_message")
-				{
-					var attachments = archivedMessage.attachments;
-					for(var i = 0; i < attachments.length; i++)
+					var archivedMessage = sortedMessages[k];
+					var name = getRealNameFromId(archivedMessage.user);
+					archivedMessage['real_name'] = name;
+					var txt = archivedMessage.text;
+					
+					/*
+					if(name == "<Unknown User>")
 					{
-						var attachment = attachments[i];
-						var attachmentText = attachment['text'];
-						if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
-						{
-							archivedMessage['real_name'] = "Conan-bot";
-							archivedMessage['text'] = attachmentText;
-							filteredMessages.push(archivedMessage);
-							break;
-						}
-						
+						robot.logger.debug(util.inspect(archivedMessage));
 					}
+					*/
+					
+					//robot.logger.debug("Msg["+k+"] -> user_id:["+archivedMessage.user+"] user:["+name+"] txt:["+txt+"]");
+					//throw away any system messages
+					if(name == "SYSTEM")
+					{
+						continue;
+					}
+					
+					if(txt.indexOf("&gt") != -1)
+					{
+						continue;
+					}
+					
+					//regex will find text enclosed by 1 or 3 backticks, or italicized
+					var match = txt.match(/`{1}([^`]+)`{1}|`{3}([^`]+)`{3}|_{1}([^_]+)_{1}/i);
+				 
+					if(match != null)
+					{
+						//found a match, so this message goes into the array.
+						//robot.logger.debug("Matched regex; insert into array and continue.");
+						filteredMessages.push(archivedMessage);
+						continue;
+					}
+					
+					//we also want to save "/me" messages
+					if(archivedMessage.subtype == "me_message")
+					{
+						//robot.logger.debug("Found /me message. Insert into arrary and continue");
+						archivedMessage.text = "_" + archivedMessage.text + "_";
+						filteredMessages.push(archivedMessage);
+						continue;
+					}
+					
+					//we want to show combat start and end messages
+					if(archivedMessage.subtype == "bot_message")
+					{
+						var attachments = archivedMessage.attachments;
+						for(var i = 0; i < attachments.length; i++)
+						{
+							var attachment = attachments[i];
+							var attachmentText = attachment['text'];
+							if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
+							{
+								archivedMessage['real_name'] = "Conan-bot";
+								archivedMessage['text'] = attachmentText;
+								filteredMessages.push(archivedMessage);
+								break;
+							}
+							
+						}
+					}
+					
+					
 				}
-				
-				
+				robot.logger.debug("message filter function returning ["+filteredMessages.length+"] messages");
+				return filteredMessages;	
 			}
-			robot.logger.debug("message filter function returning ["+filteredMessages.length+"] messages");
-			return filteredMessages;				
+			catch(err)
+			{
+				robot.logger.debug("messageFilter->Error: " + err);
+			}			
 		};
 		
 		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
@@ -219,7 +226,7 @@
 						robot.adapter.customMessage(_msgData);
 					})
 					.catch(function (err) {
-						robot.logger.debug("Couldn't get channel history: " + err);
+						robot.logger.debug("requestChannelHistory(recursive):Couldn't get channel history: " + err);
 					});
 				}
 				
@@ -242,7 +249,7 @@
 				robot.adapter.customMessage(msgData);
 			})
 			.catch(function (err) {
-				robot.logger.debug("Couldn't get channel history: " + err);
+				robot.logger.debug("requestChannelHistory:Couldn't get channel history: " + err);
 			});
 			return;
 		};
