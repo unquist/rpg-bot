@@ -192,7 +192,7 @@
 					var recursive_params = {
 						channel: campaignChannelId,
 						oldest: params.oldest,
-						latest: res.messages[messages.length-1].ts,
+						latest: res.messages[res.messages.length-1].ts,
 						count: 1000
 					};
 					robot.logger.debug("sending recursive params: " + util.inspect(recursive_params));
