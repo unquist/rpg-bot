@@ -17,7 +17,7 @@
 	
 	module.exports = function(robot) {
 		
-
+		var summarizeIntervalInMinutes = Number(process.env.RPGBOT_SUMMARIZE_INTERVAL) || 0;
         var util = require("util");
 		
 		var getRealNameFromId = function(userId){
@@ -37,17 +37,22 @@
 		var summaryChannelId = 'C1RJ8KRD5';
 		var campaignChannelId = 'C1D2ZTKF0';
 		
-		var HubotCron = require('hubot-cronjob');
-		robot.logger.debug("Initializing cron job");
-		var fn, pattern, timezone;
-		pattern = '1 */15 * * * *';
-		timezone = 'America/New_York';
-		fn = function(err) {
-			robot.logger.debug("Executing postSummary cron job");
-			postSummary("CRON",15,'minutes');
-		};
-		new HubotCron(pattern, timezone, fn);
-
+		//don't turn on the cron job if the variable is set to zero
+		if(summarizeIntervalInMinutes != 0)
+		{
+			var HubotCron = require('hubot-cronjob');
+		
+			var fn, pattern, timezone;
+			pattern = '1 */'+summarizeIntervalInMinutes+' * * * *';
+			timezone = 'America/New_York';
+			robot.logger.debug("Initializing cron job with pattern ["+pattern+"] and timezone ["+timezone+"]");
+			fn = function(err) {
+				robot.logger.debug("Executing postSummary cron job");
+				postSummary("CRON",summarizeIntervalInMinutes,'minutes');
+			};
+			new HubotCron(pattern, timezone, fn);
+		}
+		
 		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
         };
