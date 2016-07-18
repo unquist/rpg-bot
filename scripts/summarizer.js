@@ -73,7 +73,7 @@
 			try
 			{
 				messages.sort(sortMessagesChronologically);
-				robot.logger.debug("messageFilter-> messages inspect: " + util.inspect(messages));
+				//robot.logger.debug("messageFilter-> messages inspect: " + util.inspect(messages));
 				var filteredMessages = new Array();
 				//robot.logger.debug("messageFilter function recieved ["+messages.length+"] messages.");
 				for(var k = 0; k < messages.length; k++)
@@ -233,7 +233,7 @@
 						latest: Number(res.messages[res.messages.length-1].ts),
 						count: 1000
 					};
-					robot.logger.debug("sending recursive params: " + util.inspect(recursive_params));
+					//robot.logger.debug("sending recursive params: " + util.inspect(recursive_params));
 					
 					robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
 					.then(function (_res) {
@@ -276,14 +276,7 @@
 				
 				var msgData = {
 					channel: summaryChannelId,
-					text: summaryMessage,
-					"attachments": [{
-						"fallback": "Summarizer updated at [" + dateNow + "]",
-						"color": "#cc3300",
-						"text": "Summarizer updated at _" + dateNow + "_",
-						"image_url" : "http://www.rihs.org/atlas/images/rule.jpg",
-						"mrkdwn_in": ["text"]
-					}]
+					text: summaryMessage
 				};
 
 				//post the message
