@@ -157,6 +157,7 @@
 		
 		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
 		{
+			
 			var timeNow = new Date();
 			var targetPastTime = new Date();
 			switch(typeOfTimeUnits)
@@ -186,11 +187,37 @@
 				oldest: utcTargetPastTime,
 				count: 1000
 			};
-						
+					
 			requestChannelHistory(params);
 			
 			return;
 		};
+		
+		var getFormattedJSONAttachment = function(messageText,channel,inChannel) {
+			
+			var msgData = {
+				
+				"attachments": [{
+					"fallback": messageText,
+					"color": "#cc3300",
+					"text": messageText,
+					"channel":channel,
+					"image_url" : "http://www.rihs.org/atlas/images/rule.jpg",
+					"mrkdwn_in": ["text"]
+              }]
+          };
+		  
+		  if(inChannel)
+		  {
+			msgData['response_type'] = 'in_channel';
+		  }
+		  else
+		  {
+			msgData['response_type'] = 'ephemeral';
+		  }
+		  
+		  return msgData;
+		}
 		
 		var requestChannelHistory = function(params)
 		{
@@ -244,9 +271,19 @@
 					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
 				}
 				robot.logger.debug("sending a message with length ["+summaryMessage.length+"] to channel ["+summaryChannelId+"]");
+				
+				var dateNow = new Date();
+				
 				var msgData = {
 					channel: summaryChannelId,
-					text: summaryMessage
+					text: summaryMessage,
+					"attachments": [{
+						"fallback": "Summarizer updated at [" + dateNow + "]",
+						"color": "#cc3300",
+						"text": "Summarizer updated at _" + dateNow + "_",
+						"image_url" : "http://www.rihs.org/atlas/images/rule.jpg",
+						"mrkdwn_in": ["text"]
+					}]
 				};
 
 				//post the message
