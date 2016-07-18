@@ -192,7 +192,7 @@
 					var recursive_params = {
 						channel: campaignChannelId,
 						oldest: params.oldest,
-						latest: res.messages[res.messages.length-1].ts,
+						latest: Number(res.messages[res.messages.length-1].ts),
 						count: 1000
 					};
 					robot.logger.debug("sending recursive params: " + util.inspect(recursive_params));
@@ -204,7 +204,7 @@
 				var summaryMessage = ""; 
 				
 				var filteredMessages = messageFilter(res.messages);
-				
+				robot.logger.debug("returned from messageFilter");
 				for(var k = 0; k < filteredMessages.length; k++)
 				{
 					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
