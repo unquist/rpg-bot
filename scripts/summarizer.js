@@ -114,6 +114,7 @@
 				if(archivedMessage.subtype == "me_message")
 				{
 					//robot.logger.debug("Found /me message. Insert into arrary and continue");
+					archivedMessage.text = "_" + archivedMessage.text + "_";
 					filteredMessages.push(archivedMessage);
 					continue;
 				}
@@ -175,9 +176,30 @@
 				count: 1000
 			};
 						
+			requestChannelHistory(params);
+			
+			return;
+		};
+		
+		var requestChannelHistory = function(params)
+		{
 			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
 			.then(function (res) {
 				robot.logger.debug("Successfully retrieved channel history.");
+				
+				if(res.has_more)
+				{
+					var recursive_params = {
+						channel: campaignChannelId,
+						oldest: params.oldest,
+						latest: res.messages[messages.length-1].ts,
+						count: 1000
+					};
+					robot.logger.debug("sending recursive params: " + util.inspect(recursive_params));
+					requestChannelHistory(recursive_params);
+				}
+				
+				
 				//create the message with attachment object
 				var summaryMessage = ""; 
 				
@@ -199,7 +221,6 @@
 			.catch(function (err) {
 				robot.logger.debug("Couldn't get channel history: " + err);
 			});
-			
 			return;
 		};
 		
