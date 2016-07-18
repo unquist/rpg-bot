@@ -72,6 +72,7 @@
 		{
 			try
 			{
+				robot.logger.debug("messageFilter-> messages inspect: " + util.inspect(messages));
 				messages.sort(sortMessagesChronologically);
 				var filteredMessages = new Array();
 				robot.logger.debug("messageFilter function recieved ["+messages.length+"] messages.");
