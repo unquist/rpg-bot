@@ -196,9 +196,32 @@
 						count: 1000
 					};
 					robot.logger.debug("sending recursive params: " + util.inspect(recursive_params));
-					requestChannelHistory(recursive_params);
+					
+					robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
+					.then(function (_res) {
+						robot.logger.debug("Successfully retrieved channel history.");
+						//create the message with attachment object
+						var _summaryMessage = ""; 
+					
+						var _filteredMessages = messageFilter(_res.messages);
+						robot.logger.debug("returned from messageFilter");
+						for(var _k = 0; _k < _filteredMessages.length; _k++)
+						{
+							_summaryMessage += "*"+_filteredMessages[_k].real_name+"*: " + _filteredMessages[_k].text + "\n\n";
+						}
+						robot.logger.debug("sending a message with length ["+_summaryMessage.length+"] to channel ["+summaryChannelId+"]");
+						var _msgData = {
+							channel: summaryChannelId,
+							text: _summaryMessage
+						};
+
+						//post the message
+						robot.adapter.customMessage(_msgData);
+					})
+					.catch(function (err) {
+						robot.logger.debug("Couldn't get channel history: " + err);
+					});
 				}
-				
 				
 				//create the message with attachment object
 				var summaryMessage = ""; 
