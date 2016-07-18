@@ -72,12 +72,12 @@
 		{
 			try
 			{
-				var sortedMessages = messages.sort(sortMessagesChronologically);
+				messages.sort(sortMessagesChronologically);
 				var filteredMessages = new Array();
-				robot.logger.debug("messageFilter function recieved ["+sortedMessages.length+"] messages.");
-				for(var k = 0; k < sortedMessages.length; k++)
+				robot.logger.debug("messageFilter function recieved ["+messages.length+"] messages.");
+				for(var k = 0; k < messages.length; k++)
 				{
-					var archivedMessage = sortedMessages[k];
+					var archivedMessage = messages[k];
 					var name = getRealNameFromId(archivedMessage.user);
 					archivedMessage['real_name'] = name;
 					var txt = archivedMessage.text;
