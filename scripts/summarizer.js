@@ -52,14 +52,25 @@
             return Math.round(Math.random() * (sides - 1)) + 1;
         };
 		
+		var sortMessagesChronologically = function(a,b) {
+			var timeA=Number(a.ts);
+			var timeB=Number(b.ts);
+			if (timeA < timeB) //sort string ascending
+				return -1 
+			if (timeA > timeB)
+				return 1
+			return 0 //default return value (no sorting) 
+		};
+		
 		//filters a message array, and returns the array. Since we assume slack will give us messages in the reverse order, this array re-sorts oldest-to-newest
 		var messageFilter = function(messages)
 		{
+			var sortedMessages = messages.sort(sortMessagesChronologically);
 			var filteredMessages = new Array();
-			robot.logger.debug("messageFilter function recieved ["+messages.length+"] messages.");
-			for(var k = 0; k < messages.length; k++)
+			robot.logger.debug("messageFilter function recieved ["+sortedMessages.length+"] messages.");
+			for(var k = 0; k < sortedMessages.length; k++)
 			{
-				var archivedMessage = messages[k];
+				var archivedMessage = sortedMessages[k];
 				var name = getRealNameFromId(archivedMessage.user);
 				archivedMessage['real_name'] = name;
 				var txt = archivedMessage.text;
