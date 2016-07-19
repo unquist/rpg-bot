@@ -5,9 +5,12 @@
 //   None
 //
 // Configuration:
-//   None
+//   RPGBOT_SUMMARIZE_INTERVAL: required, defaults to 0 which turns the summarizer off
+//   RPGBOT_SUMMARY_CHANNEL_NAME: required, set this to the name of the channel you want summaries posted to. Do not prefix the name with a "#" character.
+//   RPGBOT_CAMPAIGN_CHANNEL_NAME: required, set this to the name of the channel you summarized. Do not prefix the name with a "#" character.
 //
 // Commands:
+//	 None
 //
 // Author:
 //   unquist
@@ -33,12 +36,42 @@
 		    return user.real_name;
 		};
 		
-		//TODO: move this to something more modular. Maybe an environment variable?
-		var summaryChannelId = 'C1RJ8KRD5';
-		var campaignChannelId = 'C1D2ZTKF0';
+		var summaryChannelName = process.env.RPGBOT_SUMMARY_CHANNEL_NAME || "<NOT SET>";
+		var campaignChannelName = process.env.RPGBOT_CAMPAIGN_CHANNEL_NAME || "<NOT SET>";
 		
-		//don't turn on the cron job if the variable is set to zero
-		if(summarizeIntervalInMinutes != 0)
+		//var summaryChannelId = 'C1RJ8KRD5';
+		//var campaignChannelId = 'C1D2ZTKF0';
+		var summaryChannelId = null;
+		var campaignChannelId = null;
+		var channelListParams = {};
+		
+		//need to set the id of the channel based on the name
+		if(summaryChannelName != "<NOT SET>" && campaignChannelName != "<NOT SET>")
+		{
+			robot.slack.channels.list(channelListParams)
+			.then(function (res) {
+				robot.logger.debug("summarizer initialization: Successfully retrieved channel list.");
+				for(var j = 0; j < res.channels; j++)
+				{
+					robot.logger.debug("summarizer initialization: found channel["+j+"] with name ["+res.channels[j].name+"] and id ["+res.channels[j].id+"]");
+					if(res.channels[j].name == summaryChannelName)
+					{
+						summaryChannelId = res.channels[j].id;
+					}
+					else if(res.channels[j].name == campaignChannelName)
+					{
+						campaignChannelId = res.channels[j].id;
+					}
+				}
+
+			})
+			.catch(function (err) {
+				robot.logger.debug("summarizer initialization: Failed to set summary and or campaign channel id; summarizer will not work ->" + err);
+			});
+		}
+
+		//don't turn on the cron job if the variable is set to zero, or if the channel ids failed to initialize correctly
+		if(summarizeIntervalInMinutes != 0 && summaryChannelId != null && campaignChannelId != null)
 		{
 			var HubotCron = require('hubot-cronjob');
 		
@@ -271,9 +304,7 @@
 					summaryMessage += "*"+filteredMessages[k].real_name+"*: " + filteredMessages[k].text + "\n\n";
 				}
 				robot.logger.debug("sending a message with length ["+summaryMessage.length+"] to channel ["+summaryChannelId+"]");
-				
-				var dateNow = new Date();
-				
+			
 				var msgData = {
 					channel: summaryChannelId,
 					text: summaryMessage
@@ -288,22 +319,72 @@
 			return;
 		};
 		
-		robot.respond(/(summary)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
+		//use the "summarylog" phrase to test functionality.
+		robot.respond(/(summarylog)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
             var callerName = msg.message.user.name;
 			//robot.logger.debug(util.inspect(msg));
 	
 			var numberOfTimeUnits = Number(msg.match[2]) || 0;
 			var typeOfTimeUnits = msg.match[3] || "hour";
 			
-			robot.logger.debug("User ["+callerName+"] asked for the log for ["+numberOfTimeUnits+"] ["+typeOfTimeUnits+"].");
+			robot.logger.debug("User ["+callerName+"] asked for the debug log for ["+numberOfTimeUnits+"] ["+typeOfTimeUnits+"].");
 			
-			postSummary(callerName,numberOfTimeUnits,typeOfTimeUnits);
+			var timeNow = new Date();
+			var targetPastTime = new Date();
+			switch(typeOfTimeUnits)
+			{
+				case "minute":
+				case "minutes":
+					targetPastTime.setMinutes(timeNow.getMinutes()-numberOfTimeUnits);
+					break;
+				case "hour":
+				case "hours":
+					targetPastTime.setHours(timeNow.getHours()-numberOfTimeUnits);
+					break;
+				case "day":
+				case "days":
+					targetPastTime.setDate(timeNow.getDate()-numberOfTimeUnits);
+					break;
+				default:
+					return msg.reply("I didn't recognize ["+typeOfTimeUnits+"]. Valid units are `minutes`, `hours` or `days`.");
+			}
+					
+			//utc:
+			//var utcTime = timeNow.getTime() / 1000;
+			var utcTargetPastTime = (targetPastTime.getTime())/1000;
+			
+			var params = {
+				channel: campaignChannelId,
+				oldest: utcTargetPastTime,
+				count: 1000
+			};
+			
+			debugChannelHistory(params);
 
 			
 			return;
         });
 		
-		
+		var debugChannelHistory = function(params)
+		{
+			robot.slack.channels.history(params)// NOTE: could also give postMessage a callback
+			.then(function (res) {
+				robot.logger.debug("Successfully retrieved channel history.");
+						
+								
+				var filteredMessages = messageFilter(res.messages);
+				robot.logger.debug("returned from messageFilter");
+				for(var k = 0; k < filteredMessages.length; k++)
+				{
+					robot.logger.debug("debugChannelHistory: filteredMessages["+k+"]="+util.inspect(filteredMessages[k]));
+				}
+				
+			})
+			.catch(function (err) {
+				robot.logger.debug("requestChannelHistory:Couldn't get channel history: " + err);
+			});
+			return;
+		};
 		
 /*End function definitions*/
 	};
