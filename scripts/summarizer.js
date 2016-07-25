@@ -143,7 +143,20 @@
 						continue;
 					}
 					
+					//get rid of quoted text, which is metagame conversation
 					if(txt.indexOf("&gt") != -1)
+					{
+						continue;
+					}
+					
+					//get rid of "file_" messages
+					if(archivedMessage.subtype == "file_share" || archivedMessage.subtype == "file_mention" || archivedMessage.subtype == "file_comment")
+					{
+						continue;
+					}
+					
+					//need to remove links
+					if(txt.indexOf("<https") != -1)
 					{
 						continue;
 					}
