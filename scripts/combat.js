@@ -1424,7 +1424,7 @@
 						
 				
 						//post the message
-						robot.adapter.customMessage(msgData);
+						robot.messageRoom(channel_name,msgData);
 						
 						reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
 						msgData = getFormattedJSONAttachment("Successfully initialized init-dm.",channel_name,false);
