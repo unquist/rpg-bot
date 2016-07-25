@@ -339,7 +339,14 @@
 		
 		//use the "summarylog" phrase to test functionality.
 		robot.respond(/(summarylog)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
-            var callerName = msg.message.user.name;
+            
+			//if this is the first time we've run, need to translate the channel name to channel id
+			if(!summarizerInitialized)
+			{
+				initializeSummarizer();
+			}
+			
+			var callerName = msg.message.user.name;
 			//robot.logger.debug(util.inspect(msg));
 	
 			var numberOfTimeUnits = Number(msg.match[2]) || 0;
