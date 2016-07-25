@@ -45,33 +45,42 @@
 		var campaignChannelId = null;
 		var channelListParams = {};
 		
-		//need to set the id of the channel based on the name
-		if(summaryChannelName != "<NOT SET>" && campaignChannelName != "<NOT SET>")
-		{
-			robot.slack.channels.list(channelListParams)
-			.then(function (res) {
-				robot.logger.debug("summarizer initialization: Successfully retrieved channel list.");
-				for(var j = 0; j < res.channels; j++)
-				{
-					robot.logger.debug("summarizer initialization: found channel["+j+"] with name ["+res.channels[j].name+"] and id ["+res.channels[j].id+"]");
-					if(res.channels[j].name == summaryChannelName)
+		//There is some kind of order-of-operations problem with initializing. 
+		// We can't run the robot.slack.channels call at startup; probably has not itself been initialized. 
+		// Instead, we'll initialize the summarizer the first time it's called, and then set this variable to false.
+		var summarizerInitialized = false;
+		
+		var initializeSummarizer = function(){
+			//need to set the id of the channel based on the name
+			if(summaryChannelName != "<NOT SET>" && campaignChannelName != "<NOT SET>")
+			{
+				robot.slack.channels.list(channelListParams)
+				.then(function (res) {
+					robot.logger.debug("summarizer initialization: Successfully retrieved channel list.");
+					for(var j = 0; j < res.channels; j++)
 					{
-						summaryChannelId = res.channels[j].id;
+						robot.logger.debug("summarizer initialization: found channel["+j+"] with name ["+res.channels[j].name+"] and id ["+res.channels[j].id+"]");
+						if(res.channels[j].name == summaryChannelName)
+						{
+							robot.logger.debug("setting "+summaryChannelName+" to id "+res.channels[j].id);
+							summaryChannelId = res.channels[j].id;
+						}
+						else if(res.channels[j].name == campaignChannelName)
+						{
+							robot.logger.debug("setting "+campaignChannelName+" to id "+res.channels[j].id);
+							campaignChannelId = res.channels[j].id;
+						}
 					}
-					else if(res.channels[j].name == campaignChannelName)
-					{
-						campaignChannelId = res.channels[j].id;
-					}
-				}
-
-			})
-			.catch(function (err) {
-				robot.logger.debug("summarizer initialization: Failed to set summary and or campaign channel id; summarizer will not work ->" + err);
-			});
+					summarizerInitialized = true;
+					robot.logger.debug("summarizer successfully initialized.");
+				})
+				.catch(function (err) {
+					robot.logger.debug("summarizer initialization: Failed to set summary and or campaign channel id; summarizer will not work ->" + err);
+				});
+			}
 		}
-
-		//don't turn on the cron job if the variable is set to zero, or if the channel ids failed to initialize correctly
-		if(summarizeIntervalInMinutes != 0 && summaryChannelId != null && campaignChannelId != null)
+		//don't turn on the cron job if the variable is set to zero, or if the channel variables were not set
+		if(summarizeIntervalInMinutes != 0 && summaryChannelName != "<NOT SET>" && campaignChannelName != "<NOT SET>")
 		{
 			var HubotCron = require('hubot-cronjob');
 		
@@ -84,6 +93,10 @@
 				postSummary("CRON",summarizeIntervalInMinutes,'minutes');
 			};
 			new HubotCron(pattern, timezone, fn);
+		}
+		else
+		{
+			robot.logger.debug("Summarizer failed to start cron job due to missing or zeroed environment variables. summarizeIntervalInMinutes["+summarizeIntervalInMinutes+"], summaryChannelName["+summaryChannelName+"] campaignChannelName["+campaignChannelName+"]");
 		}
 		
 		var randint = function(sides) {
@@ -190,6 +203,11 @@
 		
 		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
 		{
+			//if this is the first time we've run, need to translate the channel name to channel id
+			if(!summarizerInitialized)
+			{
+				initializeSummarizer();
+			}
 			
 			var timeNow = new Date();
 			var targetPastTime = new Date();
