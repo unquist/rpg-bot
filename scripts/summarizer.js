@@ -56,8 +56,8 @@
 			{
 				robot.slack.channels.list(channelListParams)
 				.then(function (res) {
-					robot.logger.debug("summarizer initialization: Successfully retrieved channel list.");
-					for(var j = 0; j < res.channels; j++)
+					robot.logger.debug("summarizer initialization: Successfully retrieved channel list of length["+res.channels.length+"].");
+					for(var j = 0; j < res.channels.length; j++)
 					{
 						robot.logger.debug("summarizer initialization: found channel["+j+"] with name ["+res.channels[j].name+"] and id ["+res.channels[j].id+"]");
 						if(res.channels[j].name == summaryChannelName)
@@ -201,14 +201,8 @@
 			}			
 		};
 		
-		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
+		var executePostSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
 		{
-			//if this is the first time we've run, need to translate the channel name to channel id
-			if(!summarizerInitialized)
-			{
-				initializeSummarizer();
-			}
-			
 			var timeNow = new Date();
 			var targetPastTime = new Date();
 			switch(typeOfTimeUnits)
@@ -242,6 +236,23 @@
 			requestChannelHistory(params);
 			
 			return;
+		};
+		
+		var postSummary = function(callerName,numberOfTimeUnits,typeOfTimeUnits)
+		{
+			//if this is the first time we've run, need to translate the channel name to channel id
+			if(!summarizerInitialized)
+			{
+				initializeSummarizer();
+				setTimeout(function(){
+					executePostSummary(callerName,numberOfTimeUnits,typeOfTimeUnits);
+				}, 5000);
+			}
+			else
+			{
+				executePostSummary(callerName,numberOfTimeUnits,typeOfTimeUnits);
+			}
+			
 		};
 		
 		var getFormattedJSONAttachment = function(messageText,channel,inChannel) {
@@ -337,15 +348,8 @@
 			return;
 		};
 		
-		//use the "summarylog" phrase to test functionality.
-		robot.respond(/(summarylog)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
-            
-			//if this is the first time we've run, need to translate the channel name to channel id
-			if(!summarizerInitialized)
-			{
-				initializeSummarizer();
-			}
-			
+		var respondToSummaryLog = function(msg)
+		{
 			var callerName = msg.message.user.name;
 			//robot.logger.debug(util.inspect(msg));
 	
@@ -388,6 +392,24 @@
 
 			
 			return;
+		};
+		
+		//use the "summarylog" phrase to test functionality.
+		robot.respond(/(summarylog)\s+(\d+)\s+(hour|hours|minute|minutes|day|days)/i, function(msg) {
+            
+			//if this is the first time we've run, need to translate the channel name to channel id
+			if(!summarizerInitialized)
+			{
+				initializeSummarizer();
+				setTimeout(function(){
+					respondToSummaryLog(msg);
+				}, 5000);
+			}
+			else
+			{
+				respondToSummaryLog(msg);
+			}
+
         });
 		
 		var debugChannelHistory = function(params)
