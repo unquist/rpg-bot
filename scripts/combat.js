@@ -68,9 +68,10 @@
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
+			reply += "\n\n*_/combat setdm [NAME]_* - OPTIONAL: Configures one player as the DM. If set, init-dm, add-dm, and kill can only be run by the DM. Additionally, setting the DM activates the option monster HP functionality."
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
-			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can run this to quickly add monsters of a single type to a combat.";
+			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP] command sets the starting health for each monster.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
 			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
@@ -1420,6 +1421,14 @@
 						}
 						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+						
+				
+						//post the message
+						robot.adapter.customMessage(msgData);
+						
+						reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
+						msgData = getFormattedJSONAttachment("Successfully initialized init-dm.",channel_name,false);
+												
 						return res.json(msgData);
 						break;
 					case "add":
