@@ -1424,7 +1424,7 @@
 						
 				
 						//post the message
-						robot.logger.deubg("res: "+util.inspect(res));
+						robot.logger.debug("res: "+util.inspect(res));
 						
 						//reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
 						//msgData = getFormattedJSONAttachment("Successfully initialized init-dm.",channel_name,false);
