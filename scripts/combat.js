@@ -1424,10 +1424,10 @@
 						
 				
 						//post the message
-						robot.messageRoom(channel_name,msgData);
+						robot.logger.deubg("res: "+util.inspect(res));
 						
-						reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
-						msgData = getFormattedJSONAttachment("Successfully initialized init-dm.",channel_name,false);
+						//reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
+						//msgData = getFormattedJSONAttachment("Successfully initialized init-dm.",channel_name,false);
 												
 						return res.json(msgData);
 						break;
