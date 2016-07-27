@@ -22,6 +22,7 @@
 		
 		const PC_TYPE = 0;
 		const MONSTER_TYPE = 1;
+		const NPC_TYPE = 2;
 		
 		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out his chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined his ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleeps with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'return to dust' ,'walked the plank','forgot to keep breathing','punched his ticket','took the long walk');
 		
@@ -68,18 +69,14 @@
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
-			reply += "\n\n*_/combat setdm [NAME]_* - OPTIONAL: Configures one player as the DM. If set, init-dm, add-dm, and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
+			reply += "\n\n*_/combat setdm [NAME]_* - OPTIONAL: Configures one player as the DM. If set, init-dm and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
-			reply += "\n\n*_/combat init-npc [bonus]_* - Initialize an NPC into combat (including pets, familiars, mounts) to the combat.";
+			reply += "\n\n*_/combat init-npc [BONUS] [NAME/TYPE]_* - Initialize an NPC with [NAME/TYPE] into combat (including pets, familiars, mounts) to the combat.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
 			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
-			/* removed the "add" commands. these are refactored to the init command
-			reply += "\n\n*_/combat add [BONUS]_* - Use this to add a player to a combat that has already started. BONUS is your Dex. initiative bonus.";
-			reply += "\n\n*_/combat add-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can use this to add new monsters to a fight that has already started.";
-			*/
 			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
@@ -321,7 +318,7 @@
 			
 			if(firstPlayer.type == PC_TYPE) {
 				  reply += "\n*" + firstPlayer.name + ", you're up first!*";
-			  } else if (firstPlayer.type == MONSTER_TYPE) {
+			  } else {
 				  reply += "\n*" + firstPlayer.name + ", you're up first!*";
 			  }	
 			
@@ -333,7 +330,7 @@
 				var order = k + 1;
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 			}
@@ -443,8 +440,7 @@
 				return "That's too many monsters for this combat "+callerName+". You can add " + remainingSpots + " monsters maximum.\nI already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots. ";
 			}
 			
-			
-			
+
 			var initRoll = rolldie(20);
 			var initScore = initRoll;
 			var bonusDescription = "";
@@ -493,6 +489,79 @@
 				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
 				return callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".\nStill waiting on "+stillNeeded+" combatants."; 
 			}
+		};
+		
+		var initNPC = function(callerName,bonus,addBonus,npcName){
+			robot.logger.debug("NPC Init request from " + callerName + " with bonus of [" + bonus + "]");
+			var combat_started = robot.brain.get('combat_flag');
+			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+			//array of players
+			var combatantsArray = robot.brain.get('combatantsArray');
+			var numTotalCombatants = robot.brain.get('numTotalCombatants');
+			
+			
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 0);
+				return "No combat started "+callerName+". Begin with `/combat start`";
+			}  
+			if(combat_started == 0)
+			{
+				return "Don't get trigger happy "+callerName+". Need to start combat before you roll initiative for an NPC...";
+			}
+			else if(numTotalCombatants == numRegisteredCombatants)
+			{
+				/* TODO: implement a combat Add NPC */
+				//return combatAddNPC(callerName,bonus,addBonus, numMonsters,monsterName) 
+				return "Sorry " + callerName + ", can only add NPCs before combat has started (for now).";
+			}
+			
+			var initRoll = rolldie(20);
+			var initScore = initRoll;
+			var bonusDescription = "";
+			if(addBonus)
+			{
+				initScore += Number(bonus);
+				bonusDescription = "+" + bonus;
+				
+			}
+			else
+			{
+				initScore -= Number(bonus);
+				bonusDescription = "-" + bonus;
+			}
+			
+			numRegisteredCombatants += 1;
+			
+  			var newCombatant = new Combatant(npcName,numRegisteredCombatants,initScore,NPC_TYPE,"NPC");
+  			  			
+  			combatantsArray.push(newCombatant);
+  			robot.brain.set('combatantsArray',combatantsArray);
+
+  			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			
+			//ready to start combat?
+			if(numRegisteredCombatants == numTotalCombatants)
+			{
+			  
+				combatantsArray = combatantsArray.sort(combatantSortByInit);
+				robot.brain.set('combatantsArray',combatantsArray);
+				robot.brain.set('currentTurnIndex',0);
+				var firstPlayer = combatantsArray[0];
+			  
+				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + npcName + " the NPC.<SPLIT>";
+								
+				reply += constructInitReplyMessage(combatantsArray,firstPlayer);
+			
+				return reply; 
+			}
+			else
+			{
+				var stillNeeded = numTotalCombatants - numRegisteredCombatants;
+				return callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + npcName + " the NPC.\nStill waiting on "+stillNeeded+" combatants."; 
+			}
+
 		};
 		
 		var combatSetInit = function (callerName, newInit) {
@@ -565,7 +634,7 @@
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n" + combatantsArray[k].name + " _[id:"+combatantsArray[k].id+"]_ rolled `" +combatantsArray[k].init+"`.";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					} else {
 						reply += "\n" + combatantsArray[k].name + " _[id:"+combatantsArray[k].id+"]_ rolled `" +combatantsArray[k].init+"`.";
 					}
 					
@@ -583,7 +652,7 @@
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					} else {
 						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 					
@@ -592,7 +661,7 @@
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					} else {
 						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 				}
@@ -627,7 +696,7 @@
 					var order = k + 1;
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					} else {
 						reply += "\n" + combatantsArray[k].name + " (initiative of " + combatantsArray[k].init + ")" + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 					
@@ -645,7 +714,7 @@
 			var reply = ""
 			if(combatantsArray[currentTurnIndex].type == PC_TYPE) {
 				reply = "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
-			} else if (combatantsArray[currentTurnIndex].type == MONSTER_TYPE) {
+			} else {
 				reply = "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
 			}
 			
@@ -669,7 +738,7 @@
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					} else {
 						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 					
@@ -678,7 +747,7 @@
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-					} else if (combatantsArray[k].type == MONSTER_TYPE) {
+					} else {
 						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					}
 				}
@@ -754,7 +823,7 @@
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 				
@@ -763,7 +832,7 @@
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 			}
@@ -863,7 +932,7 @@
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 				
@@ -872,7 +941,7 @@
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 			}
@@ -1034,7 +1103,7 @@
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 				
@@ -1043,7 +1112,7 @@
 			{
 				if(combatantsArray[k].type == PC_TYPE) {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
-				} else if (combatantsArray[k].type == MONSTER_TYPE) {
+				} else {
 					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 				}
 			}
@@ -1432,52 +1501,43 @@
 						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
 						
-				
-						//post the message
-						//robot.logger.debug("res: "+util.inspect(res));
-						
-						//reply = "Missing a command! Use _/combat help_ for an explanation of each command.";
-						//msgData = getFormattedJSONAttachment("Successfully initialized init-dm.",channel_name,false);
-												
 						return res.json(msgData);
 						break;
-					/*
-					case "add":
-						var bonus = 0;
+					case "init-npc":
 						if(parameters != "")
 						{
-							bonus = parameters.match(/\d+/i) || 0;
-						}
-						reply = combatAdd(username,Number(bonus));
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						return res.json(msgData);
-						break;
-					case "add-dm":
-						if(parameters != "")
-						{
-							var addDmParams = parameters.match(/(\d+)\s+(\d+)\s+(.+)/i) || null;
-							if(addDmParams == null)
+							var initNPCParams = parameters.match(/(\+|-){0,1}(\d+)\s+([a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*)/i) || null;
+							if(initNPCParams == null)
 							{
-								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+								reply = "Need to specify the the bonus and the name of the NPC!\n For example, *_/combat init-npc 2 steve the dog_* Rolls initiative for steve the dog, with a +2 bonus.";
 							}
 							else
 							{
-								var bonus = addDmParams[1] || 0;
+								var addBonus = initNPCParams[1] || true;
+								if(addBonus == "-")
+								{
+									addBonus = false;
+								}
+								else
+								{
+									addBonus = true;
+								}
+								var bonus = initNPCParams[2] || 0;
 								bonus = Number(bonus);
-								var numMonsters = addDmParams[2] || 0;
-								numMonsters = Number(numMonsters);
-								var monsterName = addDmParams[3] || "Nameless Horror";
-								reply += combatAddDM(username,bonus,numMonsters,monsterName);
+								var npcName = initNPCParams[3] || "Steve";
+								
+								reply += initNPC(username,bonus,addBonus,npcName);
 							}
 						}
 						else
 						{
-							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat add-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+							reply = "Need to specify the the bonus and the name of the NPC!\n For example, *_/combat init-npc 2 steve the dog_* Rolls initiative for steve the dog, with a +2 bonus.";
 						}
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+						
 						return res.json(msgData);
 						break;
-					*/
 					case "setinit":
 						if(parameters != "")
 						{
