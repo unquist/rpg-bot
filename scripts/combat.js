@@ -289,7 +289,7 @@
 			var countMonsterTypes = 0;
 			for(var type in combatantTypes)
 			{
-				if(type != "PC")
+				if(type != "PC" && type != "NPC")
 				{
 					countMonsterTypes += 1;
 					if(Number(combatantTypes[type]) > 1)
