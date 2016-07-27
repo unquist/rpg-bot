@@ -68,15 +68,18 @@
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
-			reply += "\n\n*_/combat setdm [NAME]_* - OPTIONAL: Configures one player as the DM. If set, init-dm, add-dm, and kill can only be run by the DM. Additionally, setting the DM activates the option monster HP functionality."
+			reply += "\n\n*_/combat setdm [NAME]_* - OPTIONAL: Configures one player as the DM. If set, init-dm, add-dm, and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
-			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP] command sets the starting health for each monster.";
+			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
+			reply += "\n\n*_/combat init-npc [bonus]_* - Initialize an NPC into combat (including pets, familiars, mounts) to the combat.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
 			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
+			/* removed the "add" commands. these are refactored to the init command
 			reply += "\n\n*_/combat add [BONUS]_* - Use this to add a player to a combat that has already started. BONUS is your Dex. initiative bonus.";
 			reply += "\n\n*_/combat add-dm [BONUS] [NUM MONSTERS] [MONSTER NAME]_* - The DM can use this to add new monsters to a fight that has already started.";
+			*/
 			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
@@ -359,7 +362,7 @@
 			}
 			else if(numTotalCombatants == numRegisteredCombatants)
 			{
-				return "This combat is full up "+callerName+".";
+				return combatAdd(callerName, bonus);
 			}
 			else if(robot.brain.get(callerName+"_initScore") != null)
 			{
@@ -426,7 +429,7 @@
 			}
 			else if(numTotalCombatants == numRegisteredCombatants)
 			{
-				return "This combat is full up "+callerName+". Add your self to the fight with `combat add [initiative bonus]`.";
+				return combatAddDM(callerName,bonus,addBonus, numMonsters,monsterName) 
 			}
 			
 			
@@ -702,10 +705,6 @@
 		{
 			return "Don't get trigger happy "+callerName+". Need to start combat and roll initiative before you add yourself...";
 		}
-	    else if(numRegisteredCombatants < numTotalCombatants)
-	    {
-			return "No need to use *_add_* right now "+callerName+". Try *_/combat init [BONUS]_* to roll for initiative and join the fight.";
-		}
 		else if(robot.brain.get(callerName+"_initScore") != null)
   		{
   			return callerName+" already rolled initiative `"+robot.brain.get(callerName+"_initScore")+"`. No backsies.\nYou can use `combat setinit [init]` to manually fix your initiative up until the start of combat.";
@@ -773,7 +772,7 @@
 		  
 	  };
 	  
-	  var combatAddDM = function(callerName,bonus,numMonsters,monsterName) {
+	  var combatAddDM = function(callerName,bonus,addBonus,numMonsters,monsterName) {
 		var combat_started = robot.brain.get('combat_flag');
 		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 		//array of players
@@ -790,16 +789,27 @@
 		{
 			return "Don't get trigger happy "+callerName+".\nNeed to start combat and roll initiative before you add more monsters...";
 		}
-	    else if(numRegisteredCombatants < numTotalCombatants)
-	    {
-			return "No need to use *_add_* right now "+callerName+".\nTry *_/combat init-dm [BONUS] [NUM MONSTERS] [NAME]_* to roll initiative for a few monsters.";
-		}
+	    
  			
   			
   		robot.logger.debug("Add request from " + callerName + " with bonus of [" + bonus + "]");
   			
   		var initRoll = rolldie(20);
-  		var initScore = initRoll + Number(bonus);
+		var initScore = initRoll;
+		var bonusDescription = "";
+		
+		if(addBonus)
+		{
+			initScore += Number(bonus);
+			bonusDescription = "+" + bonus;
+			
+		}
+		else
+		{
+			initScore -= Number(bonus);
+			bonusDescription = "-" + bonus;
+		}
+  		
 		
 		var numCombatantsIndex = numRegisteredCombatants;
 		var newMonsterCombatants = new Array();
@@ -845,7 +855,7 @@
   		robot.brain.set('numTotalCombatants',numTotalCombatants);
   		
 		//now construct our response_type
-		var reply = "New monsters ("+monsterName+") rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
+		var reply = "New monsters ("+monsterName+") rolled `"+initRoll+"` with a modifier of `"+bonusDescription+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
 		for(var k = 0; k < combatantsArray.length; k++)
 		{
 			var order = k + 1;
@@ -1431,6 +1441,7 @@
 												
 						return res.json(msgData);
 						break;
+					/*
 					case "add":
 						var bonus = 0;
 						if(parameters != "")
@@ -1466,6 +1477,7 @@
 						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
 						break;
+					*/
 					case "setinit":
 						if(parameters != "")
 						{
