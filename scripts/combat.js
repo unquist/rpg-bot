@@ -1410,7 +1410,7 @@
 			username = getRealNameFromId(data.user_id);
 			channel_name = data.channel_name;
 			text = data.text;
-			var match = text.match(/([a-z]+-{0,1}[a-z]{0,2})(\s*)(.*)/i);
+			var match = text.match(/([a-z]+-{0,1}[a-z]{0,3})(\s*)(.*)/i);
 			var reply = "";  
 			if(match != null)
 			{
