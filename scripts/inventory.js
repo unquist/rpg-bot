@@ -17,7 +17,8 @@
      
 		const GOOGLE_SERVICE_ACCOUNT = process.env.SERVICE_ACCOUNT;
 		const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
-		
+		var google = require("googleapis")
+		var util = require("util");
 		var GoogleSpreadsheet = require('google-spreadsheet');
 		/*
         robot.respond(/(inventory)/i, function(msg) {
@@ -44,6 +45,9 @@
         });
 		*/
 		robot.respond(/(inventory)/i, function(msg) {
+			robot.logger.debug(util.inspect(google));
+		
+		
 			robot.emit("googleapi:request", {
 				service: "Sheets",
 				version: "v4",
