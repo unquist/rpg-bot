@@ -45,8 +45,8 @@
         });
 		*/
 		robot.respond(/(inventory)/i, function(msg) {
-			robot.logger.debug(util.inspect(google));
-		
+			//robot.logger.debug(util.inspect(google));
+			var serviceClient = google['sheets']("v4");
 		
 			robot.emit("googleapi:request", {
 				service: "sheets",
