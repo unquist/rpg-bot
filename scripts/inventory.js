@@ -49,7 +49,7 @@
 		
 		
 			robot.emit("googleapi:request", {
-				service: "Sheets",
+				service: "sheets",
 				version: "v4",
 				endpoint: "sheets.spreadsheets.values.get",
 				params: {
