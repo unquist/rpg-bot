@@ -45,20 +45,22 @@
 		*/
 		robot.respond(/(inventory)/i, function(msg) {
 			robot.emit("googleapi:request", {
-				service: "analytics",
-				version: "v3",
-				endpoint: "management.profiles.list",
+				service: "sheets",
+				version: "v4",
+				endpoint: "sheets.spreadsheets.values.get",
 				params: {
-					accountId: '~all',
-					webPropertyId: '~all'
+					spreadsheetId: '1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0',
+					range: 'A11:A17'
 				},
 				callback: function(err, data) {
 					if (err) {
-						return console.log(err);
+						return robot.logger.debug("inventory error:"err);
 					}
-					return console.log(data.items.map(function(item) {
-						return item.name + " - " + item.websiteUrl;
-					}).join("\n"));
+					for(var k = 0; k < data.values.length; k++)
+					{
+						robot.logger.debug("["+k+"] <"+data.values[k]+">");
+					}
+					return "Finished."
 				}
 			});
         });
