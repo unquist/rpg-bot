@@ -6,6 +6,5 @@
   "hubot-brain-inspect",
   "google-spreadsheet",
   "hubot-googleapi",
-  "googleapis",
   "hubot-slack-api"
 ]
