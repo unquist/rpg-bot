@@ -45,7 +45,7 @@
 		*/
 		robot.respond(/(inventory)/i, function(msg) {
 			robot.emit("googleapi:request", {
-				service: "sheets",
+				service: "Sheets",
 				version: "v4",
 				endpoint: "sheets.spreadsheets.values.get",
 				params: {
