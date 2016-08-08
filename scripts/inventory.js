@@ -19,7 +19,7 @@
 		const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 		
 		var GoogleSpreadsheet = require('google-spreadsheet');
-
+		/*
         robot.respond(/(inventory)/i, function(msg) {
             robot.logger.debug("Inventory function");
 			var callerName = msg.message.user.name;
@@ -42,7 +42,27 @@
 			
 			return msg.reply(callerName+" checked their inventory.");
         });
-  
+		*/
+		robot.respond(/(inventory)/i, function(msg) {
+			robot.emit("googleapi:request", {
+				service: "analytics",
+				version: "v3",
+				endpoint: "management.profiles.list",
+				params: {
+					accountId: '~all',
+					webPropertyId: '~all'
+				},
+				callback: function(err, data) {
+					if (err) {
+						return console.log(err);
+					}
+					return console.log(data.items.map(function(item) {
+						return item.name + " - " + item.websiteUrl;
+					}).join("\n"));
+				}
+			});
+        });
+
   
      
 };
