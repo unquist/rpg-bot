@@ -54,7 +54,7 @@
 				},
 				callback: function(err, data) {
 					if (err) {
-						return robot.logger.debug("inventory error:"err);
+						return robot.logger.debug("inventory error:"+err);
 					}
 					for(var k = 0; k < data.values.length; k++)
 					{
