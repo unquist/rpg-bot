@@ -512,9 +512,7 @@
 			}
 			else if(numTotalCombatants == numRegisteredCombatants)
 			{
-				/* TODO: implement a combat Add NPC */
-				//return combatAddNPC(callerName,bonus,addBonus, numMonsters,monsterName) 
-				return "Sorry " + callerName + ", can only add NPCs before combat has started (for now).";
+				return combatAddNPC(callerName,bonus,addBonus,npcName);
 			}
 			
 			var initRoll = rolldie(20);
@@ -841,6 +839,101 @@
 		  
 	  };
 	  
+	  var combatAddNPC = function(callerName,bonus,addBonus,npcName) {
+		var combat_started = robot.brain.get('combat_flag');
+		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
+		//array of players
+		var combatantsArray = robot.brain.get('combatantsArray');
+		var numTotalCombatants = robot.brain.get('numTotalCombatants');
+		
+		if(combat_started != 0 && combat_started != 1)
+		{
+  			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			robot.brain.set('combat_flag', 0);
+			return "No combat started "+callerName+". Begin with `/combat start`";
+		}  
+		if(combat_started == 0)
+		{
+			return "Don't get trigger happy "+callerName+". Need to start combat before you add an NPC...";
+		}
+
+		
+  		robot.logger.debug("Add request from " + callerName + " with bonus of [" + bonus + "]");
+  			
+  		var initRoll = rolldie(20);
+		var initScore = initRoll;
+  		var bonusDescription = "";
+		if(addBonus)
+		{
+			initScore += Number(bonus);
+			bonusDescription = "+" + bonus;
+			
+		}
+		else
+		{
+			initScore -= Number(bonus);
+			bonusDescription = "-" + bonus;
+		}
+		
+		
+		numRegisteredCombatants += 1;
+		numTotalCombatants += 1;
+			
+  		var newCombatant = new Combatant(npcName,numRegisteredCombatants,initScore,NPC_TYPE,"NPC");
+  		
+  			
+		//now we have the new combatant and their init. But need to make sure the turn counter 
+		// stays correct before re-sorting.
+		var currentTurnIndex = Number(robot.brain.get('currentTurnIndex'));
+		var currentCombatant = combatantsArray[currentTurnIndex];
+		
+		//now add the new player and resort the array
+  		combatantsArray.push(newCombatant);
+  		combatantsArray = combatantsArray.sort(combatantSortByInit);
+		
+		//loop through the array, find the player whose turn it is, and reset the index
+		for(var i = 0; i < combatantsArray.length; i++)
+		{
+			if(combatantsArray[i].id == currentCombatant.id)
+			{
+				currentTurnIndex = i;
+				robot.brain.set('currentTurnIndex',currentTurnIndex);
+			}
+		}
+		
+		robot.brain.set('combatantsArray',combatantsArray);
+
+  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+  		robot.brain.set('numTotalCombatants',numTotalCombatants);
+  		
+		//now construct our response_type
+		var reply = "New NPC "+npcName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
+		for(var k = 0; k < combatantsArray.length; k++)
+		{
+			var order = k + 1;
+			if(currentTurnIndex == k)
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+				} else {
+					reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+				}
+				
+			}
+			else
+			{
+				if(combatantsArray[k].type == PC_TYPE) {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+				} else {
+					reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+				}
+			}
+		}
+		return reply;		
+		  
+	  };
+	  
+	  
 	  var combatAddDM = function(callerName,bonus,addBonus,numMonsters,monsterName) {
 		var combat_started = robot.brain.get('combat_flag');
 		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
@@ -886,7 +979,7 @@
 		{
 			var index = k + 1;
 			numCombatantsIndex += 1;
-			var thisMonsterName = enemy_name.getRandomEnemyName() + " the " + monsterName;
+			var thisMonsterName = enemy_name.getRandomEnemyName() + " (" + monsterName +")";
 			var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE);
 			newMonsterCombatants.push(newCombatant);
 		}		
