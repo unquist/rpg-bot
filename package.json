@@ -6,6 +6,7 @@
   "description": "A simple robot for playing D&D on slack.",
   "dependencies": {
     "google-spreadsheet": "^2.0.3",
+    "googleapis": "^12.1.0",
     "hubot": "^2.19.0",
     "hubot-brain-inspect": "0.0.1",
     "hubot-cronjob": "^0.2.1",
