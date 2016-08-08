@@ -24,7 +24,7 @@
 		const MONSTER_TYPE = 1;
 		const NPC_TYPE = 2;
 		
-		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out his chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined his ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleeps with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'return to dust' ,'walked the plank','forgot to keep breathing','punched his ticket','took the long walk');
+		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out his chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined his ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleeps with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'returned to dust' ,'walked the plank','forgot to keep breathing','punched his ticket','took the long walk');
 		
 		var getRandomDeathEuphemism = function() {
 		  var index = Math.floor(Math.random()*death_euphemisms.length);
@@ -1044,7 +1044,7 @@
 		};
 		
 		
-	var combatKill = function(callerName,combatantIdArray) {
+	var combatKill = function(callerName,combatantIdArray,deathMessage) {
 		var combat_started = robot.brain.get('combat_flag');
 
 		if(combat_started != 0 && combat_started != 1)
@@ -1092,19 +1092,30 @@
 		
 		//now construct our response message.
 		var reply = "";
+		
+		var deathEuphemism = "";
+		if(deathMessage != "")
+		{
+			deathEuphemism = deathMessage;
+		}
+		else
+		{
+			deathEuphemism = getRandomDeathEuphemism();
+		}
+		
 		if(combatantsToBeKilled.length < 1)
 		{
 			return "No valid Ids found. No combatants removed from combat."; 
 		}
 		else if(combatantsToBeKilled.length == 1)
 		{
-			reply += "_*" + combatantsToBeKilled[0].name + "*_ "  + getRandomDeathEuphemism() + "\n";
+			reply += "_*" + combatantsToBeKilled[0].name + "*_ "  + deathEuphemism + "\n";
 		}
 		else
 		{
 			for(var k = 0; k < combatantsToBeKilled.length; k++)
 			{
-				reply += "_*" + combatantsToBeKilled[k].name + "*_ "  + getRandomDeathEuphemism() + ".\n";
+				reply += "_*" + combatantsToBeKilled[k].name + "*_ "  + deathEuphemism + ".\n";
 			}
 			
 		}
@@ -1674,12 +1685,12 @@
 							  robot.logger.debug("original playerId arry set to->"+playerId+"<--");
 							  var playerIdArray = new Array();
 							  for(var k = 0; k < playerId.length; k++)
-  							{
+								{
   							  playerIdArray.push(Number(playerId[k]));
-  							}
+								}
 							  
 							  robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
-								reply = combatKill(username,playerIdArray);
+								reply = combatKill(username,playerIdArray,"");
 							}
 						}
 						else
