@@ -37,7 +37,7 @@
 
 					return data;
 				}*/
-				callback: callbackParam(err,data)
+				callback: callbackParam
 			});
 		};
 
