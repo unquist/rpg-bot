@@ -17,7 +17,8 @@
     module.exports = function(robot) {
         var util = require("util");
 		var enemy_name = require('./enemy_name');
-
+		var spreadsheet_wrapper = require('./spreadsheet_wrapper');
+		
 		var hasProp = {}.hasOwnProperty;
 		
 		const PC_TYPE = 0;
@@ -370,6 +371,13 @@
   			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
   			
 			//if bonus is zero, that could mean one of two things: either it's really 0, or the PC wants to try and use the value in their character sheet
+			spreadsheet_wrapper.getSpreadsheetValues('1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0','Party Loot!A11:A17',function(err, data) {
+				if (err) {
+					robot.logger.debug("getSpreadsheetValues error:"+err);
+					return msg.reply(err);
+				}
+				return msg.reply(data.values);
+			});
 			
 			
   			var initRoll = rolldie(20);

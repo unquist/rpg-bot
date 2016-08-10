@@ -8,7 +8,8 @@
 //   None
 //
 // Commands:
-//   
+//   hubot googleapi auth -  required command to authenticate access to your Google spreadsheets
+//	 hubot googleapi sheet SPREADSHEET_ID - each user must set this to configure access to your character sheet stored in Drive
 // Author:
 //   unquist
 
@@ -64,6 +65,17 @@ module.exports = function(robot) {
 	robot.respond(/googleapi auth(orize)?$/, function(msg) {
 		return msg.send("Authorize at " + HUBOT_URL + AUTH_PATH);
 	});
+	
+	robot.respond(/googleapi sheet (\S+)$/, function(msg) {
+		var spreadsheetId = msg.match[1] || 'NA';
+		if(spreadsheetId == 'NA')
+		{
+			return msg.send("I didn't understand that. The correct syntax is `googleapi sheet SPDREADSHEET_ID` where SPDREADSHEET_ID is the long character string that uniquely identifies a google sheet.");
+		}
+		var callerName = msg.message.user.id;
+		return msg.send("Stored spreadsheet id ["+spreadsheetId+"] for user id ["+callerName+"]");
+	});
+	
 	robot.router.get(AUTH_PATH, function(req, res) {
 		return res.redirect(client.generateAuthUrl({
 			access_type: "offline",
