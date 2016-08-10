@@ -71,7 +71,7 @@
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
 			reply += "\n\n*_/combat setdm [NAME]_* - OPTIONAL: Configures one player as the DM. If set, init-dm and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
-			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. Once the correct number of player and monsters have rolled, combat will automatically start.";
+			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. If character sheet integration has been performed, this will automatically use the value in your sheet.  Adding the BONUS param will always override the automatic functionality. Once the correct number of player and monsters have rolled, combat will automatically start.";
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
 			reply += "\n\n*_/combat init-npc [BONUS] [NAME/TYPE]_* - Initialize an NPC with [NAME/TYPE] into combat (including pets, familiars, mounts) to the combat.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
@@ -369,6 +369,9 @@
   			
   			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
   			
+			//if bonus is zero, that could mean one of two things: either it's really 0, or the PC wants to try and use the value in their character sheet
+			
+			
   			var initRoll = rolldie(20);
   			var initScore = initRoll + bonus;
 			numRegisteredCombatants += 1;

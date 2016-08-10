@@ -19,6 +19,18 @@
 		var util = require("util");
 		var spreadsheet_wrapper = require('./spreadsheet_wrapper');
 
+		robot.respond(/(delete brain auth key)/i, function(msg) {
+			try{
+				delete robot.brain.data._private['googleapi:credential'];
+				return msg.reply("Successfully deleted googleapi:credential");
+			}
+			catch(err)
+			{
+				return msg.reply("error in <delete brain auth key>:" + err);
+			}
+			
+		});
+		
 		robot.respond(/(inventory)/i, function(msg) {
 			//robot.logger.debug(util.inspect(google));
 			/*
