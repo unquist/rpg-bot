@@ -92,7 +92,7 @@ module.exports = function(robot) {
 				return callback(err);
 			}
 			serviceClient = google[service](version);
-			robot.logger.debug("foo");
+			robot.logger.debug("endpoint="+endpoint);
 			return endpoint.split(".").reduce((function(a, e) {
 				return a[e];
 			}), serviceClient)(params, callback);
