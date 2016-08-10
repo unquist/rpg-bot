@@ -100,7 +100,7 @@ module.exports = function(robot) {
 			return endpointSplit.reduce((function(a, e) {
 				robot.logger.debug("a=["+a+"], e=["+e+"]");
 				return a[e];
-			}), serviceClient)(params, callback);*/
+			}), serviceClient)(params, callback);
 		});
 	});
 };
