@@ -51,7 +51,7 @@
 			robot.emit("googleapi:request", {
 				service: "sheets",
 				version: "v4",
-				endpoint: "sheets.spreadsheets.values.get",
+				endpoint: "spreadsheets.values.get",
 				params: {
 					spreadsheetId: '1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0',
 					range: 'A11:A17'
