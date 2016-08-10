@@ -97,7 +97,8 @@ module.exports = function(robot) {
 			
 			var endpointSplit = endpoint.split(".");
 			robot.logger.debug("endpointSplit="+endpointSplit);
-			/*.reduce((function(a, e) {
+			return endpointSplit.reduce((function(a, e) {
+				robot.logger.debug("a=["+a+"], e=["+e+"]");
 				return a[e];
 			}), serviceClient)(params, callback);*/
 		});
