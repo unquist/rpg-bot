@@ -96,9 +96,9 @@ module.exports = function(robot) {
 			serviceClient = google[service](version);
 			
 			var endpointSplit = endpoint.split(".");
-			robot.logger.debug("endpointSplit="+endpointSplit);
+			//robot.logger.debug("endpointSplit="+endpointSplit);
 			return endpointSplit.reduce((function(a, e) {
-				robot.logger.debug("a=["+a+"], e=["+e+"]");
+				//robot.logger.debug("a=["+a+"], e=["+e+"]");
 				return a[e];
 			}), serviceClient)(params, callback);
 		});

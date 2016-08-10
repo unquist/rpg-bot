@@ -54,17 +54,18 @@
 				endpoint: "spreadsheets.values.get",
 				params: {
 					spreadsheetId: '1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0',
-					range: 'A11:A17'
+					range: '"Party Loot"!A11:A17'
 				},
 				callback: function(err, data) {
 					if (err) {
 						return robot.logger.debug("inventory error:"+err);
 					}
+					var result = "";
 					for(var k = 0; k < data.values.length; k++)
 					{
-						robot.logger.debug("["+k+"] <"+data.values[k]+">");
+						result += "["+k+"] <"+data.values[k]+">\n";
 					}
-					return "Finished."
+					return result;
 				}
 			});
         });
