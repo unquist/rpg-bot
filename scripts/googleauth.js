@@ -14,6 +14,8 @@
 
 var AUTH_PATH, BRAIN_KEY, GOOGLE_API_CLIENT_ID, GOOGLE_API_CLIENT_SECRET, GOOGLE_API_SCOPES, HEROKU_URL, HUBOT_URL, OAuth2, SAFETY_MARGIN, client, google, ref, updateCredential;
 
+var util = require("util");
+
 google = require("googleapis");
 
 OAuth2 = google.auth.OAuth2;
@@ -92,7 +94,7 @@ module.exports = function(robot) {
 				return callback(err);
 			}
 			serviceClient = google[service](version);
-			robot.logger.debug("endpoint="+endpoint);
+			robot.logger.debug("serviceClient="+util.inspect(serviceClient));
 			return endpoint.split(".").reduce((function(a, e) {
 				return a[e];
 			}), serviceClient)(params, callback);
