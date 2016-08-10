@@ -94,10 +94,12 @@ module.exports = function(robot) {
 				return callback(err);
 			}
 			serviceClient = google[service](version);
-			robot.logger.debug("serviceClient="+util.inspect(serviceClient));
-			return endpoint.split(".").reduce((function(a, e) {
+			
+			var endpointSplit = endpoint.split(".");
+			robot.logger.debug("endpointSplit="+endpointSplit);
+			/*.reduce((function(a, e) {
 				return a[e];
-			}), serviceClient)(params, callback);
+			}), serviceClient)(params, callback);*/
 		});
 	});
 };
