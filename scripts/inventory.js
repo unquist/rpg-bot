@@ -15,11 +15,11 @@
 (function() {
     module.exports = function(robot) {
      
-		const GOOGLE_SERVICE_ACCOUNT = process.env.SERVICE_ACCOUNT;
-		const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
+		//const GOOGLE_SERVICE_ACCOUNT = process.env.SERVICE_ACCOUNT;
+		//const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 		var google = require("googleapis")
 		var util = require("util");
-		var GoogleSpreadsheet = require('google-spreadsheet');
+		//var GoogleSpreadsheet = require('google-spreadsheet');
 		/*
         robot.respond(/(inventory)/i, function(msg) {
             robot.logger.debug("Inventory function");
