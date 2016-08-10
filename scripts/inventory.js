@@ -54,7 +54,7 @@
 				endpoint: "spreadsheets.values.get",
 				params: {
 					spreadsheetId: '1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0',
-					range: '"Party Loot"!A11:A17'
+					range: 'Party Loot!A11:A17'
 				},
 				callback: function(err, data) {
 					if (err) {
