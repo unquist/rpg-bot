@@ -66,6 +66,11 @@ module.exports = function(robot) {
 		return msg.send("Authorize at " + HUBOT_URL + AUTH_PATH);
 	});
 	
+	robot.respond(/googleapi sheet$/, function(msg) {
+
+		return msg.send("You need to specify a spreadsheet id. The correct syntax is `googleapi sheet SPDREADSHEET_ID` where SPDREADSHEET_ID is the long character string that uniquely identifies a google sheet.");
+	});
+	
 	robot.respond(/googleapi sheet (\S+)$/, function(msg) {
 		var spreadsheetId = msg.match[1] || 'NA';
 		if(spreadsheetId == 'NA')
