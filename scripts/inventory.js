@@ -65,7 +65,7 @@
 					{
 						result += "["+k+"] <"+data.values[k]+">\n";
 					}
-					return result;
+					return msg.reply(result);
 				}
 			});
         });
