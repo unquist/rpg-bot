@@ -38,12 +38,20 @@
 					return msg.reply("getSpreadsheetValues error in google-sheet call:"+err);
 				}
 				var result = "";
-				robot.logger.debug(util.inspect(data));
-				for(var k = 0; k < data.values.length; k++)
+				robot.logger.debug("data:"+util.inspect(data));
+				if(data.values)
 				{
-					result += "["+k+"] "+data.values[k]+"\n";
+					for(var k = 0; k < data.values.length; k++)
+					{
+						result += "["+k+"] "+data.values[k]+"\n";
+					}
+				}
+				else
+				{
+					result = "No values in <"+rangeParam+">";
 				}
 				return msg.reply(result);
+				
 			});
 			
 		});
