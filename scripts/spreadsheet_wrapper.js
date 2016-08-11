@@ -25,9 +25,7 @@
 		var partyInfoSpreadsheetRedisKey = "partyinfo:";
 		var intializedRedisKey = partyInfoSpreadsheetRedisKey + "initialized"
 		
-		//check and see if the spreadsheet has been initialized.
-		var alphabet{ "A":0, }
-		
+			
 		if(!robot.brain.get(intializedRedisKey))
 		{
 			//first, get a list of all user names
