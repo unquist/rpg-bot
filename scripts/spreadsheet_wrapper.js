@@ -24,18 +24,40 @@
 		
 		var partyInfoSpreadsheetRedisKey = "partyinfo:";
 		var intializedRedisKey = partyInfoSpreadsheetRedisKey + "initialized"
-		
+				
+
+		var getSpreadsheetValues = function(spreadSheetId,range,callbackParam){
+			var serviceClient = google['sheets']("v4");
+			robot.emit("googleapi:request", {
+				service: "sheets",
+				version: "v4",
+				endpoint: "spreadsheets.values.get",
+				params: {
+					spreadsheetId: spreadSheetId,
+					range: range
+				},
+				/*
+				callback: function(err, data) {
+					if (err) {
+						robot.logger.debug("getSpreadsheetValues error:"+err);
+						return err;
+					}
+
+					return data;
+				}*/
+				callback: callbackParam
+			});
+		};
 			
 		if(!robot.brain.get(intializedRedisKey))
 		{
-			robot.logger.debug("initializing party spreadsheet info");
+			robot.logger.debug("initializing party spreadsheet info; length=["+robot.brain.data.users.length+"]");
 			//first, get a list of all user names
 			var users = {};
 			for(var i = 0; i < robot.brain.data.users.length; i++)
 			{
 				var user_name = robot.brain.data.users[i].name;
-				robot.logger.debug("initializing party spreadsheet info; username = "+user_name);
-				
+				robot.logger.debug("initializing party spreadsheet info; username = "+user_name);	
 			}
 			getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
 				/*
@@ -108,31 +130,7 @@
 			});
 			
 		});
-		
-		 
-		
-		var getSpreadsheetValues = function(spreadSheetId,range,callbackParam){
-			var serviceClient = google['sheets']("v4");
-			robot.emit("googleapi:request", {
-				service: "sheets",
-				version: "v4",
-				endpoint: "spreadsheets.values.get",
-				params: {
-					spreadsheetId: spreadSheetId,
-					range: range
-				},
-				/*
-				callback: function(err, data) {
-					if (err) {
-						robot.logger.debug("getSpreadsheetValues error:"+err);
-						return err;
-					}
 
-					return data;
-				}*/
-				callback: callbackParam
-			});
-		};
 
 		//Must be at the end
 		module.exports.getSpreadsheetValues = getSpreadsheetValues;
