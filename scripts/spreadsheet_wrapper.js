@@ -26,21 +26,34 @@
 		var intializedRedisKey = partyInfoSpreadsheetRedisKey + "initialized"
 		
 		//check and see if the spreadsheet has been initialized.
-		/*
+		var alphabet{ "A":0, }
+		
 		if(!robot.brain.get(intializedRedisKey))
 		{
-			
+			//first, get a list of all user names
+			var users = {};
+			for(var i = 0; i < robot.brain.data.users.length; i++)
+			{
+				var user_name = robot.brain.data.users[i].name;
+				robot.logger.debug("initializing party spreadsheet info; username = "+user_name);
+				
+			}
 			getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
 				if(err)
 				{
 					robot.logger.debug("Error initializing party spreadsheet info:"+err);
 				}
-				//var ""
+				// [ Slack User ][ cheesesandwich ][  ][  ][ Slack User ][ gatsbythegreat ][  ][  ][ Slack User ][ mandrews ][  ][  ][ Slack User ][ seussalot ][  ][  ][ Slack User ][ hamishthaggis ][  ][  ][ Slack User ][ moresault ]
+				for(var k = 0; k < data.values.length; k++)
+				{
+					
+					
+				}
 			});
 			
-			robot.brain.set(intializedRedisKey,"true");
+			//robot.brain.set(intializedRedisKey,"true");
 		}
-		*/
+		
 		
 		robot.respond(/google-sheet (\S+)$/, function(msg) 
 		{
@@ -59,7 +72,7 @@
 				if (err) {
 					return msg.reply("getSpreadsheetValues error in google-sheet call:"+err);
 				}
-				var result = "";
+				var result = "\n";
 				robot.logger.debug("data:"+util.inspect(data));
 				if(data.values)
 				{
