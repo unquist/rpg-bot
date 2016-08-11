@@ -19,6 +19,28 @@
 		var util = require("util");
 
 		var partyInfoSpreadsheetId = process.env.PARTY_INFO_SPREADSHEET_ID || "<NOT SET>"; 
+
+		var username_query = "A6:V6";
+		
+		var partyInfoSpreadsheetRedisKey = "partyinfo:";
+		var intializedRedisKey = partyInfoSpreadsheetRedisKey + "initialized"
+		
+		//check and see if the spreadsheet has been initialized.
+		/*
+		if(!robot.brain.get(intializedRedisKey))
+		{
+			
+			getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
+				if(err)
+				{
+					robot.logger.debug("Error initializing party spreadsheet info:"+err);
+				}
+				//var ""
+			});
+			
+			robot.brain.set(intializedRedisKey,"true");
+		}
+		*/
 		
 		robot.respond(/google-sheet (\S+)$/, function(msg) 
 		{
@@ -43,7 +65,19 @@
 				{
 					for(var k = 0; k < data.values.length; k++)
 					{
-						result += "["+k+"] "+data.values[k]+"\n";
+						
+						if(data.values[k].length > 0)
+						{
+							for(var i = 0; i < data.values[k].length; i++)
+							{
+								result += "["+k+"]["+i+"] " + data.values[k][i] + "\n";
+							}
+						}
+						else
+						{
+							result += "["+k+"] "+data.values[k]+"\n";
+						}
+						
 					}
 				}
 				else
@@ -55,6 +89,8 @@
 			});
 			
 		});
+		
+		 
 		
 		var getSpreadsheetValues = function(spreadSheetId,range,callbackParam){
 			var serviceClient = google['sheets']("v4");
