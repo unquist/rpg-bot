@@ -28,6 +28,7 @@
 			
 		if(!robot.brain.get(intializedRedisKey))
 		{
+			robot.logger.debug("initializing party spreadsheet info");
 			//first, get a list of all user names
 			var users = {};
 			for(var i = 0; i < robot.brain.data.users.length; i++)
@@ -37,6 +38,7 @@
 				
 			}
 			getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
+				/*
 				if(err)
 				{
 					robot.logger.debug("Error initializing party spreadsheet info:"+err);
@@ -47,6 +49,7 @@
 					
 					
 				}
+				*/
 			});
 			
 			//robot.brain.set(intializedRedisKey,"true");
