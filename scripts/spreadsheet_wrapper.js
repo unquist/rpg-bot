@@ -24,9 +24,11 @@
 		
 		var partyInfoSpreadsheetRedisKey = "partyinfo:";
 		var intializedRedisKey = partyInfoSpreadsheetRedisKey + "initialized"
-				
+		
+		//var getInitiative()
 
 		var getSpreadsheetValues = function(spreadSheetId,range,callbackParam){
+			
 			var serviceClient = google['sheets']("v4");
 			robot.emit("googleapi:request", {
 				service: "sheets",
@@ -76,6 +78,7 @@
 			
 			//robot.brain.set(intializedRedisKey,"true");
 		}
+		
 		
 		
 		robot.respond(/google-sheet (\S+)$/, function(msg) 
