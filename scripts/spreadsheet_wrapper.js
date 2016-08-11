@@ -1,5 +1,5 @@
 // Description:
-//   Inventory tracker
+//   Party Info Google Spreadsheet wrapper
 //
 // Dependencies:
 //   google-spreadsheet
@@ -8,7 +8,7 @@
 //   None
 //
 // Commands:
-//   
+//   hubot google-sheet [RANGE] -  required command to authenticate access to your Google spreadsheets
 // Author:
 //   unquist
 
@@ -18,6 +18,36 @@
 		var google = require("googleapis");
 		var util = require("util");
 
+		var partyInfoSpreadsheetId = process.env.PARTY_INFO_SPREADSHEET_ID || "<NOT SET>"; 
+		
+		robot.respond(/google-sheet (\S+)$/, function(msg) 
+		{
+			if(partyInfoSpreadsheetId == "<NOT SET>")
+			{
+				return msg.reply("The PARTY_INFO_SPREADSHEET_ID environment variable has not been set.")
+			}
+			var rangeParam = msg.match[1] || "NA";
+			
+			if(rangeParam == "NA")
+			{
+				return msg.reply("Need to specifiy a valid range to query. Example `A1:A5`.");
+			}
+			
+			getSpreadsheetValues(partyInfoSpreadsheetId,rangeParam,function(err, data){
+				if (err) {
+					return msg.reply("getSpreadsheetValues error in google-sheet call:"+err);
+				}
+				var result = "";
+				robot.logger.debug(util.inspect(data));
+				for(var k = 0; k < data.values.length; k++)
+				{
+					result += "["+k+"] "+data.values[k]+"\n";
+				}
+				return msg.reply(result);
+			});
+			
+		});
+		
 		var getSpreadsheetValues = function(spreadSheetId,range,callbackParam){
 			var serviceClient = google['sheets']("v4");
 			robot.emit("googleapi:request", {
