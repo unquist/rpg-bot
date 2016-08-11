@@ -65,7 +65,7 @@
 				{
 					for(var k = 0; k < data.values.length; k++)
 					{
-						
+						/*
 						if(data.values[k].length > 0)
 						{
 							for(var i = 0; i < data.values[k].length; i++)
@@ -77,7 +77,12 @@
 						{
 							result += "["+k+"] "+data.values[k]+"\n";
 						}
-						
+						*/
+						for(var i = 0; i < data.values[k].length; i++)
+						{
+								result += "[ " + data.values[k][i] + " ]";
+						}
+						result += "\n";
 					}
 				}
 				else
