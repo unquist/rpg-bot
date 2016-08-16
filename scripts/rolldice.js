@@ -230,8 +230,8 @@
 		//text = data.text;     
 		token = data.token;
 		
-		robot.logger.debug("received token:["+token+"]");
-		robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
+		//robot.logger.debug("received token:["+token+"]");
+		//robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
 		
 		if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
 		{
