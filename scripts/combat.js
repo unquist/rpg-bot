@@ -76,7 +76,7 @@
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
 			reply += "\n\n*_/combat init-npc [BONUS] [NAME/TYPE]_* - Initialize an NPC with [NAME/TYPE] into combat (including pets, familiars, mounts) to the combat.";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
-			reply += "\n\n*_/combat next_* - Signal to the bot that the current player's turn is over (and it's time for the next player).";
+		reply += "\n\n*_/combat next [REPEAT]_* - Signal to the bot that the current player's turn is over (and it's time for the next player). The optional [REPEAT} parameter allows you to move the turn order forward that many times. So if it's goblin A's turn, `/combat next 3` will complete A, B, and C's turns.";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
@@ -678,7 +678,7 @@
 			return reply;
 		};
 			
-		var combatNext = function(callerName) {
+		var combatNext = function(callerName,repeat) {
 		  var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 			//array of players
@@ -713,18 +713,42 @@
 				return reply;
 				
 			}
+			
+			
+			
 			var currentTurnIndex = robot.brain.get('currentTurnIndex');
-			currentTurnIndex += 1;
-			if(currentTurnIndex >= combatantsArray.length)
+			var reply = "";
+			
+			if(repeat > 1)
 			{
-				currentTurnIndex = 0;
+				reply = "Advancing `"+repeat+"` turns. ";
+				for(var k = 0; k < repeat; k++)
+				{
+					currentTurnIndex += 1;
+					if(currentTurnIndex >= combatantsArray.length)
+					{
+						currentTurnIndex = 0;
+					}
+				}
 			}
+			else
+			{
+				currentTurnIndex += 1;
+				if(currentTurnIndex >= combatantsArray.length)
+				{
+					currentTurnIndex = 0;
+				}
+			}
+			
+			
 			robot.brain.set('currentTurnIndex',currentTurnIndex);
-			var reply = ""
+			
+			
+			
 			if(combatantsArray[currentTurnIndex].type == PC_TYPE) {
-				reply = "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
+				reply += "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
 			} else {
-				reply = "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
+				reply += "Next turn started. *" +combatantsArray[currentTurnIndex].name+"* is up!";
 			}
 			
 			//now list out the number of monsters left, and the current status.
@@ -1542,7 +1566,12 @@
 						return res.json(msgData);
 						break;
 					case "next":
-					  reply = combatNext(username);
+					  var repeat = 1;
+					  if(parameters != "")
+					  {
+						  repeat = parameters.match(/\d+/i) || 1;
+					  }
+					  reply = combatNext(username,repeat);
 					  var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						return res.json(msgData);
 						break;
