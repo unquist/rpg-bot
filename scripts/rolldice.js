@@ -219,89 +219,89 @@
 		return null;
     };
 
-    robot.router.post('/hubot/roll', function(req, res) {
-      robot.logger.debug("Received a POST request to /hubot/roll");
-          
-      var data, channel_name, response_url, command, text, token,username, realName;
-               
-      data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
-      //robot.logger.debug("data:"+util.inspect(data));
-		  command = data.command;
-      //text = data.text;     
-		  token = data.token;
-		  
-		  //robot.logger.debug("received token:["+token+"]");
-		  //robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
-		  
-		  if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
-		  {
-			  return res.send("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?");
-		  }
-		  else
-		  {
-			  robot.logger.debug("Request authenticated.");
-		  }
-		  username = data.user_name;
-		  userId = data.user_id;
-		  realName = getRealNameFromId(userId);
-		  channel_name = data.channel_name;
-      var helpMatch = data.text.match(/help/i);
-      if(helpMatch != null)
-      {
-        return res.send(getHelpText());
-      }
+	robot.router.post('/hubot/roll', function(req, res) {
+		robot.logger.debug("Received a POST request to /hubot/roll");
+		
+		var data, channel_name, response_url, command, text, token,username, realName;
+		
+		data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+		//robot.logger.debug("data:"+util.inspect(data));
+		command = data.command;
+		//text = data.text;     
+		token = data.token;
+		
+		robot.logger.debug("received token:["+token+"]");
+		robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
+		
+		if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
+		{
+			return res.send("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?");
+		}
+		else
+		{
+			robot.logger.debug("Request authenticated.");
+		}
+		username = data.user_name;
+		userId = data.user_id;
+		realName = getRealNameFromId(userId);
+		channel_name = data.channel_name;
+		var helpMatch = data.text.match(/help/i);
+		if(helpMatch != null)
+		{
+			return res.send(getHelpText());
+		}
 
-      var text = data.text; //create a copy since we will be modifying this
-  	  var match = text.match(/(\d+)(d)(\d+)/ig);
+		var text = data.text; //create a copy since we will be modifying this
+		var match = text.match(/(\d+)(d)(\d+)/ig);
 
-  	  if(! match) {
-  	  	robot.logger.debug("failed match!");
-  	  	return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
-  	  }
+		if(! match) {
+			robot.logger.debug("failed match!");
+			return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+		}
 
-  	  args = [];
-	var match = text.match(/(\d+)(d)(\d+)/ig);
-	for (var i = match.length-1 ; i >= 0; i--) {
-  		var idx = text.lastIndexOf(match[i]);
-  		arg = text.slice(idx);
-  		args.push(arg);
-  		text = text.slice(0,idx);
-  		console.log("arg: "+arg);
-  		console.log("remaining: "+text);
-	}
+		args = [];
+		var match = text.match(/(\d+)(d)(\d+)/ig);
+		for (var i = match.length-1 ; i >= 0; i--) {
+			var idx = text.lastIndexOf(match[i]);
+			arg = text.slice(idx);
+			args.push(arg);
+			text = text.slice(0,idx);
+			robot.logger.debug("arg: "+arg);
+			robot.logger.debug("remaining: "+text);
+		}
 
-	  var msgData = null;
-	  for (var i = args.length-1; i >= 0; i--) {
-	    robot.logger.debug("Rolling: "+args[i]);
-	    nextMessage = doRoll(realName,args[i]);
-	    if(nextMessage) {
-	    	if(msgData == null) {
-	    		msgData = nextMessage;
-	    	} else {
-	    		msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
-	    	}
-	    } else {
-	    	return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
-	    }
-	    
-	  }
+		var msgData = null;
+		for (var i = args.length-1; i >= 0; i--) {
+			robot.logger.debug("Rolling: "+args[i]);
+			nextMessage = doRoll(realName,args[i]);
+			if(nextMessage) {
+				if(msgData == null) {
+					msgData = nextMessage;
+				} else {
+					msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
+				}
+			} else {
+				return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+			}
+			
+		}
 
 		msgData['channel'] = channel_name;
 		msgData['response_type'] = 'in_channel';	  
 		return res.json(msgData);
 		/*
-      msgData = doRoll(realName,data.text);
-      if(msgData) {
+	msgData = doRoll(realName,data.text);
+	if(msgData) {
 
-      	msgData['channel'] = channel_name;
+		msgData['channel'] = channel_name;
 		msgData['response_type'] = 'in_channel';
 
 		return res.json(msgData);
-      } else {
-      	return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
-      }
+	} else {
+		return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+	}
 */
-    });
+	});
       
     };
 
