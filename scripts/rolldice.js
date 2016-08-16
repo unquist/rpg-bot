@@ -202,7 +202,8 @@
 	 * returns a msgData object representing the slack response on success or null if it couldn't parse the input
   	*/
     var doRoll = function(realName,text) {
-    	var match = text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\w]+)?/i);
+    	
+		var match = text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\S]+)?/i);
 		  
 		if(match != null)
 		{
@@ -259,6 +260,23 @@
 			return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
 		}
 
+		//first, check to see if there's a multiplier anywhere in the string
+		var multiplierMatch = text.match(/\s{0,1}(\d+)[x|X]\s/i);
+		var multiplier = 1;
+		if(multiplierMatch != null)
+		{
+			robot.logger.debug("Found a multipler match: " +multiplierMatch);
+			multiplier = Number(multiplierMatch[1]);
+			var indexOfMultipler = text.indexOf(multiplierMatch[1]);
+			robot.logger.debug("Found a multipler match; text before: " +text);
+			text = text.replace(/(\d+)[x|X]/,"");
+			robot.logger.debug("Found a multipler match; text after: " +text);
+		}
+		else
+		{
+			robot.logger.debug("No multiplier request. Proceed as normal");
+		}
+		
 		args = [];
 		var match = text.match(/(\d+)(d)(\d+)/ig);
 		for (var i = match.length-1 ; i >= 0; i--) {
@@ -270,22 +288,26 @@
 			robot.logger.debug("remaining: "+text);
 		}
 
+		//arg = 1d20+1 adv foo foo foo
+		
 		var msgData = null;
-		for (var i = args.length-1; i >= 0; i--) {
-			robot.logger.debug("Rolling: "+args[i]);
-			nextMessage = doRoll(realName,args[i]);
-			if(nextMessage) {
-				if(msgData == null) {
-					msgData = nextMessage;
+		for(var k = 0; k < multiplier; k++)
+		{
+			for (var i = args.length-1; i >= 0; i--) {
+				robot.logger.debug("Rolling: "+args[i]);
+				nextMessage = doRoll(realName,args[i]);
+				if(nextMessage) {
+					if(msgData == null) {
+						msgData = nextMessage;
+					} else {
+						msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
+					}
 				} else {
-					msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
+					return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
 				}
-			} else {
-				return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+				
 			}
-			
 		}
-
 		msgData['channel'] = channel_name;
 		msgData['response_type'] = 'in_channel';	  
 		return res.json(msgData);
