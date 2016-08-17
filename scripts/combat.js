@@ -28,21 +28,21 @@
 		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out his chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined his ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleeps with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'returned to dust' ,'walked the plank','forgot to keep breathing','punched his ticket','took the long walk');
 		
 		var getRandomDeathEuphemism = function() {
-		  var index = Math.floor(Math.random()*death_euphemisms.length);
-		  var euphemism = death_euphemisms[index];
-      return euphemism; 
+			var index = Math.floor(Math.random()*death_euphemisms.length);
+			var euphemism = death_euphemisms[index];
+			return euphemism; 
 		}
 		
 		var getRealNameFromId = function(userId)
-    {
-      var user = robot.brain.data.users[userId];
-      if(user == null)
-      {
-        return "<Unknown User>"
-      }
-      
-      return user.real_name;
-    };
+		{
+			var user = robot.brain.data.users[userId];
+			if(user == null)
+			{
+				return "<Unknown User>"
+			}
+			
+			return user.real_name;
+		};
 		
 		var countCombatantTypes = function(combatantsArray)
 		{
@@ -76,7 +76,7 @@
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
 			reply += "\n\n*_/combat init-npc [BONUS] [NUM NPC] [NAME/TYPE]_* - Initialize [NUM NPC] NPCs with [NAME/TYPE] into combat (including pets, familiars, mounts).";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
-		reply += "\n\n*_/combat next [REPEAT]_* - Signal to the bot that the current player's turn is over (and it's time for the next player). The optional [REPEAT} parameter allows you to move the turn order forward that many times. So if it's goblin A's turn, `/combat next 3` will complete A, B, and C's turns.";
+			reply += "\n\n*_/combat next [REPEAT]_* - Signal to the bot that the current player's turn is over (and it's time for the next player). The optional [REPEAT} parameter allows you to move the turn order forward that many times. So if it's goblin A's turn, `/combat next 3` will complete A, B, and C's turns.";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
@@ -173,7 +173,7 @@
 			   robot.brain.set('combat_flag', 0);
 			   return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
-		  if(combat_started == 0)
+			if(combat_started == 0)
 			{
 			   return "No combat started "+callerName+". Begin with `/combat start`";
 			}
@@ -211,39 +211,39 @@
 			robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
 
 			if(combat_started != 0 && combat_started != 1)
-		   {
-			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			   robot.brain.set('combat_flag', 1);
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				robot.brain.set('combat_flag', 1);
 			}  
 			else if(combat_started == 1)
 			{
 				return "Combat already started "+callerName+". End with `/combat end`";
 			}
-		   //Combat has started. First step is to check the number of participants
-		   
-		   if(numCombatants < 2)
-		   {
+			//Combat has started. First step is to check the number of participants
+			
+			if(numCombatants < 2)
+			{
 				var reply = "Need at least two to tango "+callerName+"! Usage `combat start [num participants]` where [num participants] is 2 or more.\n";
 				return reply;
-		   }
+			}
 
-					   
-			   //how many players have rolled for initiative? zero so far
-			   var numRegisteredCombatants = 0;
-			   robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
-			   //array of players. currently empty
-			   var combatantsArray = [];
-			   robot.brain.set('combatantsArray',combatantsArray);
-			   //who is in the fight?
-			   var numTotalCombatants = numCombatants;
-			   robot.brain.set('numTotalCombatants',numTotalCombatants);
-			   
-			   //create an empty graveyard for PCs
-			   robot.brain.set('pc_graveyard', new Array());
-			   
-			   robot.brain.set('combat_flag', 1);
-			   return callerName+" started combat with " + numCombatants + " belligerents.\nEveryone in @channel roll for initiative with the _/combat init [BONUS]_ command!";
-			   
+			
+			//how many players have rolled for initiative? zero so far
+			var numRegisteredCombatants = 0;
+			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			//array of players. currently empty
+			var combatantsArray = [];
+			robot.brain.set('combatantsArray',combatantsArray);
+			//who is in the fight?
+			var numTotalCombatants = numCombatants;
+			robot.brain.set('numTotalCombatants',numTotalCombatants);
+			
+			//create an empty graveyard for PCs
+			robot.brain.set('pc_graveyard', new Array());
+			
+			robot.brain.set('combat_flag', 1);
+			return callerName+" started combat with " + numCombatants + " belligerents.\nEveryone in @channel roll for initiative with the _/combat init [BONUS]_ command!";
+			
 		};
 		
 		var constructInitReplyMessage = function(combatantsArray,firstPlayer)
@@ -1781,6 +1781,10 @@
 						if(parameters != "")
 						{
 							var playerId = parameters.match(/(\d+)/ig) || -1;
+							var playerIdAlternative = parameters.match(/(\d+)(\s+[a-z|\s|']+)*/ig) || null;
+							
+							robot.logger.debug("playerIdAlternative="+playerIdAlternative);
+							
 							if(playerId == -1)
 							{
 								reply = "Need to specify the id or ids of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
