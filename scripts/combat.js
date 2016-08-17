@@ -369,18 +369,7 @@
   			
   			
   			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
-  			
-			/*
-			//if bonus is zero, that could mean one of two things: either it's really 0, or the PC wants to try and use the value in their character sheet
-			spreadsheet_wrapper.getSpreadsheetValues('1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0','Party Loot!A11:A17',function(err, data) {
-				if (err) {
-					robot.logger.debug("getSpreadsheetValues error:"+err);
-					return msg.reply(err);
-				}
-				return msg.reply(data.values);
-			});
-			*/
-			
+  						
   			var initRoll = rolldie(20);
   			var initScore = initRoll + bonus;
 			numRegisteredCombatants += 1;
@@ -415,7 +404,8 @@
   			}
 		  
 		  };
-		  
+		
+		
 
 		var initdm = function(callerName,bonus,addBonus,numMonsters,monsterName) {
 			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
@@ -1661,13 +1651,43 @@
 					return res.json(msgData);
 					break;
 				case "init":
-					var bonus = 0;
+					var bonus = -1;
 					if(parameters != "")
 					{
-						bonus = parameters.match(/\d+/i) || 0;
+						bonus = parameters.match(/\d+/i) || -1;
 					}
 					reply = combatInit(username,Number(bonus));
 					//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+					return res.json(msgData);
+					break;
+				case "init-g":
+					var bonus = -1;
+					if(parameters != "")
+					{
+						bonus = parameters.match(/\d+/i) || -1;
+					}
+					
+					if(bonus == -1)
+					{
+						//if bonus is -1, no bonus param was provided. we should thus assume that the player wants to pull the value from their spreadsheet.
+						spreadsheet_wrapper.getSpreadsheetValues('1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0','Party Loot!A11:A17',function(err, data) {
+							if (err) {
+								robot.logger.debug("getSpreadsheetValues error:"+err);
+								return msg.reply(err);
+							}
+							reply = combatInit(username,Number(bonus));
+							var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+							return res.json(msgData);	
+						});
+						return "";
+					}
+					reply = combatInit(username,Number(bonus));
+					//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					if(reply == "")
+					{
+						return;
+					}
 					var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
 					return res.json(msgData);
 					break;

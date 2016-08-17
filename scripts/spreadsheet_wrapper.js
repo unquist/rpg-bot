@@ -20,66 +20,113 @@
 
 		var partyInfoSpreadsheetId = process.env.PARTY_INFO_SPREADSHEET_ID || "<NOT SET>"; 
 
-		var username_query = "A6:V6";
+		var username_query = "A7:V7";
 		
 		var partyInfoSpreadsheetRedisKey = "partyinfo:";
 		var intializedRedisKey = partyInfoSpreadsheetRedisKey + "initialized"
 		
-		//var getInitiative()
-
 		var getSpreadsheetValues = function(spreadSheetId,range,callbackParam){
 			
-			var serviceClient = google['sheets']("v4");
-			robot.emit("googleapi:request", {
-				service: "sheets",
-				version: "v4",
-				endpoint: "spreadsheets.values.get",
-				params: {
-					spreadsheetId: spreadSheetId,
-					range: range
-				},
-				/*
-				callback: function(err, data) {
-					if (err) {
-						robot.logger.debug("getSpreadsheetValues error:"+err);
-						return err;
-					}
-
-					return data;
-				}*/
-				callback: callbackParam
-			});
-		};
-			
-		if(!robot.brain.get(intializedRedisKey))
-		{
-			robot.logger.debug("initializing party spreadsheet info; length=["+robot.brain.data.users.length+"]");
-			//first, get a list of all user names
-			var users = {};
-			for(var i = 0; i < robot.brain.data.users.length; i++)
+			if(!robot.brain.get(intializedRedisKey))
 			{
-				var user_name = robot.brain.data.users[i].name;
-				robot.logger.debug("initializing party spreadsheet info; username = "+user_name);	
-			}
-			getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
+				robot.logger.debug("initializing party spreadsheet info; length=["+robot.brain.data.users.length+"]");
+				//first, get a list of all user names
+				var users = {};
+				for(var i = 0; i < robot.brain.data.users.length; i++)
+				{
+					var user_name = robot.brain.data.users[i].name;
+					users.push(user_name);
+					robot.logger.debug("initializing party spreadsheet info; username = "+user_name);	
+				}
 				/*
-				if(err)
-				{
-					robot.logger.debug("Error initializing party spreadsheet info:"+err);
-				}
-				// [ Slack User ][ cheesesandwich ][  ][  ][ Slack User ][ gatsbythegreat ][  ][  ][ Slack User ][ mandrews ][  ][  ][ Slack User ][ seussalot ][  ][  ][ Slack User ][ hamishthaggis ][  ][  ][ Slack User ][ moresault ]
-				for(var k = 0; k < data.values.length; k++)
-				{
+				getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
 					
+					if(err)
+					{
+						robot.logger.debug("Error initializing party spreadsheet info:"+err);
+					}
+					// [ Slack User ][ cheesesandwich ][  ][  ][ Slack User ][ gatsbythegreat ][  ][  ][ Slack User ][ mandrews ][  ][  ][ Slack User ][ seussalot ][  ][  ][ Slack User ][ hamishthaggis ][  ][  ][ Slack User ][ moresault ]
+					for(var k = 0; k < data.values.length; k++)
+					{
+						
+						
+					}
 					
-				}
+				});
 				*/
-			});
-			
-			//robot.brain.set(intializedRedisKey,"true");
-		}
-		
-		
+				
+				var serviceClient = google['sheets']("v4");
+				robot.emit("googleapi:request", {
+					service: "sheets",
+					version: "v4",
+					endpoint: "spreadsheets.values.get",
+					params: {
+						spreadsheetId: partyInfoSpreadsheetId,
+						range: username_query
+					},
+					callback: function(err, data) {
+						if (err) {
+							robot.logger.debug("getSpreadsheetValues error:"+err);
+							return err;
+						}
+						
+						// [ Slack User ][ cheesesandwich ][  ][  ][ Slack User ][ gatsbythegreat ][  ][  ][ Slack User ][ mandrews ][  ][  ][ Slack User ][ seussalot ][  ][  ][ Slack User ][ hamishthaggis ][  ][  ][ Slack User ][ moresault ]
+						for(var k = 0; k < data.values.length; k++)
+						{
+							if(data.values[k] != "" && data.values[k].indexOf("Slack User") == -1)
+							{
+								robot.logger.debug("inner results loop -> data.values[k] =["+data.values[k]+"]");
+								var indexOfUser = users.findIndex(function(name){return name == data.values[k]});
+								var cellLetter = String.fromCharCode(index + 65 + 1);
+								robot.logger.debug("code->robot.brain.set(partyInfoSpreadsheetRedisKey+data.values[k],cellLetter);");
+								robot.logger.debug("interpreted->robot.brain.set("+partyInfoSpreadsheetRedisKey+data.values[k]+","+cellLetter+");");
+							}
+							
+						}
+						//robot.brain.set(intializedRedisKey,"true");
+						robot.logger.debug("robot.brain.set(intializedRedisKey,'true');");
+						
+						
+						//now the code should be initialized and we need to call the original call back command
+						var serviceClient = google['sheets']("v4");
+						robot.emit("googleapi:request", {
+							service: "sheets",
+							version: "v4",
+							endpoint: "spreadsheets.values.get",
+							params: {
+								spreadsheetId: spreadSheetId,
+								range: range
+							},
+							callback: callbackParam
+						});
+					}
+				});
+			}
+			else
+			{
+				var serviceClient = google['sheets']("v4");
+				robot.emit("googleapi:request", {
+					service: "sheets",
+					version: "v4",
+					endpoint: "spreadsheets.values.get",
+					params: {
+						spreadsheetId: spreadSheetId,
+						range: range
+					},
+					/*
+					callback: function(err, data) {
+						if (err) {
+							robot.logger.debug("getSpreadsheetValues error:"+err);
+							return err;
+						}
+
+						return data;
+					}*/
+					callback: callbackParam
+				});
+			}
+		};
+					
 		
 		robot.respond(/google-sheet (\S+)$/, function(msg) 
 		{

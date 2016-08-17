@@ -44,7 +44,10 @@
       helpText += "\n/roll 4d100-7 adv    (Rolls four hundred-sided dice twice and takes the higher result, then substracts seven)";
       helpText += "\n/roll 1d4 dis    (Rolls a single four-sided die twice and takes the lower result.)";
 	  helpText += "\n/roll 1d20+1 to hit with sword 2d8 slashing damage    (Rolls a single d20, adds 1 to the result, and returns the outcome. Then roll two eight-side dice and return the result. The labels will be attached to each result.)";
-      return helpText;    
+      helpText += "\n";
+	  helpText += "\nAdditionally, you may add (in any order) a parameter of the form `#x`, which will run # multiples of whatever the command is:";
+	  helpText += "\n/roll 10x 1d20+1 to hit 1d6 damage    (Rolls a 1d20+1 and a 1d6 couplet, 10 times in a row)";
+	  return helpText;    
     };
     
 	var getRollResults = function(sides, num) {
