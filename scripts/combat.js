@@ -1784,7 +1784,7 @@
 					{
 						var playerId = parameters.match(/(\d+)/ig) || -1;
 						var deathEuphemism = parameters.match(/(\s+[a-z|\s|']+)*/ig) || "";
-							
+						robot.logger.debug("matched deathEuphemism param=["+deathEuphemism+"]");	
 									
 						if(playerId == -1)
 						{
@@ -1806,7 +1806,7 @@
 								deathEuphemism = deathEuphemism[1].toString().trim();
 							}
 							
-							robot.logger.debug("found deathEuphemism param=["+deathEuphemism+"]");
+							robot.logger.debug("found trimmed deathEuphemism param=["+deathEuphemism+"]");
 							reply = combatKill(username,playerIdArray,deathEuphemism);
 						}
 					}
