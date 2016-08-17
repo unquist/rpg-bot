@@ -1806,7 +1806,7 @@
 								deathEuphemism = deathEuphemism.toString().trim();
 							}
 							
-							
+							robot.logger.debug("found deathEuphemism param=["+deathEuphemism+"]");
 							reply = combatKill(username,playerIdArray,deathEuphemism);
 						}
 					}
