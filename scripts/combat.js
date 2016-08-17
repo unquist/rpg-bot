@@ -1592,13 +1592,13 @@
 		
 		robot.router.post('/hubot/combat', function(req, res) {
 			robot.logger.debug("Received a POST request to /hubot/combat");
-			  
+			
 			var data, channel_name, response_url, command, subcommand, text, token,username;
-				   
+			
 			data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
 			//robot.logger.debug("data:"+util.inspect(data));
 			command = data.command;
-		   
+			
 			token = data.token;
 			robot.logger.debug("received token:["+token+"]");
 			//robot.logger.debug("stored token is:["+process.env.)
@@ -1616,203 +1616,209 @@
 				robot.logger.debug("Parameters recieved: ["+parameters+"]");
 				switch(subcommand)
 				{
-					case "clearall":
-						clearAll();
-						reply = "All combat data cleared.";
-						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
-						return res.json(msgData);
-						break;
-					case "next":
-					  var repeat = 1;
-					  if(parameters != "")
-					  {
-						  repeat = parameters.match(/\d+/i) || 1;
-					  }
-					  reply = combatNext(username,repeat);
-					  var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						return res.json(msgData);
-						break;
-					case "end":
-					  reply = combatEnd(username);
-					  var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						return res.json(msgData);
-						break;
-					case "start":
-						if(parameters != "")
-						{
-							var numCombatants = parameters.match(/\d+/i) || -1;
-							if(numCombatants == -1)
-							{
-								reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
-							}
-							else
-							{
-								reply = combatStart(username,Number(numCombatants));
-							}
-						}
-						else
+				case "clearall":
+					clearAll();
+					reply = "All combat data cleared.";
+					var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+					return res.json(msgData);
+					break;
+				case "next":
+					var repeat = 1;
+					if(parameters != "")
+					{
+						repeat = parameters.match(/\d+/i) || 1;
+					}
+					reply = combatNext(username,repeat);
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				case "end":
+					reply = combatEnd(username);
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				case "start":
+					if(parameters != "")
+					{
+						var numCombatants = parameters.match(/\d+/i) || -1;
+						if(numCombatants == -1)
 						{
 							reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
 						}
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						return res.json(msgData);
-						break;
-					case "init":
-						var bonus = 0;
-						if(parameters != "")
-						{
-							bonus = parameters.match(/\d+/i) || 0;
-						}
-						reply = combatInit(username,Number(bonus));
-						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
-						return res.json(msgData);
-						break;
-					case "init-dm":
-						if(parameters != "")
-						{
-							var initdmParams = parameters.match(/(\+|-){0,1}(\d+)\s+(\d+)\s+(.+)/i) || null;
-							if(initdmParams == null)
-							{
-								reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
-							}
-							else
-							{
-								var addBonus = initdmParams[1] || true;
-								if(addBonus == "-")
-								{
-									addBonus = false;
-								}
-								else
-								{
-									addBonus = true;
-								}
-								var bonus = initdmParams[2] || 0;
-								bonus = Number(bonus);
-								var numMonsters = initdmParams[3] || 0;
-								numMonsters = Number(numMonsters);
-								var monsterName = initdmParams[4] || "Nameless Horror";
-								reply += initdm(username,bonus,addBonus,numMonsters,monsterName);
-							}
-						}
 						else
+						{
+							reply = combatStart(username,Number(numCombatants));
+						}
+					}
+					else
+					{
+						reply = "Need to specify the number of combatants in the fight (minimum of 2)!\n For example, *_/combat start 4_* begins a combat with four participants.";
+					}
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				case "init":
+					var bonus = 0;
+					if(parameters != "")
+					{
+						bonus = parameters.match(/\d+/i) || 0;
+					}
+					reply = combatInit(username,Number(bonus));
+					//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+					return res.json(msgData);
+					break;
+				case "init-dm":
+					if(parameters != "")
+					{
+						var initdmParams = parameters.match(/(\+|-){0,1}(\d+)\s+(\d+)\s+(.+)/i) || null;
+						if(initdmParams == null)
 						{
 							reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
 						}
-						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
-						
-						return res.json(msgData);
-						break;
-					case "init-npc":
-						if(parameters != "")
+						else
 						{
-							var initNPCParams = parameters.match(/(\+|-){0,1}(\d+)\s+(\d+)\s+(.+)/i) || null;
-							if(initNPCParams == null)
+							var addBonus = initdmParams[1] || true;
+							if(addBonus == "-")
 							{
-								reply = "Need to specify the the bonus, number, and the name of the NPC!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 steve the dogs, with a +2 bonus.";
+								addBonus = false;
 							}
 							else
 							{
-								var addBonus = initNPCParams[1] || true;
-								if(addBonus == "-")
-								{
-									addBonus = false;
-								}
-								else
-								{
-									addBonus = true;
-								}
-								var bonus = initNPCParams[2] || 0;
-								bonus = Number(bonus);
-								var numNPCs = initNPCParams[3] || 0;
-								numNPCs = Number(numNPCs);
-								if(numNPCs < 1)
-								{
-									reply = "The number of NPCs must be 1 or more!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 'steve the dogs', with a +2 bonus.";
-									var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);						
-									return res.json(msgData);
-								}
-								var npcName = initNPCParams[4] || "Johnson";
-								
-								reply += initNPC(username,bonus,addBonus,numNPCs,npcName);
+								addBonus = true;
 							}
+							var bonus = initdmParams[2] || 0;
+							bonus = Number(bonus);
+							var numMonsters = initdmParams[3] || 0;
+							numMonsters = Number(numMonsters);
+							var monsterName = initdmParams[4] || "Nameless Horror";
+							reply += initdm(username,bonus,addBonus,numMonsters,monsterName);
 						}
-						else
+					}
+					else
+					{
+						reply = "Need to specify the the bonus, number of monsters, and the name of the monsters!\n For example, *_/combat init-dm 2 10 Bugbear_* Rolls initiative for 10 Bugbears, with a +2 bonus.";
+					}
+					//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+					
+					return res.json(msgData);
+					break;
+				case "init-npc":
+					if(parameters != "")
+					{
+						var initNPCParams = parameters.match(/(\+|-){0,1}(\d+)\s+(\d+)\s+(.+)/i) || null;
+						if(initNPCParams == null)
 						{
 							reply = "Need to specify the the bonus, number, and the name of the NPC!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 steve the dogs, with a +2 bonus.";
 						}
-						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
-						
-						return res.json(msgData);
-						break;
-					case "setinit":
-						if(parameters != "")
+						else
 						{
-							var newInit = parameters.match(/\d+/i) || -1;
-							if(newInit == -1)
+							var addBonus = initNPCParams[1] || true;
+							if(addBonus == "-")
 							{
-								reply = "Need to specify the new initiative value!\n For example, *_/combat setinit 12_* will set your initiative to 12. Note that you can only use this function up until all initiatives have been rolled.";
+								addBonus = false;
 							}
 							else
 							{
-								reply = combatSetInit(username,Number(newInit));
+								addBonus = true;
 							}
+							var bonus = initNPCParams[2] || 0;
+							bonus = Number(bonus);
+							var numNPCs = initNPCParams[3] || 0;
+							numNPCs = Number(numNPCs);
+							if(numNPCs < 1)
+							{
+								reply = "The number of NPCs must be 1 or more!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 'steve the dogs', with a +2 bonus.";
+								var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);						
+								return res.json(msgData);
+							}
+							var npcName = initNPCParams[4] || "Johnson";
+							
+							reply += initNPC(username,bonus,addBonus,numNPCs,npcName);
 						}
-						else
+					}
+					else
+					{
+						reply = "Need to specify the the bonus, number, and the name of the NPC!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 steve the dogs, with a +2 bonus.";
+					}
+					//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
+					
+					return res.json(msgData);
+					break;
+				case "setinit":
+					if(parameters != "")
+					{
+						var newInit = parameters.match(/\d+/i) || -1;
+						if(newInit == -1)
 						{
 							reply = "Need to specify the new initiative value!\n For example, *_/combat setinit 12_* will set your initiative to 12. Note that you can only use this function up until all initiatives have been rolled.";
 						}
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						return res.json(msgData);
-						break;
-					case "status":
-						reply = combatStatus(username);
-						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
-						return res.json(msgData);
-						break;
-					case "help":
-						reply = helpText();
-						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
-						return res.json(msgData);
-						break;
-					case "kill":
-						if(parameters != "")
+						else
 						{
-							var playerId = parameters.match(/(\d+)/ig) || -1;
-							var playerIdAlternative = parameters.match(/(\d+)(\s+[a-z|\s|']+)*/ig) || null;
+							reply = combatSetInit(username,Number(newInit));
+						}
+					}
+					else
+					{
+						reply = "Need to specify the new initiative value!\n For example, *_/combat setinit 12_* will set your initiative to 12. Note that you can only use this function up until all initiatives have been rolled.";
+					}
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				case "status":
+					reply = combatStatus(username);
+					var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+					return res.json(msgData);
+					break;
+				case "help":
+					reply = helpText();
+					var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+					return res.json(msgData);
+					break;
+				case "kill":
+					if(parameters != "")
+					{
+						var playerId = parameters.match(/(\d+)/ig) || -1;
+						var deathEuphemism = parameters.match(/(\s+[a-z|\s|']+)*/ig) || "";
 							
-							robot.logger.debug("playerIdAlternative="+util.inspect(playerIdAlternative));
-							
-							if(playerId == -1)
-							{
-								reply = "Need to specify the id or ids of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
-							}
-							else
-							{
-							  robot.logger.debug("original playerId arry set to->"+playerId+"<--");
-							  var playerIdArray = new Array();
-							  for(var k = 0; k < playerId.length; k++)
-								{
-  							  playerIdArray.push(Number(playerId[k]));
-								}
-							  
-							  robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
-								reply = combatKill(username,playerIdArray,"");
-							}
+									
+						if(playerId == -1)
+						{
+							reply = "Need to specify the id or ids of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
 						}
 						else
 						{
-							reply = "Need to specify the id of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
+							robot.logger.debug("original playerId arry set to->"+playerId+"<--");
+							var playerIdArray = new Array();
+							for(var k = 0; k < playerId.length; k++)
+							{
+								playerIdArray.push(Number(playerId[k]));
+							}
+							
+							robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
+							
+							if(deathEuphemism != "")
+							{
+								deathEuphemism = deathEuphemism.toString().trim();
+							}
+							
+							
+							reply = combatKill(username,playerIdArray,deathEuphemism);
 						}
-						var msgData = getFormattedJSONAttachment(reply,channel_name,true);
-						return res.json(msgData);
-						break;
-					default:
-						reply = "I don't know how to _" + subcommand + "_! Use _/combat help_ for an explanation of each command.";
-						var msgData = getFormattedJSONAttachment(reply,channel_name,false);
-						return res.json(msgData);
+					}
+					else
+					{
+						reply = "Need to specify the id of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
+					}
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				default:
+					reply = "I don't know how to _" + subcommand + "_! Use _/combat help_ for an explanation of each command.";
+					var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+					return res.json(msgData);
 				}
 			}
 			else
