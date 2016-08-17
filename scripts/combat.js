@@ -1783,7 +1783,7 @@
 							var playerId = parameters.match(/(\d+)/ig) || -1;
 							var playerIdAlternative = parameters.match(/(\d+)(\s+[a-z|\s|']+)*/ig) || null;
 							
-							robot.logger.debug("playerIdAlternative="+playerIdAlternative);
+							robot.logger.debug("playerIdAlternative="+util.inspect(playerIdAlternative));
 							
 							if(playerId == -1)
 							{
