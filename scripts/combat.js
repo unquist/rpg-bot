@@ -523,7 +523,7 @@
 			}
 			else if(numTotalCombatants == numRegisteredCombatants)
 			{
-				return combatAddNPC(callerName,bonus,addBonus,npcName);
+				return combatAddNPC(callerName,bonus,addBonus,numNPCs,npcName);
 			}
 			
 			if((numRegisteredCombatants + numNPCs) > numTotalCombatants)
@@ -553,7 +553,7 @@
 			{
 				var index = k + 1;
 				numCombatantsIndex += 1;
-				var newCombatant = new Combatant(npcName,numCombatantsIndex,initScore,NPC_TYPE,"NPC");
+				var newCombatant = new Combatant(npcName+" (NPC)",numCombatantsIndex,initScore,NPC_TYPE,"NPC");
 				combatantsArray.push(newCombatant);
 			}
 			
@@ -886,7 +886,7 @@
 		  
 	  };
 	  
-	  var combatAddNPC = function(callerName,bonus,addBonus,npcName) {
+	  var combatAddNPC = function(callerName,bonus,addBonus,numNPCs,npcName) {
 		var combat_started = robot.brain.get('combat_flag');
 		var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
 		//array of players
@@ -922,7 +922,7 @@
 			bonusDescription = "-" + bonus;
 		}
 		
-		
+		/*
 		numRegisteredCombatants += 1;
 		numTotalCombatants += 1;
 			
@@ -955,6 +955,51 @@
   		
 		//now construct our response_type
 		var reply = "New NPC "+npcName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
+		*/
+		var numCombatantsIndex = numRegisteredCombatants;
+		var newNPCCombatants = new Array();
+		for(var k = 0; k < numNPCs; k++)
+		{
+			var index = k + 1;
+			numCombatantsIndex += 1;
+			var newCombatant = new Combatant(npcName+" (NPC)",numRegisteredCombatants,initScore,NPC_TYPE,"NPC");
+			newNPCCombatants.push(newCombatant);
+		}		
+		
+		numRegisteredCombatants += numNPCs;
+		numTotalCombatants += numNPCs;
+			
+ 			
+		//now we have the new monsters and their init. But need to make sure the turn counter 
+		// stays correct before re-sorting.
+		var currentTurnIndex = Number(robot.brain.get('currentTurnIndex'));
+		var currentCombatant = combatantsArray[currentTurnIndex];
+		
+		//now add the new player and resort the array
+		for(var i = 0; i < newNPCCombatants.length; i++)
+		{
+			combatantsArray.push(newNPCCombatants[i]);
+		}
+  		
+  		combatantsArray = combatantsArray.sort(combatantSortByInit);
+		
+		//loop through the new array, find the player whose turn it is, and reset the index
+		for(var i = 0; i < combatantsArray.length; i++)
+		{
+			if(combatantsArray[i].id == currentCombatant.id)
+			{
+				currentTurnIndex = i;
+				robot.brain.set('currentTurnIndex',currentTurnIndex);
+			}
+		}
+		
+		robot.brain.set('combatantsArray',combatantsArray);
+
+  		robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+  		robot.brain.set('numTotalCombatants',numTotalCombatants);
+  		
+		//now construct our response_type
+		var reply = "New NPC(s) "+npcName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
 		for(var k = 0; k < combatantsArray.length; k++)
 		{
 			var order = k + 1;
