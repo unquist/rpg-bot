@@ -1803,7 +1803,7 @@
 							
 							if(deathEuphemism != "")
 							{
-								deathEuphemism = deathEuphemism.toString().trim();
+								deathEuphemism = deathEuphemism[1].toString().trim();
 							}
 							
 							robot.logger.debug("found deathEuphemism param=["+deathEuphemism+"]");
