@@ -370,6 +370,7 @@
   			
   			robot.logger.debug("Init request from " + callerName + " with bonus of [" + bonus + "]");
   			
+			/*
 			//if bonus is zero, that could mean one of two things: either it's really 0, or the PC wants to try and use the value in their character sheet
 			spreadsheet_wrapper.getSpreadsheetValues('1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0','Party Loot!A11:A17',function(err, data) {
 				if (err) {
@@ -378,7 +379,7 @@
 				}
 				return msg.reply(data.values);
 			});
-			
+			*/
 			
   			var initRoll = rolldie(20);
   			var initScore = initRoll + bonus;
