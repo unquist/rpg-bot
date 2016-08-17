@@ -74,7 +74,7 @@
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. If character sheet integration has been performed, this will automatically use the value in your sheet.  Adding the BONUS param will always override the automatic functionality. Once the correct number of player and monsters have rolled, combat will automatically start.";
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
-			reply += "\n\n*_/combat init-npc [BONUS] [NAME/TYPE]_* - Initialize an NPC with [NAME/TYPE] into combat (including pets, familiars, mounts) to the combat.";
+			reply += "\n\n*_/combat init-npc [BONUS] [NUM NPC] [NAME/TYPE]_* - Initialize [NUM NPC] NPCs with [NAME/TYPE] into combat (including pets, familiars, mounts).";
 			reply += "\n\n*_/combat setinit [INIT]_* - Optional command to manually set your initiative. Useful if you rolled but forgot to put in the right Dex. bonus.";
 		reply += "\n\n*_/combat next [REPEAT]_* - Signal to the bot that the current player's turn is over (and it's time for the next player). The optional [REPEAT} parameter allows you to move the turn order forward that many times. So if it's goblin A's turn, `/combat next 3` will complete A, B, and C's turns.";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
@@ -502,7 +502,7 @@
 			}
 		};
 		
-		var initNPC = function(callerName,bonus,addBonus,npcName){
+		var initNPC = function(callerName,bonus,addBonus,numNPCs,npcName){
 			robot.logger.debug("NPC Init request from " + callerName + " with bonus of [" + bonus + "]");
 			var combat_started = robot.brain.get('combat_flag');
 			var numRegisteredCombatants = robot.brain.get('numRegisteredCombatants');
@@ -526,6 +526,12 @@
 				return combatAddNPC(callerName,bonus,addBonus,npcName);
 			}
 			
+			if((numRegisteredCombatants + numNPCs) > numTotalCombatants)
+			{
+				var remainingSpots = numTotalCombatants - numRegisteredCombatants;
+				return "That's too many NPCs for this combat "+callerName+". You can add " + remainingSpots + " NPCs maximum.\nI already have " +numRegisteredCombatants+ " fighter(s), out of " +numTotalCombatants+" total spots. ";
+			}
+			
 			var initRoll = rolldie(20);
 			var initScore = initRoll;
 			var bonusDescription = "";
@@ -540,15 +546,21 @@
 				initScore -= Number(bonus);
 				bonusDescription = "-" + bonus;
 			}
+	
 			
-			numRegisteredCombatants += 1;
+			var numCombatantsIndex = numRegisteredCombatants;
+			for(var k = 0; k < numNPCs; k++)
+			{
+				var index = k + 1;
+				numCombatantsIndex += 1;
+				var newCombatant = new Combatant(npcName,numCombatantsIndex,initScore,NPC_TYPE,"NPC");
+				combatantsArray.push(newCombatant);
+			}
 			
-  			var newCombatant = new Combatant(npcName,numRegisteredCombatants,initScore,NPC_TYPE,"NPC");
-  			  			
-  			combatantsArray.push(newCombatant);
-  			robot.brain.set('combatantsArray',combatantsArray);
-
-  			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			robot.brain.set('combatantsArray',combatantsArray);
+			numRegisteredCombatants += numNPCs;
+			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
+			
 			
 			//ready to start combat?
 			if(numRegisteredCombatants == numTotalCombatants)
@@ -1650,10 +1662,10 @@
 					case "init-npc":
 						if(parameters != "")
 						{
-							var initNPCParams = parameters.match(/(\+|-){0,1}(\d+)\s+([a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*)/i) || null;
+							var initNPCParams = parameters.match(/(\+|-){0,1}(\d+)\s+(\d+)\s+(.+)/i) || null;
 							if(initNPCParams == null)
 							{
-								reply = "Need to specify the the bonus and the name of the NPC!\n For example, *_/combat init-npc 2 steve the dog_* Rolls initiative for steve the dog, with a +2 bonus.";
+								reply = "Need to specify the the bonus, number, and the name of the NPC!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 steve the dogs, with a +2 bonus.";
 							}
 							else
 							{
@@ -1668,14 +1680,22 @@
 								}
 								var bonus = initNPCParams[2] || 0;
 								bonus = Number(bonus);
-								var npcName = initNPCParams[3] || "Steve";
+								var numNPCs = initNPCParams[3] || 0;
+								numNPCs = Number(numNPCs);
+								if(numNPCs < 1)
+								{
+									reply = "The number of NPCs must be 1 or more!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 'steve the dogs', with a +2 bonus.";
+									var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);						
+									return res.json(msgData);
+								}
+								var npcName = initNPCParams[4] || "Johnson";
 								
-								reply += initNPC(username,bonus,addBonus,npcName);
+								reply += initNPC(username,bonus,addBonus,numNPCs,npcName);
 							}
 						}
 						else
 						{
-							reply = "Need to specify the the bonus and the name of the NPC!\n For example, *_/combat init-npc 2 steve the dog_* Rolls initiative for steve the dog, with a +2 bonus.";
+							reply = "Need to specify the the bonus, number, and the name of the NPC!\n For example, *_/combat init-npc 2 5 steve the dog_* Rolls initiative for 5 steve the dogs, with a +2 bonus.";
 						}
 						//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 						var msgData = getFormattedJSONMultiAttachment(reply.split("<SPLIT>"),channel_name,true);
