@@ -1195,6 +1195,8 @@
 			deathEuphemism = getRandomDeathEuphemism();
 		}
 		
+		robot.logger.debug("deathEuphemism="+deathEuphemism);
+		
 		if(combatantsToBeKilled.length < 1)
 		{
 			return "No valid Ids found. No combatants removed from combat."; 
