@@ -1804,7 +1804,7 @@
 					if(parameters != "")
 					{
 						var playerId = parameters.match(/(\d+)/ig) || -1;
-						var deathEuphemism = parameters.match(/(\s{1}[a-z]+([a-z|\s|'])*)*/ig) || "";
+						var deathMessageMatch = parameters.match(/(\s{1}[a-z]+([a-z|\s|'])*)*/ig) || "";
 						robot.logger.debug("matched deathEuphemism param=["+deathEuphemism+"]");	
 									
 						if(playerId == -1)
@@ -1822,18 +1822,21 @@
 							
 							robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
 							
-							for(var d = 0; d< deathEuphemism.length; d++)
+							var deathMessage = "";
+							if(deathMessageMatch != "")
 							{
-								robot.logger.debug("deathEuphemism["+d+"]=["+deathEuphemism[d]+"]");
+								for(var d = 0; d < deathMessageMatch.length; d++)
+								{
+									if(deathMessageMatch[d] != "")
+									{
+										deathMessage = deathMessageMatch[d];
+									}
+								}
+								
 							}
 							
-							if(deathEuphemism != "")
-							{
-								deathEuphemism = deathEuphemism[1].toString().trim();
-							}
-							
-							robot.logger.debug("found trimmed deathEuphemism param=["+deathEuphemism+"]");
-							reply = combatKill(username,playerIdArray,deathEuphemism);
+							robot.logger.debug("found trimmed deathMessage param=["+deathMessage+"]");
+							reply = combatKill(username,playerIdArray,deathMessage);
 						}
 					}
 					else
