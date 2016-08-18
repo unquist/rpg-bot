@@ -37,7 +37,7 @@
 				for (var key in userObjectFromRobot) 
 				{
 					var user_name = userObjectFromRobot[key].name;
-					users.push(user_name);
+					userArray.push(user_name);
 					robot.logger.debug("initializing party spreadsheet info; username = "+user_name);
 				}
 
