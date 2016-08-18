@@ -79,9 +79,9 @@
 						{
 							if(data.values[0][k] != "" && data.values[0][k].indexOf("Slack User") == -1)
 							{
-								robot.logger.debug("inner results loop -> data.values[k] =["+data.values[0][k]+"]");
-								var indexOfUser = userArray.findIndex(function(name){return name == data.values[0][k]});
-								var cellLetter = String.fromCharCode(index + 65 + 1);
+								robot.logger.debug("inner results loop -> data.values["+k+"] =["+data.values[0][k]+"]");
+								//var indexOfUser = userArray.findIndex(function(name){return name == data.values[0][k]});
+								var cellLetter = String.fromCharCode(k + 65 + 1);
 								robot.logger.debug("code->robot.brain.set(partyInfoSpreadsheetRedisKey+data.values[0][k],cellLetter);");
 								robot.logger.debug("interpreted->robot.brain.set("+partyInfoSpreadsheetRedisKey+data.values[0][k]+","+cellLetter+");");
 							}
@@ -89,7 +89,6 @@
 						}
 						//robot.brain.set(intializedRedisKey,"true");
 						robot.logger.debug("robot.brain.set(intializedRedisKey,'true');");
-						
 						
 						//now the code should be initialized and we need to call the original call back command
 						var serviceClient = google['sheets']("v4");
