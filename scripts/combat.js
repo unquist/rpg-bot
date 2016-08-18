@@ -1651,10 +1651,10 @@
 					return res.json(msgData);
 					break;
 				case "init":
-					var bonus = -1;
+					var bonus = 0;
 					if(parameters != "")
 					{
-						bonus = parameters.match(/\d+/i) || -1;
+						bonus = parameters.match(/\d+/i) || 0;
 					}
 					reply = combatInit(username,Number(bonus));
 					//var msgData = getFormattedJSONAttachment(reply,channel_name,true);
