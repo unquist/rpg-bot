@@ -458,15 +458,27 @@
 				bonusDescription = "-" + bonus;
 			}
 			var numCombatantsIndex = numRegisteredCombatants;
-			for(var k = 0; k < numMonsters; k++)
+			
+			//if the BOSS keyword is used, and there's only one monster, then the monster name should be the name, with "Boss" in the parenthetical.
+			if(monsterName.indexOf("BOSS") != -1 && numMonsters == 1)
 			{
-				var index = k + 1;
 				numCombatantsIndex += 1;
-				var thisMonsterName = enemy_name.getRandomEnemyName() + " (" + monsterName +")";
-				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,monsterName);
+				monsterName = monsterName.replace("BOSS","").trim();
+				var thisMonsterName = monsterName + " (boss villain)";
+				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,"boss villain");
 				combatantsArray.push(newCombatant);
 			}
-			
+			else
+			{
+				for(var k = 0; k < numMonsters; k++)
+				{
+					var index = k + 1;
+					numCombatantsIndex += 1;
+					var thisMonsterName = enemy_name.getRandomEnemyName() + " (" + monsterName +")";
+					var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,monsterName);
+					combatantsArray.push(newCombatant);
+				}
+			}
 			robot.brain.set('combatantsArray',combatantsArray);
 			numRegisteredCombatants += numMonsters;
 			robot.brain.set('numRegisteredCombatants',numRegisteredCombatants);
