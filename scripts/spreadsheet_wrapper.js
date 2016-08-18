@@ -75,15 +75,15 @@
 						robot.logger.debug("within first callback.");
 						robot.logger.debug("data returned:"+util.inspect(data));
 						// [ Slack User ][ cheesesandwich ][  ][  ][ Slack User ][ gatsbythegreat ][  ][  ][ Slack User ][ mandrews ][  ][  ][ Slack User ][ seussalot ][  ][  ][ Slack User ][ hamishthaggis ][  ][  ][ Slack User ][ moresault ]
-						for(var k = 0; k < data.values.length; k++)
+						for(var k = 0; k < data.values[0].length; k++)
 						{
-							if(data.values[k] != "" && data.values[k].indexOf("Slack User") == -1)
+							if(data.values[0][k] != "" && data.values[0][k].indexOf("Slack User") == -1)
 							{
-								robot.logger.debug("inner results loop -> data.values[k] =["+data.values[k]+"]");
-								var indexOfUser = userArray.findIndex(function(name){return name == data.values[k]});
+								robot.logger.debug("inner results loop -> data.values[k] =["+data.values[0][k]+"]");
+								var indexOfUser = userArray.findIndex(function(name){return name == data.values[0][k]});
 								var cellLetter = String.fromCharCode(index + 65 + 1);
-								robot.logger.debug("code->robot.brain.set(partyInfoSpreadsheetRedisKey+data.values[k],cellLetter);");
-								robot.logger.debug("interpreted->robot.brain.set("+partyInfoSpreadsheetRedisKey+data.values[k]+","+cellLetter+");");
+								robot.logger.debug("code->robot.brain.set(partyInfoSpreadsheetRedisKey+data.values[0][k],cellLetter);");
+								robot.logger.debug("interpreted->robot.brain.set("+partyInfoSpreadsheetRedisKey+data.values[0][k]+","+cellLetter+");");
 							}
 							
 						}
