@@ -29,7 +29,7 @@
 			
 			if(!robot.brain.get(intializedRedisKey))
 			{
-				var userArray = robot.brain.users();
+				var userArray = robot.brain.users;
 				robot.logger.debug("initializing party spreadsheet info; length=["+userArray.length+"]");
 				//first, get a list of all user names
 				var users = {};
