@@ -1805,7 +1805,7 @@
 					{
 						var playerId = parameters.match(/(\d+)/ig) || -1;
 						var deathMessageMatch = parameters.match(/(\s{1}[a-z]+([a-z|\s|'])*)*/ig) || "";
-						robot.logger.debug("matched deathEuphemism param=["+deathEuphemism+"]");	
+						robot.logger.debug("matched deathMessageMatch param=["+deathMessageMatch+"]");	
 									
 						if(playerId == -1)
 						{
