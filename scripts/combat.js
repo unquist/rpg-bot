@@ -1825,6 +1825,7 @@
 							var deathMessage = "";
 							if(deathMessageMatch != "")
 							{
+								/*
 								for(var d = 0; d < deathMessageMatch.length; d++)
 								{
 									if(deathMessageMatch[d] != "")
@@ -1832,7 +1833,11 @@
 										deathMessage = deathMessageMatch[d];
 									}
 								}
-								
+								*/
+								robot.logger.debug("deathMessageMatch before filter["+deathMessageMatch+"]");
+								deathMessageMatch = deathMessageMatch.filter(function(n){ return n != "" });
+								robot.logger.debug("deathMessageMatch before filter["+deathMessageMatch+"]");
+								deathMessage = deathMessageMatch[0];
 							}
 							
 							robot.logger.debug("found trimmed deathMessage param=["+deathMessage+"]");
