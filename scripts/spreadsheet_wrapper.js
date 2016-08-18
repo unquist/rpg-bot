@@ -72,7 +72,8 @@
 							robot.logger.debug("getSpreadsheetValues error:"+err);
 							return err;
 						}
-						
+						robot.logger.debug("within first callback.");
+						robot.logger.debug("data returned:"+util.inspect(data));
 						// [ Slack User ][ cheesesandwich ][  ][  ][ Slack User ][ gatsbythegreat ][  ][  ][ Slack User ][ mandrews ][  ][  ][ Slack User ][ seussalot ][  ][  ][ Slack User ][ hamishthaggis ][  ][  ][ Slack User ][ moresault ]
 						for(var k = 0; k < data.values.length; k++)
 						{
