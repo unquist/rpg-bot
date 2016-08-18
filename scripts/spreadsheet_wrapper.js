@@ -29,17 +29,18 @@
 			
 			if(!robot.brain.get(intializedRedisKey))
 			{
-				var userArray = robot.brain.users;
-				robot.logger.debug("robot.brain.users->" + util.inspect(robot.brain.users()));
-				robot.logger.debug("initializing party spreadsheet info; length=["+userArray.length+"]");
+				var userObjectFromRobot = robot.brain.users();
+				
 				//first, get a list of all user names
-				var users = {};
-				for(var i = 0; i < userArray.length; i++)
+				var userArray = new Array();
+				
+				for (var key in userObjectFromRobot) 
 				{
-					var user_name = userArray[i].name;
+					var user_name = userObjectFromRobot[key].name;
 					users.push(user_name);
-					robot.logger.debug("initializing party spreadsheet info; username = "+user_name);	
+					robot.logger.debug("initializing party spreadsheet info; username = "+user_name);
 				}
+
 				/*
 				getSpreadsheetValues(partyInfoSpreadsheetId,username_query,function(err, data){
 					
@@ -78,7 +79,7 @@
 							if(data.values[k] != "" && data.values[k].indexOf("Slack User") == -1)
 							{
 								robot.logger.debug("inner results loop -> data.values[k] =["+data.values[k]+"]");
-								var indexOfUser = users.findIndex(function(name){return name == data.values[k]});
+								var indexOfUser = userArray.findIndex(function(name){return name == data.values[k]});
 								var cellLetter = String.fromCharCode(index + 65 + 1);
 								robot.logger.debug("code->robot.brain.set(partyInfoSpreadsheetRedisKey+data.values[k],cellLetter);");
 								robot.logger.debug("interpreted->robot.brain.set("+partyInfoSpreadsheetRedisKey+data.values[k]+","+cellLetter+");");
