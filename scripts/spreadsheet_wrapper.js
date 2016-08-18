@@ -29,12 +29,13 @@
 			
 			if(!robot.brain.get(intializedRedisKey))
 			{
-				robot.logger.debug("initializing party spreadsheet info; length=["+robot.brain.data.users.length+"]");
+				
+				robot.logger.debug("initializing party spreadsheet info; length=["+robot.brain.users.length+"]");
 				//first, get a list of all user names
 				var users = {};
-				for(var i = 0; i < robot.brain.data.users.length; i++)
+				for(var i = 0; i < robot.brain.users.length; i++)
 				{
-					var user_name = robot.brain.data.users[i].name;
+					var user_name = robot.brain.users[i].name;
 					users.push(user_name);
 					robot.logger.debug("initializing party spreadsheet info; username = "+user_name);	
 				}
