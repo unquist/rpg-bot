@@ -1804,7 +1804,7 @@
 					if(parameters != "")
 					{
 						var playerId = parameters.match(/(\d+)/ig) || -1;
-						var deathEuphemism = parameters.match(/(\s+[a-z|\s|']+)*/ig) || "";
+						var deathEuphemism = parameters.match(/(\s{1}[a-z]+([a-z|\s|'])*)*/ig) || "";
 						robot.logger.debug("matched deathEuphemism param=["+deathEuphemism+"]");	
 									
 						if(playerId == -1)
@@ -1821,6 +1821,11 @@
 							}
 							
 							robot.logger.debug("Constructed playerIdArray->"+playerIdArray+"<--");
+							
+							for(var d = 0; d< deathEuphemism.length; d++)
+							{
+								robot.logger.debug("deathEuphemism["+d+"]=["+deathEuphemism[d]+"]");
+							}
 							
 							if(deathEuphemism != "")
 							{
