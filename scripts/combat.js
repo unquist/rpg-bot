@@ -36,7 +36,7 @@
 		
 		var getBrainValue = function(key)
 		{
-			robot.brain.get(COMBAT_BRAIN_PREFIX+key);
+			return robot.brain.get(COMBAT_BRAIN_PREFIX+key);
 		};
 		
 		var deleteBrainValue = function(key)
@@ -185,7 +185,7 @@
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
-			   robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+			   robot.logger.debug("Bad value for combat_started ["+combat_started+"]");
 			   clearAll();
 			   setBrainValue('combat_flag', 0);
 			   return "No combat started "+callerName+". Begin with `/combat start`";
