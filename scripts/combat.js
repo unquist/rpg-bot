@@ -1786,10 +1786,7 @@
 							if(hit_die_match != null && hit_die_match != "")
 							{
 								robot.logger.debug("Found hit die match:["+util.inspect(hit_die_match)+"]");
-								var numDice = hit_die_match[1] || 0;
-								var d = hit_die_match[2] || "d";
-								var numSides = hit_die_match[3] || 0;
-								hit_die =  numDice + d + numSides;
+								hit_die =  hit_die_match.toString();
 								robot.logger.debug("Setting hit_die to:"+hit_die);
 								robot.logger.debug("monsterName before trim:["+monsterName+"]");
 								monsterName = monsterName.replace(hit_die,"").trim();
