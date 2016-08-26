@@ -96,7 +96,7 @@
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
-			reply += "\n\n*_/combat setdm_* - OPTIONAL: Configures the calling player as the DM. If set, init-dm and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
+			reply += "\n\n*_/combat setdm_* - OPTIONAL: Configures the calling player as the DM. If set, it activates the optional monster HP functionality where only the DM can see monster HP."
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. If character sheet integration has been performed, this will automatically use the value in your sheet.  Adding the BONUS param will always override the automatic functionality. Once the correct number of player and monsters have rolled, combat will automatically start.";
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
@@ -127,13 +127,14 @@
             return randint(sides);
         };
 		
-		function Combatant (name,id,init,type,monsterType) {
+		function Combatant (name,id,init,type,monsterType,hitpoints) {
 			this.name = name;
 			this.id = id;
 			this.tieBreaker = rolldie(10000);
 			this.init = Number(init);
 			this.type = Number(type);
 			this.monsterType = monsterType;
+			this.hitpoints = hitpoints;
 		};
  	
 		var combatantSortByName = function(a,b) {
@@ -1779,7 +1780,19 @@
 							var numMonsters = initdmParams[3] || 0;
 							numMonsters = Number(numMonsters);
 							var monsterName = initdmParams[4] || "Nameless Horror";
-							reply += initdm(username,bonus,addBonus,numMonsters,monsterName);
+							//check and see if the "monsterName" param has a HD request
+							var hit_die_match = monsterName.match(/(\d+)(d)(\d+)/ig) || "";
+							var hit_die = "N/A";
+							if(hit_die_match != null && hit_die_match != "")
+							{
+								robot.logger.debug("Found hit die match:"+hit_die_match);
+								hit_die = match[1] + match[2] + match[3];
+								robot.logger.debug("Setting hit_die to:"+hit_die);
+								robot.logger.debug("monsterName before trim:["+monsterName+"]");
+								monsterName = monsterName.replace(hit_die,"").trim();
+								robot.logger.debug("monsterName after trim:["+monsterName+"]");
+							}
+							reply += initdm(username,bonus,addBonus,numMonsters,monsterName,hit_die);
 						}
 					}
 					else
