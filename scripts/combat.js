@@ -1785,8 +1785,8 @@
 							var hit_die = "N/A";
 							if(hit_die_match != null && hit_die_match != "")
 							{
-								robot.logger.debug("Found hit die match:"+hit_die_match);
-								hit_die = match[1] + match[2] + match[3];
+								robot.logger.debug("Found hit die match:["+hit_die_match+"]");
+								hit_die = hit_die_match[1] + hit_die_match[2] + hit_die_match[3];
 								robot.logger.debug("Setting hit_die to:"+hit_die);
 								robot.logger.debug("monsterName before trim:["+monsterName+"]");
 								monsterName = monsterName.replace(hit_die,"").trim();
