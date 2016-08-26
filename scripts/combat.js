@@ -1348,7 +1348,7 @@
 			var combatantsArray = getBrainValue('combatantsArray');
 			var numTotalCombatants = getBrainValue('numTotalCombatants');
 			
-			robot.logger.debug("1. combatantsArray, util.inspect="+util.inspect(combatantsArray));
+			
 			
 			var indexOfCombatantToBeKilled = -1;
 			for(var i = 0; i< combatantsArray.length; i++)
@@ -1415,13 +1415,13 @@
 				var currentTurnIndex = getBrainValue('currentTurnIndex');
 				var currentPlayer = combatantsArray[currentTurnIndex];
 				
-				robot.logger.debug("2. currentPlayer, util.inspect="+util.inspect(currentPlayer));
-				robot.logger.debug("3. combatantToBeKilled, util.inspect="+util.inspect(combatantToBeKilled));
+				//robot.logger.debug("2. currentPlayer, util.inspect="+util.inspect(currentPlayer));
+				//robot.logger.debug("3. combatantToBeKilled, util.inspect="+util.inspect(combatantToBeKilled));
 				
 				//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
 				if(currentPlayer.id == combatantToBeKilled.id)
 				{
-					
+					robot.logger.debug("3.5. combatantsArray, util.inspect="+util.inspect(combatantsArray));
 					//set the index to whomever comes after them.
 					var newCurrentPlayer;
 					if((currentTurnIndex+1) > combatantsArray.length)
