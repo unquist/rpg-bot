@@ -26,6 +26,8 @@
 		const MONSTER_TYPE = 1;
 		const NPC_TYPE = 2;
 		
+		const NOT_USING_MONSTER_HP = -999999999;
+		
 		//const names for the redis keys
 		const REDIS_KEY_COMBAT_PREFIX = "combat_script:";
 		const REDIS_KEY_COMBAT_STARTED_FLAG = "combat_flag";
@@ -112,14 +114,6 @@
 		
 		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
-        };
-
-        var rolldice = function(sides, num) {
-            var results = [];
-            for (var j = 1; j <= num; j++) {
-                results.push(randint(sides));
-            }
-            return results;
         };
 		
 		//just a lazy wrapper for randint
@@ -434,7 +428,7 @@
 		
 		
 
-		var initdm = function(callerName,bonus,addBonus,numMonsters,monsterName) {
+		var initdm = function(callerName,bonus,addBonus,numMonsters,monsterName,hit_dice) {
 			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
 			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
 			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
@@ -486,13 +480,41 @@
 			}
 			var numCombatantsIndex = numRegisteredCombatants;
 			
+			//need to set HP if using
+			var HP = NOT_USING_MONSTER_HP;
+			if(hit_dice != null && hit_dice != "N/A")
+			{
+				var dice_match = hit_dice.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}/i);
+				if(dice_match != null)
+				{
+					robot.logger.debug("Found dice_match:["+util.inspect(dice_match)+"]");
+					var num = dice_match[1] || 1;
+					var sides = dice_match[3] || 6;
+					var bonusType = dice_match[4] || "";
+					var bonus = dice_match[5] || 0;
+					
+					HP = dice_roller.getRollResults(sides,num);
+					robot.logger.debug("Random HP before bonus is ["+HP+"]");
+					if(bonusType == "+")
+					{
+						HP = HP + bonus;
+					}
+					else if(bonusType == "-")
+					{
+						HP = HP - bonus;
+					}
+					robot.logger.debug("Random HP after bonus is ["+HP+"]");
+				}
+			}
+					
+			
 			//if the BOSS keyword is used, and there's only one monster, then the monster name should be the name, with "Boss" in the parenthetical.
 			if(monsterName.indexOf("BOSS") != -1 && numMonsters == 1)
 			{
 				numCombatantsIndex += 1;
 				monsterName = monsterName.replace("BOSS","").trim();
 				var thisMonsterName = monsterName + " (boss villain)";
-				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,"boss villain");
+				var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,"boss villain",HP);
 				combatantsArray.push(newCombatant);
 			}
 			else
@@ -502,7 +524,7 @@
 					var index = k + 1;
 					numCombatantsIndex += 1;
 					var thisMonsterName = enemy_name.getRandomEnemyName() + " (" + monsterName +")";
-					var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,monsterName);
+					var newCombatant = new Combatant(thisMonsterName,numCombatantsIndex,initScore,MONSTER_TYPE,monsterName,HP);
 					combatantsArray.push(newCombatant);
 				}
 			}
@@ -1785,12 +1807,12 @@
 							var hit_die = "N/A";
 							if(hit_die_match != null && hit_die_match != "")
 							{
-								robot.logger.debug("Found hit die match:["+util.inspect(hit_die_match)+"]");
+								//robot.logger.debug("Found hit die match:["+util.inspect(hit_die_match)+"]");
 								hit_die =  hit_die_match.toString();
-								robot.logger.debug("Setting hit_die to:"+hit_die);
-								robot.logger.debug("monsterName before trim:["+monsterName+"]");
+								//robot.logger.debug("Setting hit_die to:"+hit_die);
+								//robot.logger.debug("monsterName before trim:["+monsterName+"]");
 								monsterName = monsterName.replace(hit_die,"").trim();
-								robot.logger.debug("monsterName after trim:["+monsterName+"]");
+								//robot.logger.debug("monsterName after trim:["+monsterName+"]");
 							}
 							reply += initdm(username,bonus,addBonus,numMonsters,monsterName,hit_die);
 						}

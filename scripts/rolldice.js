@@ -329,6 +329,7 @@
 	});
 
 	module.exports.rolldice = rolldice;	
+	module.exports.getRollResults = getRollResults;
 	 
     };
 
