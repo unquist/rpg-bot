@@ -1781,12 +1781,15 @@
 							numMonsters = Number(numMonsters);
 							var monsterName = initdmParams[4] || "Nameless Horror";
 							//check and see if the "monsterName" param has a HD request
-							var hit_die_match = monsterName.match(/(\d+)(d)(\d+)/ig) || "";
+							var hit_die_match = monsterName.match(/(\d+)(d)(\d+)([+-]{1}\d+){0,1}/ig) || "";
 							var hit_die = "N/A";
 							if(hit_die_match != null && hit_die_match != "")
 							{
-								robot.logger.debug("Found hit die match:["+hit_die_match+"]");
-								hit_die = hit_die_match[1] + hit_die_match[2] + hit_die_match[3];
+								robot.logger.debug("Found hit die match:["+util.inspect(hit_die_match)+"]");
+								var numDice = hit_die_match[1] || 0;
+								var d = hit_die_match[2] || "d";
+								var numSides = hit_die_match[3] || 0;
+								hit_die =  numDice + d + numSides;
 								robot.logger.debug("Setting hit_die to:"+hit_die);
 								robot.logger.debug("monsterName before trim:["+monsterName+"]");
 								monsterName = monsterName.replace(hit_die,"").trim();
