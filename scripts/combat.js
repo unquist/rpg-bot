@@ -1348,6 +1348,8 @@
 			var combatantsArray = getBrainValue('combatantsArray');
 			var numTotalCombatants = getBrainValue('numTotalCombatants');
 			
+			robot.logger.debug("1. combatantsArray, util.inspect="+util.inspect(combatantsArray));
+			
 			var indexOfCombatantToBeKilled = -1;
 			for(var i = 0; i< combatantsArray.length; i++)
 			{
@@ -1413,6 +1415,8 @@
 				var currentTurnIndex = getBrainValue('currentTurnIndex');
 				var currentPlayer = combatantsArray[currentTurnIndex];
 				
+				robot.logger.debug("2. currentPlayer, util.inspect="+util.inspect(currentPlayer));
+				robot.logger.debug("3. combatantToBeKilled, util.inspect="+util.inspect(combatantToBeKilled));
 				
 				//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
 				if(currentPlayer.id == combatantToBeKilled.id)
@@ -1428,12 +1432,14 @@
 					{
 						newCurrentPlayer = combatantsArray[currentTurnIndex+1];
 					}
-					
+					robot.logger.debug("4. newCurrentPlayer, util.inspect="+util.inspect(newCurrentPlayer));
 					//remove the killed player from the combatantsArray
 					combatantsArray.splice(indexOfCombatantToBeKilled,1);
 					setBrainValue('combatantsArray',combatantsArray);
 					for(var k = 0; k < combatantsArray.length; k++)
 					{
+						robot.logger.debug("5["+k+"]. combatantsArray[k], util.inspect="+util.inspect(combatantsArray[k]));
+						robot.logger.debug("5["+k+"]. newCurrentPlayer, util.inspect="+util.inspect(newCurrentPlayer));
 						if(combatantsArray[k].id == newCurrentPlayer.id)
 						{
 							currentTurnIndex = k;
