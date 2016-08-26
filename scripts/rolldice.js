@@ -327,8 +327,10 @@
 	}
 */
 	});
-      
+
+	module.exports.rolldice = rolldice;	
+	 
     };
 
-	module.exports.rolldice = rolldice;
+	
 })();
