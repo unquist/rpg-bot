@@ -1189,8 +1189,8 @@
 			}
 			catch (error)
 			{
-				robot.logger.debug("Caught error while trying to kill player: ["+error.essage+"]");
-				return "Error occured during kill request: ["+error.essage+"]";
+				robot.logger.debug("Caught error while trying to kill player: ["+error+"]");
+				return "Error occured during kill request: ["+error+"]";
 			}
 
 		}
@@ -1373,7 +1373,7 @@
 			{
 				try
 				{
-					var key = combatantToBeKilled.name+"_initScore";
+					var key = COMBAT_BRAIN_PREFIX+combatantToBeKilled.name+"_initScore";
 					if(hasProp.call(robot.brain.data._private, key))
 					{
 						deleteBrainValue(key)
@@ -1465,11 +1465,11 @@
 		
 		};
 		
-				//kill off a comnatant and return their Combatant object
+		
 		var setDM = function(callerName) {
 			
 			
-		}
+		};
 		
 	  /* begin 'hear' functions*/
 	  /*
