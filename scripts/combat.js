@@ -128,7 +128,7 @@
 			this.init = Number(init);
 			this.type = Number(type);
 			this.monsterType = monsterType;
-			this.hitpoints = hitpoints;
+			this.hitpoints = Number(hitpoints);
 		};
  	
 		var combatantSortByName = function(a,b) {
@@ -163,12 +163,13 @@
 		};
 		
 		var clearAll = function() {
-			deleteBrainValue('combat_flag')
-			deleteBrainValue('numRegisteredCombatants')
-			deleteBrainValue('numTotalCombatants')
-			deleteBrainValue('combatantsArray')
-			deleteBrainValue('currentTurnIndex')
-			deleteBrainValue('pc_graveyard')
+			deleteBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG)
+			deleteBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS)
+			deleteBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS)
+			deleteBrainValue(REDIS_KEY_COMBATANTS_ARRAY)
+			deleteBrainValue(REDIS_KEY_CURRENT_TURN_INDEX)
+			deleteBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT)
+			deleteBrainValue(REDIS_KEY_DM_USERNAME);
 			var key;
 			for (key in robot.brain.data._private) 
 			{
@@ -207,12 +208,12 @@
 		};
 		
 		var combatCleanupAfterEnd = function(){
-		  setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
+			setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			//TODO: any other cleanup work (like removing persistent variables)
-			deleteBrainValue('numRegisteredCombatants')
-			deleteBrainValue('numTotalCombatants')
-			deleteBrainValue('currentTurnIndex')
-			deleteBrainValue('pc_graveyard')
+			deleteBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
+			deleteBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
+			deleteBrainValue(REDIS_KEY_CURRENT_TURN_INDEX);
+			deleteBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT)
 			
 			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
 			if(combatantsArray != null)
@@ -223,7 +224,7 @@
 					deleteBrainValue(key)
 				}
 			}
-			deleteBrainValue('combatantsArray')
+			deleteBrainValue(REDIS_KEY_COMBATANTS_ARRAY)
 		};
 		
 
@@ -497,11 +498,11 @@
 					robot.logger.debug("Random HP before bonus is ["+HP+"]");
 					if(bonusType == "+")
 					{
-						HP = HP + bonus;
+						HP = HP + Number(bonus);
 					}
 					else if(bonusType == "-")
 					{
-						HP = HP - bonus;
+						HP = HP - Number(bonus);
 					}
 					robot.logger.debug("Random HP after bonus is ["+HP+"]");
 				}
@@ -717,16 +718,26 @@
 			}
 			var currentTurnIndex = getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX);
 			
+			var isTheCallingUserTheDM = isUserDM(callerName);
+			
 			var reply = "Here is the current order, with current combatant highlighted:"; 
 			for(var k = 0; k < combatantsArray.length; k++)
 			{
 				var order = k + 1;
+				
+				var HP_string = "";
+				//if the calling player is the DM, and this is a monster, report on its HP
+				if(isTheCallingUserTheDM && combatantsArray[k].type == MONSTER_TYPE)
+				{
+					HP_string = ", HP:" + combatantsArray[k].hitpoints;
+				}
+				
 				if(currentTurnIndex == k)
 				{
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
 					} else {
-						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+"]_";
+						reply += "\n("+order+") *_" + combatantsArray[k].name + "_*" + "  _[id:"+combatantsArray[k].id+HP_string+"]_";
 					}
 					
 				}
@@ -735,7 +746,7 @@
 					if(combatantsArray[k].type == PC_TYPE) {
 						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
 					} else {
-						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+"]_";
+						reply += "\n("+order+") " + combatantsArray[k].name + "  _[id:"+combatantsArray[k].id+HP_string+"]_";
 					}
 				}
 			}
@@ -1525,6 +1536,12 @@
 			}
 		};
 		
+		var clearDM = function()
+		{
+			deleteBrainValue(REDIS_KEY_DM_USERNAME);
+			return "DM value cleared. No DM currently set.";
+		};
+		
 		
 	  /* begin 'hear' functions*/
 	  /*
@@ -1952,6 +1969,11 @@
 					break;
 				case "setdm":
 					reply = setDM(username);
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				case "cleardm":
+					reply = clearDM(username);
 					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 					return res.json(msgData);
 					break;
