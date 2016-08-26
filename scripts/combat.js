@@ -17,6 +17,7 @@
     module.exports = function(robot) {
         var util = require("util");
 		var enemy_name = require('./enemy_name');
+		var dice_roller = require('./rolldice');
 		var spreadsheet_wrapper = require('./spreadsheet_wrapper');
 		
 		var hasProp = {}.hasOwnProperty;
@@ -25,23 +26,31 @@
 		const MONSTER_TYPE = 1;
 		const NPC_TYPE = 2;
 		
-		const COMBAT_BRAIN_PREFIX = "combat_script:";
+		//const names for the redis keys
+		const REDIS_KEY_COMBAT_PREFIX = "combat_script:";
+		const REDIS_KEY_COMBAT_STARTED_FLAG = "combat_flag";
+		const REDIS_KEY_COMBATANTS_ARRAY = "combatantsArray";
+		const REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS = "numRegisteredCombatants";
+		const REDIS_KEY_CURRENT_TURN_INDEX = "currentTurnIndex";
+		const REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS = "numTotalCombatants";
+		const REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT = "pc_graveyard";
+		const REDIS_KEY_DM_USERNAME = "dm_username";
 		
 		var death_euphemisms = new Array('is now at room temperature' ,'bit the dust' ,'bought a one-way ticket' ,'bought the farm ' ,'cashed out his chips' ,'checked out' ,'croaked' ,'is taking a dirt nap' ,'became worm food' ,'flatlined' ,'was fragged' ,'gave up the ghost' ,'is kaput' ,'joined his ancestors' ,'kicked the bucket' ,'kicked the can' ,'has left the building' ,'paid the piper' ,'shuffled off the mortal coil' ,'is six feet under' ,'sleeps with the fishes' ,'was terminated with extreme prejudice' ,'is tits up' ,'took a permanent vacation' ,'returned to dust' ,'walked the plank','forgot to keep breathing','punched his ticket','took the long walk');
 		
 		var setBrainValue = function(key,value)
 		{
-			robot.brain.set(COMBAT_BRAIN_PREFIX+key,value);
+			robot.brain.set(REDIS_KEY_COMBAT_PREFIX+key,value);
 		};
 		
 		var getBrainValue = function(key)
 		{
-			return robot.brain.get(COMBAT_BRAIN_PREFIX+key);
+			return robot.brain.get(REDIS_KEY_COMBAT_PREFIX+key);
 		};
 		
 		var deleteBrainValue = function(key)
 		{
-			delete robot.brain.data._private[COMBAT_BRAIN_PREFIX+key];
+			delete robot.brain.data._private[REDIS_KEY_COMBAT_PREFIX+key];
 		};
 		
 		var getRandomDeathEuphemism = function() {
@@ -87,7 +96,7 @@
 		var helpText = function() {
 			var reply = "";
 			reply = "/combat tracks your combat status. The following are the commands (in roughly the same order you need to use them in). Bracketed text below are the paramters you need to replace with your own values:";
-			reply += "\n\n*_/combat setdm_* - OPTIONAL: Configures one player as the DM. If set, init-dm and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
+			reply += "\n\n*_/combat setdm_* - OPTIONAL: Configures the calling player as the DM. If set, init-dm and kill can only be run by the DM. Additionally, setting the DM activates the optional monster HP functionality."
 			reply += "\n\n*_/combat start [NUM COMBATANTS]_* - Start tracking a combat. You need to specify _NUM COMBATANTS_ to set how many combatants are in the fight.";
 			reply += "\n\n*_/combat init [BONUS]_* - Each PC needs to run this to roll for initiative. BONUS is your Dex. bonus. If character sheet integration has been performed, this will automatically use the value in your sheet.  Adding the BONUS param will always override the automatic functionality. Once the correct number of player and monsters have rolled, combat will automatically start.";
 			reply += "\n\n*_/combat init-dm [BONUS] [NUM MONSTERS] [MONSTER NAME] [HP DICE]_* - The DM can run this to quickly add monsters of a single type to a combat. The option [HP DICE] command sets the random starting health for each monster.";
@@ -181,13 +190,13 @@
 			
 		var combatEnd = function (callerName) {
 		  
-			var combat_started = getBrainValue('combat_flag');
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 			   robot.logger.debug("Bad value for combat_started ["+combat_started+"]");
 			   clearAll();
-			   setBrainValue('combat_flag', 0);
+			   setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			   return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
 			if(combat_started == 0)
@@ -203,14 +212,14 @@
 		};
 		
 		var combatCleanupAfterEnd = function(){
-		  setBrainValue('combat_flag', 0);
+		  setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			//TODO: any other cleanup work (like removing persistent variables)
 			deleteBrainValue('numRegisteredCombatants')
 			deleteBrainValue('numTotalCombatants')
 			deleteBrainValue('currentTurnIndex')
 			deleteBrainValue('pc_graveyard')
 			
-			var combatantsArray = getBrainValue('combatantsArray');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
 			if(combatantsArray != null)
 			{
 				for(var k = 0; k < combatantsArray.length; k++)
@@ -224,13 +233,13 @@
 		
 
 		var combatStart = function(callerName,numCombatants) {
-			var combat_started = getBrainValue('combat_flag');
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
 			robot.logger.debug("numCombatants = ["+numCombatants+"]"); 
 
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 1);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 1);
 			}  
 			else if(combat_started == 1)
 			{
@@ -247,18 +256,18 @@
 			
 			//how many players have rolled for initiative? zero so far
 			var numRegisteredCombatants = 0;
-			setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
+			setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
 			//array of players. currently empty
 			var combatantsArray = [];
-			setBrainValue('combatantsArray',combatantsArray);
+			setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 			//who is in the fight?
 			var numTotalCombatants = numCombatants;
-			setBrainValue('numTotalCombatants',numTotalCombatants);
+			setBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS,numTotalCombatants);
 			
 			//create an empty graveyard for PCs
-			setBrainValue('pc_graveyard', new Array());
+			setBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT, new Array());
 			
-			setBrainValue('combat_flag', 1);
+			setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 1);
 			return callerName+" started combat with " + numCombatants + " belligerents.\nEveryone in @channel roll for initiative with the _/combat init [BONUS]_ command!";
 			
 		};
@@ -358,17 +367,17 @@
 		};
 
 		var combatInit = function(callerName, bonus) {
-		    var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		    var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 0);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 				return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
 			if(combat_started == 0)
@@ -395,16 +404,16 @@
   			setBrainValue(callerName+"_initScore",initScore);
   			
   			combatantsArray.push(newCombatant);
-  			setBrainValue('combatantsArray',combatantsArray);
+  			setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 
-  			setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
+  			setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
   			
   			//ready to start combat?
   			if(numRegisteredCombatants == numTotalCombatants)
   			{
 				combatantsArray = combatantsArray.sort(combatantSortByInit);
-  				setBrainValue('combatantsArray',combatantsArray);
-  				setBrainValue('currentTurnIndex',0);
+  				setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
+  				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,0);
   				var firstPlayer = combatantsArray[0];
 				
 				var reply = callerName+" rolled `" + initRoll +"` with a bonus of `" + bonus+"` for a total initative score of `"+initScore+"`.<SPLIT>";
@@ -426,17 +435,17 @@
 
 		var initdm = function(callerName,bonus,addBonus,numMonsters,monsterName) {
 			robot.logger.debug("DM Init request from " + callerName + " with bonus of [" + bonus + "]");
-			var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 0);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 				return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
 			if(combat_started == 0)
@@ -496,17 +505,17 @@
 					combatantsArray.push(newCombatant);
 				}
 			}
-			setBrainValue('combatantsArray',combatantsArray);
+			setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 			numRegisteredCombatants += numMonsters;
-			setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
+			setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
 			
 			//ready to start combat?
 			if(numRegisteredCombatants == numTotalCombatants)
 			{
 			  
 				combatantsArray = combatantsArray.sort(combatantSortByInit);
-				setBrainValue('combatantsArray',combatantsArray);
-				setBrainValue('currentTurnIndex',0);
+				setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
+				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,0);
 				var firstPlayer = combatantsArray[0];
 			  
 				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + numMonsters + " " + monsterName + ".<SPLIT>";
@@ -524,17 +533,17 @@
 		
 		var initNPC = function(callerName,bonus,addBonus,numNPCs,npcName){
 			robot.logger.debug("NPC Init request from " + callerName + " with bonus of [" + bonus + "]");
-			var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 0);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 				return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
 			if(combat_started == 0)
@@ -577,9 +586,9 @@
 				combatantsArray.push(newCombatant);
 			}
 			
-			setBrainValue('combatantsArray',combatantsArray);
+			setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 			numRegisteredCombatants += numNPCs;
-			setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
+			setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
 			
 			
 			//ready to start combat?
@@ -587,8 +596,8 @@
 			{
 			  
 				combatantsArray = combatantsArray.sort(combatantSortByInit);
-				setBrainValue('combatantsArray',combatantsArray);
-				setBrainValue('currentTurnIndex',0);
+				setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
+				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,0);
 				var firstPlayer = combatantsArray[0];
 			  
 				var reply = callerName+" rolled `" + initRoll +"` with a modifier of `" + bonusDescription+"` for a total initative score of `"+initScore+"` for " + npcName + " the NPC.<SPLIT>";
@@ -607,17 +616,17 @@
 		
 		var combatSetInit = function (callerName, newInit) {
 		
-			var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 0);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 				return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
 			else if(combat_started == 0)
@@ -643,23 +652,23 @@
   		  }
   		}
   		
-  		setBrainValue('combatantsArray',combatantsArray);
+  		setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
   		
   		return "Manually changed "+callerName+"'s initiative score from `" +oldInit+ "` to `"+newInit+"`.";
 		};
 		
 		var combatStatus = function(callerName) {
 		
-		  var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		  var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 0);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 				return "No combat started "+callerName+". Begin with `/combat start`"
 			}  
 			else if(combat_started == 0)
@@ -683,7 +692,7 @@
 				return reply;
 				
 			}
-			var currentTurnIndex = getBrainValue('currentTurnIndex');
+			var currentTurnIndex = getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX);
 			
 			var reply = "Here is the current order, with current combatant highlighted:"; 
 			for(var k = 0; k < combatantsArray.length; k++)
@@ -711,16 +720,16 @@
 		};
 			
 		var combatNext = function(callerName,repeat) {
-		  var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		  var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			if(combat_started != 0 && combat_started != 1)
 			{
 				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-				setBrainValue('combat_flag', 0);
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 				return "No combat started "+callerName+". Begin with `/combat start`";
 			}  
 			else if(combat_started == 0)
@@ -748,7 +757,7 @@
 			
 			
 			
-			var currentTurnIndex = getBrainValue('currentTurnIndex');
+			var currentTurnIndex = getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX);
 			var reply = "";
 			
 			if(repeat > 1)
@@ -773,7 +782,7 @@
 			}
 			
 			
-			setBrainValue('currentTurnIndex',currentTurnIndex);
+			setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 			
 			
 			
@@ -823,16 +832,16 @@
 		};
 	  
 	  var combatAdd = function(callerName,bonus) {
-		var combat_started = getBrainValue('combat_flag');
-		var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+		var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 		//array of players
-		var combatantsArray = getBrainValue('combatantsArray');
-		var numTotalCombatants = getBrainValue('numTotalCombatants');
+		var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+		var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 		
 		if(combat_started != 0 && combat_started != 1)
 		{
   			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			setBrainValue('combat_flag', 0);
+			setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			return "No combat started "+callerName+". Begin with `/combat start`";
 		}  
 		if(combat_started == 0)
@@ -857,7 +866,7 @@
   			
 		//now we have the new combatant and their init. But need to make sure the turn counter 
 		// stays correct before re-sorting.
-		var currentTurnIndex = Number(getBrainValue('currentTurnIndex'));
+		var currentTurnIndex = Number(getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX));
 		var currentCombatant = combatantsArray[currentTurnIndex];
 		
 		//now add the new player and resort the array
@@ -870,14 +879,14 @@
 			if(combatantsArray[i].id == currentCombatant.id)
 			{
 				currentTurnIndex = i;
-				setBrainValue('currentTurnIndex',currentTurnIndex);
+				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 			}
 		}
 		
-		setBrainValue('combatantsArray',combatantsArray);
+		setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 
-  		setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
-  		setBrainValue('numTotalCombatants',numTotalCombatants);
+  		setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
+  		setBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS,numTotalCombatants);
   		
 		//now construct our response_type
 		var reply = "New player "+callerName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
@@ -907,16 +916,16 @@
 	  };
 	  
 	  var combatAddNPC = function(callerName,bonus,addBonus,numNPCs,npcName) {
-		var combat_started = getBrainValue('combat_flag');
-		var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+		var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 		//array of players
-		var combatantsArray = getBrainValue('combatantsArray');
-		var numTotalCombatants = getBrainValue('numTotalCombatants');
+		var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+		var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 		
 		if(combat_started != 0 && combat_started != 1)
 		{
   			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			setBrainValue('combat_flag', 0);
+			setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			return "No combat started "+callerName+". Begin with `/combat start`";
 		}  
 		if(combat_started == 0)
@@ -951,7 +960,7 @@
   			
 		//now we have the new combatant and their init. But need to make sure the turn counter 
 		// stays correct before re-sorting.
-		var currentTurnIndex = Number(getBrainValue('currentTurnIndex'));
+		var currentTurnIndex = Number(getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX));
 		var currentCombatant = combatantsArray[currentTurnIndex];
 		
 		//now add the new player and resort the array
@@ -964,14 +973,14 @@
 			if(combatantsArray[i].id == currentCombatant.id)
 			{
 				currentTurnIndex = i;
-				setBrainValue('currentTurnIndex',currentTurnIndex);
+				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 			}
 		}
 		
-		setBrainValue('combatantsArray',combatantsArray);
+		setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 
-  		setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
-  		setBrainValue('numTotalCombatants',numTotalCombatants);
+  		setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
+  		setBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS,numTotalCombatants);
   		
 		//now construct our response_type
 		var reply = "New NPC "+npcName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
@@ -992,7 +1001,7 @@
  			
 		//now we have the new monsters and their init. But need to make sure the turn counter 
 		// stays correct before re-sorting.
-		var currentTurnIndex = Number(getBrainValue('currentTurnIndex'));
+		var currentTurnIndex = Number(getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX));
 		var currentCombatant = combatantsArray[currentTurnIndex];
 		
 		//now add the new player and resort the array
@@ -1009,14 +1018,14 @@
 			if(combatantsArray[i].id == currentCombatant.id)
 			{
 				currentTurnIndex = i;
-				setBrainValue('currentTurnIndex',currentTurnIndex);
+				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 			}
 		}
 		
-		setBrainValue('combatantsArray',combatantsArray);
+		setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 
-  		setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
-  		setBrainValue('numTotalCombatants',numTotalCombatants);
+  		setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
+  		setBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS,numTotalCombatants);
   		
 		//now construct our response_type
 		var reply = "New NPC(s) "+npcName+" rolled `"+initRoll+"` with a bonus of `"+bonus+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
@@ -1047,16 +1056,16 @@
 	  
 	  
 	  var combatAddDM = function(callerName,bonus,addBonus,numMonsters,monsterName) {
-		var combat_started = getBrainValue('combat_flag');
-		var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+		var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 		//array of players
-		var combatantsArray = getBrainValue('combatantsArray');
-		var numTotalCombatants = getBrainValue('numTotalCombatants');
+		var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+		var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 		
 		if(combat_started != 0 && combat_started != 1)
 		{
   			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			setBrainValue('combat_flag', 0);
+			setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			return "No combat started "+callerName+". Begin with `/combat start`";
 		}  
 		if(combat_started == 0)
@@ -1102,7 +1111,7 @@
  			
 		//now we have the new monsters and their init. But need to make sure the turn counter 
 		// stays correct before re-sorting.
-		var currentTurnIndex = Number(getBrainValue('currentTurnIndex'));
+		var currentTurnIndex = Number(getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX));
 		var currentCombatant = combatantsArray[currentTurnIndex];
 		
 		//now add the new player and resort the array
@@ -1119,14 +1128,14 @@
 			if(combatantsArray[i].id == currentCombatant.id)
 			{
 				currentTurnIndex = i;
-				setBrainValue('currentTurnIndex',currentTurnIndex);
+				setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 			}
 		}
 		
-		setBrainValue('combatantsArray',combatantsArray);
+		setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 
-  		setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
-  		setBrainValue('numTotalCombatants',numTotalCombatants);
+  		setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
+  		setBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS,numTotalCombatants);
   		
 		//now construct our response_type
 		var reply = "New monsters ("+monsterName+") rolled `"+initRoll+"` with a modifier of `"+bonusDescription+"` for total initiative `"+initScore+"`.\nHere is the new order, with current combatant highlighted:"; 
@@ -1157,12 +1166,12 @@
 		
 		
 	var combatKill = function(callerName,combatantIdArray,deathMessage) {
-		var combat_started = getBrainValue('combat_flag');
+		var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
 
 		if(combat_started != 0 && combat_started != 1)
 		{
 			robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
-			setBrainValue('combat_flag', 0);
+			setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
 			return "No combat started "+callerName+". Begin with `/combat start`";
 		}  
 		if(combat_started == 0)
@@ -1194,12 +1203,12 @@
 			}
 
 		}
-		var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+		var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 		//array of players
-		var combatantsArray = getBrainValue('combatantsArray');
-		var numTotalCombatants = getBrainValue('numTotalCombatants');
+		var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+		var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 		
-		var currentTurnIndex = getBrainValue('currentTurnIndex');
+		var currentTurnIndex = getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX);
 		var currentPlayer = combatantsArray[currentTurnIndex];
 		
 		//now construct our response message.
@@ -1246,7 +1255,7 @@
 		{
 			reply += "*_" + combatantsArray[0].name + "_* is the only one still standing when the dust clears.\n";
 			
-			var graveYardArray = getBrainValue('pc_graveyard');
+			var graveYardArray = getBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT);
 			if(graveYardArray.length == 1)
 			{
 				reply += graveYardArray[0].name + " was killed during the fight.\n";
@@ -1287,7 +1296,7 @@
 		{
 			reply += "All hostile monsters eliminated!\n"
 			
-			var graveYardArray = getBrainValue('pc_graveyard');
+			var graveYardArray = getBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT);
 			if(graveYardArray.length == 1)
 			{
 				reply += graveYardArray[k].name + " was killed during the fight.\n";
@@ -1342,11 +1351,11 @@
 		//kill off a comnatant and return their Combatant object
 		var killPlayerWithId = function(callerName,combatantId) {
 		
-			var combat_started = getBrainValue('combat_flag');
-			var numRegisteredCombatants = getBrainValue('numRegisteredCombatants');
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+			var numRegisteredCombatants = getBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS);
 			//array of players
-			var combatantsArray = getBrainValue('combatantsArray');
-			var numTotalCombatants = getBrainValue('numTotalCombatants');
+			var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+			var numTotalCombatants = getBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS);
 			
 			
 			
@@ -1375,14 +1384,14 @@
 			{
 				try
 				{
-					var key = COMBAT_BRAIN_PREFIX+combatantToBeKilled.name+"_initScore";
+					var key = REDIS_KEY_COMBAT_PREFIX+combatantToBeKilled.name+"_initScore";
 					if(hasProp.call(robot.brain.data._private, key))
 					{
 						deleteBrainValue(key)
 					}
-					var graveYardArray = getBrainValue('pc_graveyard');
+					var graveYardArray = getBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT);
 					graveYardArray.push(combatantToBeKilled);
-					setBrainValue('pc_graveyard',graveYardArray);
+					setBrainValue(REDIS_KEY_ARRAY_OF_PC_KILLED_IN_COMBAT,graveYardArray);
 				}
 				catch(err)
 				{
@@ -1396,9 +1405,9 @@
 			if(numRegisteredCombatants < numTotalCombatants)
 			{
 				numRegisteredCombatants -= 1;
-				setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
+				setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
 				combatantsArray.splice(indexOfCombatantToBeKilled,1);
-				setBrainValue('combatantsArray',combatantsArray);
+				setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 				var combatantsLeft = numTotalCombatants - numRegisteredCombatants;
 				return combatantToBeKilled;;
 			}
@@ -1409,10 +1418,10 @@
 				// We shouldn't need to reshuffle the array b/c it's already in the correct order.
 				numRegisteredCombatants -= 1;
 				numTotalCombatants -= 1;
-				setBrainValue('numRegisteredCombatants',numRegisteredCombatants);
-				setBrainValue('numTotalCombatants',numTotalCombatants);
+				setBrainValue(REDIS_KEY_NUMBER_OF_REGISTERED_COMBATANTS,numRegisteredCombatants);
+				setBrainValue(REDIS_KEY_TOTAL_NUMBER_OF_COMBATANTS,numTotalCombatants);
 				
-				var currentTurnIndex = getBrainValue('currentTurnIndex');
+				var currentTurnIndex = getBrainValue(REDIS_KEY_CURRENT_TURN_INDEX);
 				var currentPlayer = combatantsArray[currentTurnIndex];
 				
 				//robot.logger.debug("2. currentPlayer, util.inspect="+util.inspect(currentPlayer));
@@ -1426,18 +1435,19 @@
 					robot.logger.debug("3.5. combatantsArray, util.inspect="+util.inspect(combatantsArray));
 					//set the index to whomever comes after them.
 					var newCurrentPlayer;
-					if((currentTurnIndex+1) > combatantsArray.length)
+					if((currentTurnIndex+1) >= combatantsArray.length)
 					{
 						newCurrentPlayer = combatantsArray[0];
 					}
 					else
 					{
+						//this doesn't work where current turn index is 1, and the length is 2?
 						newCurrentPlayer = combatantsArray[currentTurnIndex+1];
 					}
 					robot.logger.debug("4. newCurrentPlayer, util.inspect="+util.inspect(newCurrentPlayer));
 					//remove the killed player from the combatantsArray
 					combatantsArray.splice(indexOfCombatantToBeKilled,1);
-					setBrainValue('combatantsArray',combatantsArray);
+					setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 					for(var k = 0; k < combatantsArray.length; k++)
 					{
 						robot.logger.debug("5["+k+"]. combatantsArray[k], util.inspect="+util.inspect(combatantsArray[k]));
@@ -1445,7 +1455,7 @@
 						if(combatantsArray[k].id == newCurrentPlayer.id)
 						{
 							currentTurnIndex = k;
-							setBrainValue('currentTurnIndex',currentTurnIndex);
+							setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 							break;
 						}
 					}
@@ -1454,7 +1464,7 @@
 				{
 					//remove the killed player from the combatantsArray
 					combatantsArray.splice(indexOfCombatantToBeKilled,1);
-					setBrainValue('combatantsArray',combatantsArray);
+					setBrainValue(REDIS_KEY_COMBATANTS_ARRAY,combatantsArray);
 					
 					//we know who's turn it should be. Just need to reset the turn index to the correct value.
 					for(var k = 0; k < combatantsArray.length; k++)
@@ -1462,7 +1472,7 @@
 						if(combatantsArray[k].id == currentPlayer.id)
 						{
 							currentTurnIndex = k;
-							setBrainValue('currentTurnIndex',currentTurnIndex);
+							setBrainValue(REDIS_KEY_CURRENT_TURN_INDEX,currentTurnIndex);
 							break;
 						}
 					}
@@ -1475,9 +1485,23 @@
 		
 		
 		var setDM = function(callerName) {
-			
-			
+			setBrainValue(REDIS_KEY_DM_USERNAME,callerName);
+			return "Setting _*"+callerName+"*_ as the DM.";
 		};
+		
+		var isUserDM = function(callerName)
+		{
+			var dm_username = getBrainValue(REDIS_KEY_DM_USERNAME);
+			if(callerName == dm_username)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		};
+		
 		
 	  /* begin 'hear' functions*/
 	  /*

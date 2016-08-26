@@ -330,4 +330,5 @@
       
     };
 
+	module.exports.rolldice = rolldice;
 })();
