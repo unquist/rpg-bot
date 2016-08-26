@@ -493,7 +493,7 @@
 					var bonusType = dice_match[4] || "";
 					var bonus = dice_match[5] || 0;
 					
-					HP = dice_roller.getRollResults(sides,num);
+					HP = dice_roller.getRollResults(sides,num).rollsTotal;
 					robot.logger.debug("Random HP before bonus is ["+HP+"]");
 					if(bonusType == "+")
 					{
