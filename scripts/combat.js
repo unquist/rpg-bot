@@ -1417,6 +1417,8 @@
 				
 				//robot.logger.debug("2. currentPlayer, util.inspect="+util.inspect(currentPlayer));
 				//robot.logger.debug("3. combatantToBeKilled, util.inspect="+util.inspect(combatantToBeKilled));
+				robot.logger.debug("2. currentTurnIndex, util.inspect="+util.inspect(currentTurnIndex));
+				robot.logger.debug("3. combatantsArray.length, util.inspect="+util.inspect(combatantsArray.length));
 				
 				//if we removing the player whose turn it is currently (which should rarely if ever happpen) need to do some extra work
 				if(currentPlayer.id == combatantToBeKilled.id)
