@@ -107,6 +107,7 @@
 			reply += "\n\n*_/combat next [REPEAT]_* - Signal to the bot that the current player's turn is over (and it's time for the next player). The optional [REPEAT} parameter allows you to move the turn order forward that many times. So if it's goblin A's turn, `/combat next 3` will complete A, B, and C's turns.";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
+			reply += "\n\n*_/combat dmg [IDs] hp [DMG]_* - Apply [DMG] worth of damage to [IDs]. Only useful if monster HP is activated. ";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
 			return reply;
@@ -1542,6 +1543,10 @@
 			return "DM value cleared. No DM currently set.";
 		};
 		
+		var combatDamage = function(username,playerIdArray,damage)
+		{
+			return "Foo";
+		};
 		
 	  /* begin 'hear' functions*/
 	  /*
@@ -1963,6 +1968,44 @@
 					else
 					{
 						reply = "Need to specify the id of combatant to remove from the fight. Use *_/combat status_* to see the IDs.";
+					}
+					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					return res.json(msgData);
+					break;
+				case "dmg":
+					if(parameters != "")
+					{
+						var parameters_string = parameters.toString();
+						var dmg_paramaters = parameters_string.match(/([\d\s]+) (hp) (\d+)/ig) || -1;
+									
+						if(dmg_paramaters == null || dmg_paramaters == -1)
+						{
+							reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
+						}
+						else
+						{
+							var id_string = dmg_paramaters[1] || "";
+							if(id_string == "")
+							{
+								reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
+							}
+							else
+							{		
+								var id_array = id_string.split(" ");
+								for(var k = 0; k < id_array.length; k++)
+								{
+									id_array[k] = Number(id_array[k].trim());
+								}
+								
+								var damage = Number(dmg_paramaters[3]) || -1;
+								robot.logger.debug("id_array =["+util.inspect(id_array)+"], HP damage = ["+damage+"]");
+								reply = combatDamage(username,id_array,damage);
+							}
+						}
+					}
+					else
+					{
+						reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
 					}
 					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 					return res.json(msgData);
