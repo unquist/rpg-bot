@@ -129,7 +129,15 @@
 			this.init = Number(init);
 			this.type = Number(type);
 			this.monsterType = monsterType;
-			this.hitpoints = Number(hitpoints);
+			this.currentHitpoints = Number(hitpoints);
+			this.totalHitpoints = Number(hitpoints);
+			this.percentDamage = function(){
+				if(currentHitpoints <= 0)
+				{
+					return 0;
+				}
+				return (currentHitpoints/totalHitpoints) * 100;
+			};
 		};
  	
 		var combatantSortByName = function(a,b) {
@@ -1543,9 +1551,90 @@
 			return "DM value cleared. No DM currently set.";
 		};
 		
-		var combatDamage = function(username,playerIdArray,damage)
+		var combatDamage = function(callerName,playerIdArray,damage)
 		{
-			return "Foo";
+			var combat_started = getBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG);
+
+			if(combat_started != 0 && combat_started != 1)
+			{
+				robot.logger.debug("Bad valuefor combat_started ["+combat_started+"]");
+				setBrainValue(REDIS_KEY_COMBAT_STARTED_FLAG, 0);
+				return "No combat started "+callerName+". Begin with `/combat start`";
+			}  
+			if(combat_started == 0)
+			{
+				return "Don't get trigger happy "+callerName+". Need to start combat and roll initiative before you damage anyone...";
+			}
+			
+			robot.logger.debug("Damage request from " + callerName + " for IDs [" + playerIdArray + "]");   
+			
+			var damagedCombatants = new Array();
+			for(var k = 0; k < playerIdArray.length; k++)
+			{
+				try{
+					var combatantId = playerIdArray[k];
+	
+					var combatantsArray = getBrainValue(REDIS_KEY_COMBATANTS_ARRAY);
+					
+					var indexOfCombatantToBeDamaged = -1;
+					for(var i = 0; i< combatantsArray.length; i++)
+					{
+						var currentCombatant = combatantsArray[i];
+						if(currentCombatant.id == combatantId)
+						{
+							indexOfCombatantToBeDamaged = i;
+							break;
+						}
+					}
+			
+					if(indexOfCombatantToBeDamaged == -1)
+					{
+						robot.logger.debug("Didn't find player with ID ["+combatantIdArray[k]+"]");
+					}
+					else
+					{
+						var combatantToDamage = combatantsArray[indexOfCombatantToBeDamaged];
+						
+						if(combatantToDamage.type != MONSTER_TYPE)
+						{
+							return "Error occured during damage request: combatant ["+combatantToDamage.name+"] is a PC or NPC and does not have HP set in this system."; 
+						}
+						else if(combatantToDamage.currentHitpoints == NOT_USING_MONSTER_HP)
+						{
+							return "Error occured during damage request: monster ["+combatantToDamage.name+" ("+combatantToDamage.monsterType+")] does not have HP.";
+						}
+						damagedCombatants.push(combatantToDamage);
+						combatantToDamage.currentHitpoints = combatantToDamage.currentHitpoints - damage;
+					}
+				}
+				catch (error)
+				{
+					robot.logger.debug("Caught error while trying to damage player: ["+error+"]");
+					return "Error occured during damage request: ["+error+"]";
+				}
+
+			}
+			if(damagedCombatants.length < 1)
+			{
+				return "Error occured during damage request: no valid monster ids found";
+			}
+			
+			//now we have an array of damaged combatants. need to tell the DM which monsters need to be killed, and how hurt the others are
+						
+			var reply = "";
+			for(var i = 0; i < damagedCombatants.length; i++)
+			{
+				var damagedCombatant = damagedCombatants[i];
+				if(damagedCombatant.currentHitpoints < 1)
+				{
+					reply += "_*" + damagedCombatant.name + "*_ [id:"+damagedCombatant.id+"] is dead: "+damagedCombatant.currentHitpoints+" HP.\n";
+				}
+				else
+				{
+					reply += "_*" + damagedCombatant.name + "*_ [id:"+damagedCombatant.id+"] at "+damagedCombatant.percentDamage+"% HP ("+damagedCombatant.currentHitpoints+"/"+damagedCombatant.totalHitpoints+").\n";
+				}
+			}
+			return reply;
 		};
 		
 	  /* begin 'hear' functions*/
@@ -2011,7 +2100,7 @@
 						robot.logger.debug("parameters was an empty string");
 						reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
 					}
-					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
+					var msgData = getFormattedJSONAttachment(reply,channel_name,false);
 					return res.json(msgData);
 					break;
 				case "setdm":
