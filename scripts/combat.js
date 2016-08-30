@@ -738,7 +738,7 @@
 				//if the calling player is the DM, and this is a monster, report on its HP
 				if(isTheCallingUserTheDM && combatantsArray[k].type == MONSTER_TYPE)
 				{
-					HP_string = ", HP:" + combatantsArray[k].hitpoints;
+					HP_string = ", HP:" + combatantsArray[k].currentHitpoints;
 				}
 				
 				if(currentTurnIndex == k)
