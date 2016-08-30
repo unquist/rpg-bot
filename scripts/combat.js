@@ -1980,13 +1980,15 @@
 									
 						if(dmg_paramaters == null || dmg_paramaters == -1)
 						{
+							robot.logger.debug("dmg_paramaters null or -1. dmg_paramaters=["+dmg_paramaters+"], parameters_string=["+parameters_string+"]");
 							reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
 						}
 						else
 						{
-							var id_string = dmg_paramaters[1] || "";
-							if(id_string == "")
+							var id_string = dmg_paramaters[1] || "NA";
+							if(id_string == "NA")
 							{
+								robot.logger.debug("id_string was empty. id_string=["+id_string+"]");
 								reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
 							}
 							else
@@ -2005,6 +2007,7 @@
 					}
 					else
 					{
+						robot.logger.debug("parameters was an empty string");
 						reply = "Need to specify the id or ids of combatant to damage, and the amount of damage to apply. Use *_/combat status_* to see the IDs.";
 					}
 					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
