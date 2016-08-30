@@ -131,13 +131,6 @@
 			this.monsterType = monsterType;
 			this.currentHitpoints = Number(hitpoints);
 			this.totalHitpoints = Number(hitpoints);
-			this.percentDamage = function(){
-				if(currentHitpoints <= 0)
-				{
-					return 0;
-				}
-				return Math.floor((currentHitpoints/totalHitpoints) * 100);
-			};
 		};
  	
 		var combatantSortByName = function(a,b) {
@@ -1631,7 +1624,8 @@
 				}
 				else
 				{
-					reply += "_*" + damagedCombatant.name + "*_ [id:"+damagedCombatant.id+"] is down to "+damagedCombatant.percentDamage()+"% HP ("+damagedCombatant.currentHitpoints+"/"+damagedCombatant.totalHitpoints+").\n";
+					var percentDamage = Math.floor((damagedCombatant.currentHitpoints/damagedCombatant.totalHitpoints) * 100);
+					reply += "_*" + damagedCombatant.name + "*_ [id:"+damagedCombatant.id+"] is down to "+percentDamage+"% HP ("+damagedCombatant.currentHitpoints+"/"+damagedCombatant.totalHitpoints+").\n";
 				}
 			}
 			return reply;
