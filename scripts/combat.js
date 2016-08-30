@@ -136,7 +136,7 @@
 				{
 					return 0;
 				}
-				return (currentHitpoints/totalHitpoints) * 100;
+				return Math.floor((currentHitpoints/totalHitpoints) * 100);
 			};
 		};
  	
@@ -1621,7 +1621,7 @@
 			
 			//now we have an array of damaged combatants. need to tell the DM which monsters need to be killed, and how hurt the others are
 						
-			var reply = "";
+			var reply = "Here are the results of the dmg request:\n";
 			for(var i = 0; i < damagedCombatants.length; i++)
 			{
 				var damagedCombatant = damagedCombatants[i];
@@ -1631,7 +1631,7 @@
 				}
 				else
 				{
-					reply += "_*" + damagedCombatant.name + "*_ [id:"+damagedCombatant.id+"] at "+damagedCombatant.percentDamage+"% HP ("+damagedCombatant.currentHitpoints+"/"+damagedCombatant.totalHitpoints+").\n";
+					reply += "_*" + damagedCombatant.name + "*_ [id:"+damagedCombatant.id+"] is down to "+damagedCombatant.percentDamage()+"% HP ("+damagedCombatant.currentHitpoints+"/"+damagedCombatant.totalHitpoints+").\n";
 				}
 			}
 			return reply;
