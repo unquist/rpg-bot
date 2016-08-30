@@ -1976,7 +1976,7 @@
 					if(parameters != "")
 					{
 						var parameters_string = parameters.toString();
-						var dmg_paramaters = parameters_string.match(/([\d\s]+) (hp) (\d+)/ig) || -1;
+						var dmg_paramaters = parameters_string.match(/([\d\s]+) (hp) (\d+)/i) || -1;
 									
 						if(dmg_paramaters == null || dmg_paramaters == -1)
 						{
