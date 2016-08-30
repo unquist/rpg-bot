@@ -1985,6 +1985,7 @@
 						}
 						else
 						{
+							robot.logger.debug("dmg_paramaters=["+dmg_paramaters+"]");
 							var id_string = dmg_paramaters[1] || "NA";
 							if(id_string == "NA")
 							{
