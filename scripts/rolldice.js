@@ -45,8 +45,18 @@
       helpText += "\n/roll 1d4 dis    (Rolls a single four-sided die twice and takes the lower result.)";
 	  helpText += "\n/roll 1d20+1 to hit with sword 2d8 slashing damage    (Rolls a single d20, adds 1 to the result, and returns the outcome. Then roll two eight-side dice and return the result. The labels will be attached to each result.)";
       helpText += "\n";
-	  helpText += "\nAdditionally, you may add (in any order) a parameter of the form `#x`, which will run # multiples of whatever the command is:";
+	  helpText += "\n_Mulitple Rolls_";
+	  helpText += "\nYou may add (in any order) a parameter of the form `#x`, which will run # multiples of whatever the command is:";
 	  helpText += "\n/roll 10x 1d20+1 to hit 1d6 damage    (Rolls a 1d20+1 and a 1d6 couplet, 10 times in a row)";
+	  helpText += "\n";
+	  helpText += "\n_Macros_";
+	  helpText += "\n/roll setmacro #[MACRO-NAME] [full dice command] - Setup a new macro";
+	  helpText += "\n/roll getmacro #[MACRO-NAME] - Return the dice command for a particular macro";
+	  helpText += "\n/roll getmacro - Return all currently set macros.";
+	  helpText += "\n/roll #[MACRO-NAME] - Run the named macro.";
+	  helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with a hash sign (#) and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
+	  helpText += "\n/roll setmacro #fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage";
+	  helpText += "\n/roll #fists-of-fury";
 	  return helpText;    
     };
     
@@ -223,44 +233,42 @@
 		return null;
     };
 
-	robot.router.post('/hubot/roll', function(req, res) {
-		robot.logger.debug("Received a POST request to /hubot/roll");
+	var processMacroCommand = function(){
 		
-		var data, channel_name, response_url, command, text, token,username, realName;
+	};
+	
+	var setMacro = function(){
 		
-		data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
-		//robot.logger.debug("data:"+util.inspect(data));
-		command = data.command;
-		//text = data.text;     
-		token = data.token;
 		
-		//robot.logger.debug("received token:["+token+"]");
-		//robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
+	};
+	
+	var getMacro = function(){
 		
-		if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
-		{
-			return res.send("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?");
-		}
-		else
-		{
-			robot.logger.debug("Request authenticated.");
-		}
-		username = data.user_name;
-		userId = data.user_id;
-		realName = getRealNameFromId(userId);
-		channel_name = data.channel_name;
-		var helpMatch = data.text.match(/help/i);
-		if(helpMatch != null)
-		{
-			return res.send(getHelpText());
-		}
-
-		var text = data.text; //create a copy since we will be modifying this
+	};
+	
+	var executeMacro = function(){
+	
+		
+	};
+	
+	var processDiceCommandString = function(diceCommandString)
+	{
+		var text = diceCommandString; //create a copy since we will be modifying this
 		var match = text.match(/(\d+)(d)(\d+)/ig);
 
 		if(! match) {
 			robot.logger.debug("failed match!");
-			return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+			var msgData = {
+				attachments: [
+					{
+						"fallback": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
+						"color": "#cc3300",
+						"text": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
+						"mrkdwn_in": ["text"]
+					}
+				]
+			};
+			return msgData;
 		}
 
 		//first, check to see if there's a multiplier anywhere in the string
@@ -306,13 +314,66 @@
 						msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
 					}
 				} else {
-					return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
+					var msgData = {
+						attachments: [
+							{
+								"fallback": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
+								"color": "#cc3300",
+								"text": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
+								"mrkdwn_in": ["text"]
+							}
+						]
+					};
+					return msgData;
 				}
 				
 			}
 		}
 		msgData['channel'] = channel_name;
-		msgData['response_type'] = 'in_channel';	  
+		msgData['response_type'] = 'in_channel';
+		return msgData;
+	};
+	
+	robot.router.post('/hubot/roll', function(req, res) {
+		robot.logger.debug("Received a POST request to /hubot/roll");
+		
+		var data, channel_name, response_url, command, text, token,username, realName;
+		
+		data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
+		//robot.logger.debug("data:"+util.inspect(data));
+		command = data.command;
+		//text = data.text;     
+		token = data.token;
+		
+		//robot.logger.debug("received token:["+token+"]");
+		//robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
+		
+		if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
+		{
+			return res.send("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?");
+		}
+		else
+		{
+			robot.logger.debug("Request authenticated.");
+		}
+		username = data.user_name;
+		userId = data.user_id;
+		realName = getRealNameFromId(userId);
+		channel_name = data.channel_name;
+		var helpMatch = data.text.match(/help/i);
+		if(helpMatch != null)
+		{
+			return res.send(getHelpText());
+		}
+
+		var macroMatch = data.text.match(/(getmacro|setmacro|#/i);
+		if(macroMatch != null)
+		{
+			var msgData = processMacroCommand(data.text);
+			return res.json(msgData);
+		}
+		
+		var msgData = processDiceCommandString(data.text);
 		return res.json(msgData);
 		/*
 	msgData = doRoll(realName,data.text);
