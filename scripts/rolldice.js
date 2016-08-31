@@ -252,7 +252,7 @@
 		
 	};
 	
-	var processDiceCommandString = function(diceCommandString)
+	var processDiceCommandString = function(diceCommandString,realName)
 	{
 		var text = diceCommandString; //create a copy since we will be modifying this
 		var match = text.match(/(\d+)(d)(\d+)/ig);
@@ -374,7 +374,7 @@
 			return res.json(msgData);
 		}
 		
-		var msgData = processDiceCommandString(data.text);
+		var msgData = processDiceCommandString(data.text,realName);
 		return res.json(msgData);
 		/*
 	msgData = doRoll(realName,data.text);
