@@ -50,6 +50,7 @@
 	  helpText += "\n/roll 10x 1d20+1 to hit 1d6 damage    (Rolls a 1d20+1 and a 1d6 couplet, 10 times in a row)";
 	  helpText += "\n";
 	  helpText += "\n_Macros_";
+	  helpText += "\n Per user macros allow you to set a long command once, associate it with a short command phrase, and then reuse the command phrase whenever necessary.";
 	  helpText += "\n/roll setmacro #[MACRO-NAME] [full dice command] - Setup a new macro";
 	  helpText += "\n/roll getmacro #[MACRO-NAME] - Return the dice command for a particular macro";
 	  helpText += "\n/roll getmacro - Return all currently set macros.";
@@ -366,7 +367,7 @@
 			return res.send(getHelpText());
 		}
 
-		var macroMatch = data.text.match(/(getmacro|setmacro|#/i);
+		var macroMatch = data.text.match(/(getmacro|setmacro|#)/i);
 		if(macroMatch != null)
 		{
 			var msgData = processMacroCommand(data.text);
