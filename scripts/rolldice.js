@@ -32,6 +32,25 @@
             }
             return results;
         };
+	
+		const MACRO_REDIS_KEY_PREFIX = "diceroller-macro:";
+		
+		var setBrainValue = function(key,value)
+		{
+			robot.brain.set(MACRO_REDIS_KEY_PREFIX+key,value);
+		};
+		
+		var getBrainValue = function(key)
+		{
+			return robot.brain.get(MACRO_REDIS_KEY_PREFIX+key);
+		};
+			
+		var deleteBrainValue = function(key)
+		{
+			delete robot.brain.data._private[MACRO_REDIS_KEY_PREFIX+key];
+		};
+		
+	
     var getHelpText = function()
     {
       var helpText = "Usage: _/roll XdY([+|-]#) (adv|advantage|dis|disadvantage) (label)_";
@@ -234,22 +253,103 @@
 		return null;
     };
 
-	var processMacroCommand = function(){
+	var processMacroCommand = function(macroCommandString,realName,username){
+		var setMacroMatch = macroCommandString.match(/setmacro/i);
+		if(setMacroMatch != null)
+		{
+			return setMacro(macroCommandString,realName,username);
+		}
+		
+		var getMacroMatch = macroCommandString.match(/getmacro/i);
+		if(getMacroMatch != null)
+		{
+			return getMacro(macroCommandString,realName,username);
+		}
+		
+		var execMacroMatch = macroCommandString.match(/(#[\S]+)/i);
+		if(execMacroMatch != null)
+		{
+			return executeMacro(macroCommandString,realName,username);
+		}
 		
 	};
-	
-	var setMacro = function(){
+	/*
+		  helpText += "\n/roll setmacro #[MACRO-NAME] [full dice command] - Setup a new macro";
+	  helpText += "\n/roll getmacro #[MACRO-NAME] - Return the dice command for a particular macro";
+	  helpText += "\n/roll getmacro - Return all currently set macros.";
+	  helpText += "\n/roll #[MACRO-NAME] - Run the named macro.";
+	  helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with a hash sign (#) and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
+	  helpText += "\n/roll setmacro #fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage";
+	  helpText += "\n/roll #fists-of-fury";
+	*/
+	var setMacro = function(macroCommandString,realName,username){
+		var setMacroMatch = macroCommandString.match(/setmacro (#[\S]+) (\S+.*)/i);
+		if(setMacroMatch == null)
+		{
+			return getMsgData('*No valid setmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
+		}
 		
+		var macroName = setMacroMatch[1] || "NA";
+		var fullMacroCommand = setMacroMatch[2] || "NA";
+		if(macroName == "NA" || fullMacroCommand == "NA")
+		{
+			return getMsgData('*No valid setmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
+		}
 		
+		setBrainValue(username+":"+macroName,fullMacroCommand)
+		
+		return getMsgData("Setting new macro name `"+macroName+"` to command `"+fullMacroCommand+"`");
 	};
 	
-	var getMacro = function(){
+	var getMacro = function(macroCommandString,realName,username){
 		
+		var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(#[\S]+){0,1}/i);
+		if(getMacroMatch == null)
+		{
+			return getMsgData('*No valid getmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
+		}
+		
+		var macroName = getMacroMatch[2] || "NA";
+		
+		//if a macro name was specified, we only need to return that
+		if(macroName != "NA")
+		{
+			var diceCommandString = getBrainValue(username+":"+macroName);
+			var message = "Macro name `"+macroName+"` runs command `"+diceCommandString+"`";
+			return getMsgData(message);
+		}
+		
+		//if no macro name was specified, we need to return all macros set for this user
+		var key;
+		var message = "You have the following macros set:\n";
+		var macroCount = 0;
+		for (key in robot.brain.data._private) 
+		{
+			if(!hasProp.call(robot.brain.data._private, key)) continue;
+			robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+			if(key.indexOf(MACRO_REDIS_KEY_PREFIX+username) != -1)
+			{
+				robot.logger.debug("Found a macro for this user.");
+				macroName = key.split(":")[2]; 
+				robot.logger.debug("macroName=["+macroName+"]");
+				message += "Macro name `"+macroName+"` runs command `"+getBrainValue(username+":"+macroName);+"`\n";
+				macroCount += 1;
+			}
+		}
+		if(macroCount == 0)
+		{
+			message = "You have no macros currently set.";
+		}
+		
+		return getMsgData(message);
 	};
 	
-	var executeMacro = function(){
+	var executeMacro = function(macroCommandString,realName,username){
 	
-		
+		/*
+		msgData['channel'] = channel_name;
+		msgData['response_type'] = 'in_channel';
+		*/
 	};
 	
 	var processDiceCommandString = function(diceCommandString,realName)
@@ -259,17 +359,7 @@
 
 		if(! match) {
 			robot.logger.debug("failed match!");
-			var msgData = {
-				attachments: [
-					{
-						"fallback": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
-						"color": "#cc3300",
-						"text": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
-						"mrkdwn_in": ["text"]
-					}
-				]
-			};
-			return msgData;
+			return getMsgData('*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.');
 		}
 
 		//first, check to see if there's a multiplier anywhere in the string
@@ -315,17 +405,8 @@
 						msgData.attachments = msgData.attachments.concat(nextMessage.attachments);
 					}
 				} else {
-					var msgData = {
-						attachments: [
-							{
-								"fallback": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
-								"color": "#cc3300",
-								"text": '*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.',
-								"mrkdwn_in": ["text"]
-							}
-						]
-					};
-					return msgData;
+
+					return getMsgData('*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.');
 				}
 				
 			}
@@ -333,6 +414,20 @@
 		msgData['channel'] = channel_name;
 		msgData['response_type'] = 'in_channel';
 		return msgData;
+	};
+	
+	var getMsgData = function(errorText){
+		var msgData = {
+			attachments: [
+				{
+					"fallback": errorText,
+					"color": "#cc3300",
+					"text": errorText,
+					"mrkdwn_in": ["text"]
+				}
+			]
+		};
+		return msgData;		
 	};
 	
 	robot.router.post('/hubot/roll', function(req, res) {
@@ -370,24 +465,13 @@
 		var macroMatch = data.text.match(/(getmacro|setmacro|#)/i);
 		if(macroMatch != null)
 		{
-			var msgData = processMacroCommand(data.text);
+			var msgData = processMacroCommand(data.text,realName,username);
 			return res.json(msgData);
 		}
 		
 		var msgData = processDiceCommandString(data.text,realName);
 		return res.json(msgData);
-		/*
-	msgData = doRoll(realName,data.text);
-	if(msgData) {
 
-		msgData['channel'] = channel_name;
-		msgData['response_type'] = 'in_channel';
-
-		return res.json(msgData);
-	} else {
-		return res.send('*No valid dice roll recognized in ['+data.text+']!*\nUse _/roll help_ to get usage.');
-	}
-*/
 	});
 
 	module.exports.rolldice = rolldice;	
