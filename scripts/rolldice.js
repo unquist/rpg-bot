@@ -333,7 +333,7 @@
 				robot.logger.debug("Found a macro for this user.");
 				macroName = key.split(":")[2]; 
 				robot.logger.debug("macroName=["+macroName+"]");
-				message += "Macro name `"+macroName+"` runs command `"+getBrainValue(username+":"+macroName);+"`\n";
+				message += "Macro name `"+macroName+"` runs command `"+getBrainValue(username+":"+macroName)+"` \n";
 				macroCount += 1;
 			}
 		}
