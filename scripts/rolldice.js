@@ -21,6 +21,7 @@
 (function() {
     module.exports = function(robot) {
         var util = require("util");
+		var hasProp = {}.hasOwnProperty;
 		var randint = function(sides) {
             return Math.round(Math.random() * (sides - 1)) + 1;
         };
