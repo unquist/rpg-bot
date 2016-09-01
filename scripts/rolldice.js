@@ -450,7 +450,7 @@
 				return getSimpleMsgDataWitoutAttachment('*No valid deletemacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
 			robot.logger.debug("clearMacro-> found getMacroMatch ["+util.inspect(getMacroMatch)+"]");
-			var macroName = getMacroMatch[2] || "NA";
+			var macroName = getMacroMatch[1] || "NA";
 			
 			//if a macro name was specified, we only need to return that
 			if(macroName != "NA")
