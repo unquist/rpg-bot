@@ -399,7 +399,8 @@
 			}
 			robot.logger.debug("Found macro="+util.inspect(macroName));
 			var originalMacroName = macroName;
-			if(!macroName.startsWith("$"))
+			var indexOfMacroChar = macroName.indexOf("$");
+			if(indexOfMacroChar == -1 || indexOfMacroChar > 0)
 			{
 				macroName = "$" + macroName;
 			}
