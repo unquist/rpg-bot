@@ -258,7 +258,7 @@
 			return null;
 		};
 
-		var processMacroCommand = function(macroCommandString,realName,username){
+		var processMacroCommand = function(macroCommandString,realName,username,channel_name){
 			
 			var clearMacrosMatch = macroCommandString.match(/clearallmacros/i);
 			if(clearMacrosMatch != null)
@@ -290,7 +290,7 @@
 				{
 					return getMsgData("Error: macro command names must consist of at least one non-space character following the `$`.");
 				}
-				return executeMacro(macroCommandString,realName,username);
+				return executeMacro(macroCommandString,realName,username,channel_name);
 			}
 			
 			return getMsgData("No valid macro command found. Use _/roll help_ to see options.");
@@ -380,7 +380,7 @@
 			return getMsgData(message);
 		};
 		
-		var executeMacro = function(macroCommandString,realName,username){
+		var executeMacro = function(macroCommandString,realName,username,channel_name){
 			
 			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
 			//var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
@@ -412,7 +412,7 @@
 				return getMsgData("Found no macro command associated with name `"+originalMacroName+"`.");
 			}
 			
-			return processDiceCommandString(diceCommandString,realName);
+			return processDiceCommandString(diceCommandString,realName,channel_name);
 		};
 		
 		var clearAllMacros = function()
@@ -431,7 +431,7 @@
 		}
 		
 		
-		var processDiceCommandString = function(diceCommandString,realName)
+		var processDiceCommandString = function(diceCommandString,realName,channel_name)
 		{
 			var text = diceCommandString; //create a copy since we will be modifying this
 			var match = text.match(/(\d+)(d)(\d+)/ig);
@@ -546,12 +546,12 @@
 			var diceMatch = data.text.match(/(\d+)(d)(\d+)/ig);
 			if(macroMatch != null)
 			{
-				var msgData = processMacroCommand(data.text,realName,username);
+				var msgData = processMacroCommand(data.text,realName,username,channel_name);
 				return res.json(msgData);
 			}
 			else if(diceMatch != null)
 			{
-				var msgData = processDiceCommandString(data.text,realName);
+				var msgData = processDiceCommandString(data.text,realName,channel_name);
 				return res.json(msgData);	
 			}
 			else
@@ -563,7 +563,7 @@
 				{
 					return res.json(getMsgData("No valid dice roll or macro command. Use _/roll help_ to see command options."));
 				}
-				var msgData = processMacroCommand(data.text,realName,username);
+				var msgData = processMacroCommand(data.text,realName,username,channel_name);
 				return res.json(msgData);
 			}
 		});
