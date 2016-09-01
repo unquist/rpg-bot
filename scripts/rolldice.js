@@ -75,12 +75,12 @@
 			helpText += "\n";
 			helpText += "\n_Macros_";
 			helpText += "\n Per user macros allow you to set a long command once, associate it with a short command phrase, and then reuse the command phrase whenever necessary.";
-			helpText += "\n/roll setmacro "+MACRO_CHAR+"[MACRO-NAME] [full dice command] - Setup a new macro. `"+MACRO_CHAR+"` is required to identify the macro name at creation.";
-			helpText += "\n/roll getmacro "+MACRO_CHAR+"[MACRO-NAME] - Return the dice command for a particular macro. `"+MACRO_CHAR+"` is optional.";
+			helpText += "\n/roll setmacro $[MACRO-NAME] [full dice command] - Setup a new macro. `$` is required to identify the macro name at creation.";
+			helpText += "\n/roll getmacro $[MACRO-NAME] - Return the dice command for a particular macro. `$` is optional.";
 			helpText += "\n/roll getmacro - Return all currently set macros.";
-			helpText += "\n/roll "+MACRO_CHAR+"[MACRO-NAME] - Run the named macro. `"+MACRO_CHAR+"` is optional.";
-			helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with `"+MACRO_CHAR+"` at creation, and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
-			helpText += "\n/roll setmacro "+MACRO_CHAR+"fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage";
+			helpText += "\n/roll $[MACRO-NAME] - Run the named macro. `$` is optional.";
+			helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with `$` at creation, and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
+			helpText += "\n/roll setmacro $fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage";
 			helpText += "\n/roll fists-of-fury";
 			return helpText;    
 		};
@@ -286,9 +286,9 @@
 			if(execMacroMatch != null)
 			{
 				robot.logger.debug("processMacroCommand-> found execMacroMatch["+util.inspect(execMacroMatch)+"]");
-				if(execMacroMatch[1] == MACRO_CHAR)
+				if(execMacroMatch[1] == "$")
 				{
-					return getMsgData("Error: macro command names must consist of at least one non-space character following the `"+MACRO_CHAR+"`.");
+					return getMsgData("Error: macro command names must consist of at least one non-space character following the `$`.");
 				}
 				return executeMacro(macroCommandString,realName,username);
 			}
@@ -397,9 +397,9 @@
 			}
 			robot.logger.debug("Found macro="+util.inspect(macroName));
 			var originalMacroName = macroName;
-			if(!macroName.startsWith(MACRO_CHAR))
+			if(!macroName.startsWith("$"))
 			{
-				macroName = MACRO_CHAR + macroName;
+				macroName = "$" + macroName;
 			}
 		
 			var diceCommandString = getBrainValue(username+":"+macroName);
