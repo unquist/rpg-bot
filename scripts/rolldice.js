@@ -372,7 +372,7 @@
 		var executeMacro = function(macroCommandString,realName,username){
 			
 			//var getMacroMatch = macroCommandString.match(/(#*[\S]+)/i);
-			var getMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"i"));
+			var getMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"ig"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
