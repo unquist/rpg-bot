@@ -260,7 +260,7 @@
 
 		var processMacroCommand = function(macroCommandString,realName,username){
 			
-			var clearMacrosMatch = macroCommandString(/clearallmacros/i);
+			var clearMacrosMatch = macroCommandString.match(/clearallmacros/i);
 			if(clearMacrosMatch != null)
 			{
 				return clearAllMacros();
