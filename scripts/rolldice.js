@@ -321,7 +321,7 @@
 		var getMacro = function(macroCommandString,realName,username){
 			
 			//var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(#*[\S]+){0,1}/i);
-			var getMacroMatch = macroCommandString.match(new RegExp(RegExp.escape('getmacro( ){0,1}('+MACRO_CHAR+'*[\S]+){0,1}'),"i"));
+			var getMacroMatch = macroCommandString.match(new RegExp('getmacro( ){0,1}('+MACRO_CHAR+'*[\S]+){0,1}',"i"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid getmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
