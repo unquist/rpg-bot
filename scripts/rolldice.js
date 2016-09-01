@@ -339,9 +339,9 @@
 			if(macroName != "NA")
 			{
 				var originalMacroName = macroName;
-				if(!macroName.startsWith(MACRO_CHAR))
+				if(!macroName.startsWith("$"))
 				{
-					macroName = MACRO_CHAR + macroName;
+					macroName = "$" + macroName;
 				}
 			
 				var diceCommandString = getBrainValue(username+":"+macroName);
