@@ -384,6 +384,7 @@
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
+			robot.logger.debug("Found macro="+util.inspect(macroName));
 			var originalMacroName = macroName;
 			if(!macroName.startsWith(MACRO_CHAR))
 			{
