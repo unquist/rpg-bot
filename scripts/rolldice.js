@@ -281,7 +281,7 @@
 			
 			
 			
-			var execMacroMatch = macroCommandString.match(/(\\${0,1}[\S]+)/i);
+			var execMacroMatch = macroCommandString.match(/(\${0,1}[\S]+)/i);
 			//var execMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
 			if(execMacroMatch != null)
 			{
@@ -305,7 +305,7 @@
 	helpText += "\n/roll #fists-of-fury";
 	*/
 		var setMacro = function(macroCommandString,realName,username){
-			var setMacroMatch = macroCommandString.match(/setmacro (\\$[\S]+) (\S+.*)/i);
+			var setMacroMatch = macroCommandString.match(/setmacro (\$[\S]+) (\S+.*)/i);
 			//var setMacroMatch = macroCommandString.match(new RegExp('setmacro \('+MACRO_CHAR+'\[\\S\]\+\) \(\\S\+\.\*\)',"i"));
 			if(setMacroMatch == null)
 			{
@@ -326,7 +326,7 @@
 		
 		var getMacro = function(macroCommandString,realName,username){
 			
-			var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(\\${0,1}[\S]+){0,1}/i);
+			var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(\${0,1}[\S]+){0,1}/i);
 			//var getMacroMatch = macroCommandString.match(new RegExp('getmacro\\s\+\('+MACRO_CHAR+'\*\[\\S\]\+\)\*',"i"));
 			if(getMacroMatch == null)
 			{
@@ -382,7 +382,7 @@
 			
 			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
 			//var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
-			var getMacroMatch = macroCommandString.match(/(\\${0,1}[\S]+)/i);
+			var getMacroMatch = macroCommandString.match(/(\${0,1}[\S]+)/i);
 			
 			if(getMacroMatch == null)
 			{
@@ -538,7 +538,7 @@
 				return res.json(getMsgData(getHelpText()));
 			}
 
-			var macroMatch = data.text.match(/(getmacro|setmacro|\\$)/i);
+			var macroMatch = data.text.match(/(getmacro|setmacro|\$)/i);
 			//var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
 			var diceMatch = data.text.match(/(\d+)(d)(\d+)/ig);
 			if(macroMatch != null)
