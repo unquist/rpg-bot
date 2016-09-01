@@ -4,3 +4,4 @@ node_modules
 slack_start.sh
 deploy.sh
 google-generated-creds.json
+merge_instructions.txt
