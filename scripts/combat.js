@@ -1710,20 +1710,38 @@
 		/*end 'hear' functions*/
 		
 		/*begin slash command listening code*/
-		var getFormattedJSONAttachment = function(messageText,channel,inChannel) {
+		var getFormattedJSONAttachment = function(messageText,channel,inChannel,noAttachments) {
 			
-			var msgData = {
-				
+			var msgData;
+
+			if(noAttachments =! null &&  noAttachments == true)
+			{
+				msgData = {
+				"text":messageText,
 				"attachments": [{
-					"fallback": messageText,
 					"color": "#cc3300",
 					"footer": "Combat Script",
 					"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
-					"text": messageText,
 					"channel":channel,
 					"mrkdwn_in": ["text"]
-              }]
-          };
+					}]
+				};
+			}
+			else
+			{
+				msgData = {
+					
+					"attachments": [{
+						"fallback": messageText,
+						"color": "#cc3300",
+						"footer": "Combat Script",
+						"footer_icon": "http://plainstexasdivision.tripod.com/sitebuildercontent/sitebuilderpictures/crossedswords.gif",
+						"text": messageText,
+						"channel":channel,
+						"mrkdwn_in": ["text"]
+				  }]
+				};
+			}
 		  
 		  if(inChannel)
 		  {
@@ -2001,7 +2019,7 @@
 					break;
 				case "help":
 					reply = helpText();
-					var msgData = getFormattedJSONAttachment(reply,channel_name,false);
+					var msgData = getFormattedJSONAttachment(reply,channel_name,false,true);
 					return res.json(msgData);
 					break;
 				case "kill":
