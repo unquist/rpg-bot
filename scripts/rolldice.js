@@ -79,6 +79,7 @@
 			helpText += "\n/roll getmacro $[MACRO-NAME] - Return the dice command for a particular macro. `$` is optional.";
 			helpText += "\n/roll getmacro - Return all currently set macros.";
 			helpText += "\n/roll $[MACRO-NAME] - Run the named macro. `$` is optional.";
+			helpText += "\n/roll clearmymacros - Clear any macros currently associated with your username.";
 			helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with `$` at creation, and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
 			helpText += "\n/roll setmacro $fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage";
 			helpText += "\n/roll fists-of-fury";
@@ -260,12 +261,18 @@
 
 		var processMacroCommand = function(macroCommandString,realName,username,channel_name){
 			
-			var clearMacrosMatch = macroCommandString.match(/clearallmacros/i);
-			if(clearMacrosMatch != null)
+			var clearAllMacrosMatch = macroCommandString.match(/clearallmacros/i);
+			if(clearAllMacrosMatch != null)
 			{
 				return clearAllMacros();
 			}
 			
+			
+			var clearMyMacrosMatch = macroCommandString.match(/clearmymacros/i);
+			if(clearMyMacrosMatch != null)
+			{
+				return clearMyMacros();
+			}
 			
 			var setMacroMatch = macroCommandString.match(/setmacro/i);
 			if(setMacroMatch != null)
@@ -412,7 +419,11 @@
 				return getMsgData("Found no macro command associated with name `"+originalMacroName+"`.");
 			}
 			
-			return processDiceCommandString(diceCommandString,realName,channel_name);
+			var msgData = processDiceCommandString(diceCommandString,realName,channel_name);
+			
+			msgData['txt'] = "Running macro `"+macroName+"`";		
+			
+			return msgData;
 		};
 		
 		var clearAllMacros = function()
@@ -430,6 +441,21 @@
 			return getMsgData("All macros cleared.");
 		}
 		
+		var clearMyMacros = function(username)
+		{
+			for (key in robot.brain.data._private) 
+			{
+				if(!hasProp.call(robot.brain.data._private, key)) continue;
+				robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+				if(key.indexOf(MACRO_REDIS_KEY_PREFIX+username) != -1)
+				{
+					robot.logger.debug("Deleting macro with name["+key+"].");
+					delete robot.brain.data._private[key];
+				}
+			}	
+			
+			return getMsgData("All macros for _"+username+"_cleared.");
+		}
 		
 		var processDiceCommandString = function(diceCommandString,realName,channel_name)
 		{
@@ -541,7 +567,7 @@
 				return res.json(getMsgData(getHelpText()));
 			}
 
-			var macroMatch = data.text.match(/(getmacro|setmacro|\$)/i);
+			var macroMatch = data.text.match(/(clearmymacros|clearallmacros|getmacro|setmacro|\$)/i);
 			//var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
 			var diceMatch = data.text.match(/(\d+)(d)(\d+)/ig);
 			if(macroMatch != null)
