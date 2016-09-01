@@ -36,7 +36,7 @@
 			return results;
 		};
 		
-		const MACRO_CHAR = "@";
+		const MACRO_CHAR = "$";
 		
 		const MACRO_REDIS_KEY_PREFIX = "diceroller-macro:";
 		
@@ -259,6 +259,14 @@
 		};
 
 		var processMacroCommand = function(macroCommandString,realName,username){
+			
+			var clearMacrosMatch = macroCommandString(/clearallmacros/i);
+			if(clearMacrosMatch != null)
+			{
+				return clearAllMacros();
+			}
+			
+			
 			var setMacroMatch = macroCommandString.match(/setmacro/i);
 			if(setMacroMatch != null)
 			{
@@ -277,6 +285,7 @@
 			var execMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
 			if(execMacroMatch != null)
 			{
+				robot.logger.debug("processMacroCommand-> found execMacroMatch["+util.inspect(execMacroMatch)+"]");
 				if(execMacroMatch[1] == MACRO_CHAR)
 				{
 					return getMsgData("Error: macro command names must consist of at least one non-space character following the `"+MACRO_CHAR+"`.");
@@ -297,12 +306,12 @@
 	*/
 		var setMacro = function(macroCommandString,realName,username){
 			//var setMacroMatch = macroCommandString.match(/setmacro (#[\S]+) (\S+.*)/i);
-			var setMacroMatch = macroCommandString.match(new RegExp('setmacro ('+MACRO_CHAR+'[\S]+) (\S+.*)',"i"));
+			var setMacroMatch = macroCommandString.match(new RegExp('setmacro \('+MACRO_CHAR+'\[\\S\]\+\) \(\\S\+\.\*\)',"i"));
 			if(setMacroMatch == null)
 			{
 				return getMsgData('*No valid setmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
-			
+			robot.logger.debug("setMacro-> found setMacroMatch ["+util.inspect(setMacroMatch)+"]");
 			var macroName = setMacroMatch[1] || "NA";
 			var fullMacroCommand = setMacroMatch[2] || "NA";
 			if(macroName == "NA" || fullMacroCommand == "NA")
@@ -318,12 +327,12 @@
 		var getMacro = function(macroCommandString,realName,username){
 			
 			//var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(#*[\S]+){0,1}/i);
-			var getMacroMatch = macroCommandString.match(new RegExp('getmacro( ){0,1}('+MACRO_CHAR+'*[\S]+){0,1}',"i"));
+			var getMacroMatch = macroCommandString.match(new RegExp('getmacro\\s\+\('+MACRO_CHAR+'\*\[\\S\]\+\)\*',"i"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid getmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
-			
+			robot.logger.debug("getMacro-> found getMacroMatch ["+util.inspect(getMacroMatch)+"]");
 			var macroName = getMacroMatch[2] || "NA";
 			
 			//if a macro name was specified, we only need to return that
@@ -400,6 +409,22 @@
 			
 			return processDiceCommandString(diceCommandString,realName);
 		};
+		
+		var clearAllMacros = function()
+		{
+			for (key in robot.brain.data._private) 
+			{
+				if(!hasProp.call(robot.brain.data._private, key)) continue;
+				robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
+				if(key.indexOf(MACRO_REDIS_KEY_PREFIX) != -1)
+				{
+					robot.logger.debug("Deleting macro with name["+key+"].");
+					delete robot.brain.data._private[key];
+				}
+			}
+			return getMsgData("All macros cleared.");
+		}
+		
 		
 		var processDiceCommandString = function(diceCommandString,realName)
 		{
@@ -511,7 +536,8 @@
 				return res.json(getMsgData(getHelpText()));
 			}
 
-			var macroMatch = data.text.match(/(getmacro|setmacro|#)/i);
+			//var macroMatch = data.text.match(/(getmacro|setmacro|#)/i);
+			var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
 			var diceMatch = data.text.match(/(\d+)(d)(\d+)/ig);
 			if(macroMatch != null)
 			{
