@@ -36,7 +36,7 @@
 			return results;
 		};
 		
-		const MACRO_CHAR = "%";
+		
 		
 		const MACRO_REDIS_KEY_PREFIX = "diceroller-macro:";
 		
@@ -281,8 +281,8 @@
 			
 			
 			
-			//var execMacroMatch = macroCommandString.match(/(#*[\S]+)/i);
-			var execMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
+			var execMacroMatch = macroCommandString.match(/(\\${0,1}[\S]+)/i);
+			//var execMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
 			if(execMacroMatch != null)
 			{
 				robot.logger.debug("processMacroCommand-> found execMacroMatch["+util.inspect(execMacroMatch)+"]");
@@ -305,8 +305,8 @@
 	helpText += "\n/roll #fists-of-fury";
 	*/
 		var setMacro = function(macroCommandString,realName,username){
-			//var setMacroMatch = macroCommandString.match(/setmacro (#[\S]+) (\S+.*)/i);
-			var setMacroMatch = macroCommandString.match(new RegExp('setmacro \('+MACRO_CHAR+'\[\\S\]\+\) \(\\S\+\.\*\)',"i"));
+			var setMacroMatch = macroCommandString.match(/setmacro (\\$[\S]+) (\S+.*)/i);
+			//var setMacroMatch = macroCommandString.match(new RegExp('setmacro \('+MACRO_CHAR+'\[\\S\]\+\) \(\\S\+\.\*\)',"i"));
 			if(setMacroMatch == null)
 			{
 				return getMsgData('*No valid setmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
@@ -326,8 +326,8 @@
 		
 		var getMacro = function(macroCommandString,realName,username){
 			
-			//var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(#*[\S]+){0,1}/i);
-			var getMacroMatch = macroCommandString.match(new RegExp('getmacro\\s\+\('+MACRO_CHAR+'\*\[\\S\]\+\)\*',"i"));
+			var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(\\${0,1}[\S]+){0,1}/i);
+			//var getMacroMatch = macroCommandString.match(new RegExp('getmacro\\s\+\('+MACRO_CHAR+'\*\[\\S\]\+\)\*',"i"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid getmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
@@ -381,7 +381,9 @@
 		var executeMacro = function(macroCommandString,realName,username){
 			
 			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
-			var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
+			//var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
+			var getMacroMatch = macroCommandString.match(/(\\${0,1}[\S]+)/i);
+			
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
@@ -536,8 +538,8 @@
 				return res.json(getMsgData(getHelpText()));
 			}
 
-			//var macroMatch = data.text.match(/(getmacro|setmacro|#)/i);
-			var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
+			var macroMatch = data.text.match(/(getmacro|setmacro|\\$)/i);
+			//var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
 			var diceMatch = data.text.match(/(\d+)(d)(\d+)/ig);
 			if(macroMatch != null)
 			{
