@@ -36,7 +36,7 @@
 			return results;
 		};
 		
-		const MACRO_CHAR = "$";
+		const MACRO_CHAR = "%";
 		
 		const MACRO_REDIS_KEY_PREFIX = "diceroller-macro:";
 		
