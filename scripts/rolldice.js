@@ -274,7 +274,7 @@
 			
 			
 			//var execMacroMatch = macroCommandString.match(/(#*[\S]+)/i);
-			var execMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"i"));
+			var execMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
 			if(execMacroMatch != null)
 			{
 				if(execMacroMatch[1] == MACRO_CHAR)
@@ -372,7 +372,7 @@
 		var executeMacro = function(macroCommandString,realName,username){
 			
 			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
-			var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"ig"));
+			var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
