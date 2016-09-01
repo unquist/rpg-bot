@@ -371,7 +371,7 @@
 		
 		var executeMacro = function(macroCommandString,realName,username){
 			
-			//var getMacroMatch = macroCommandString.match(/(#*[\S]+)/i);
+			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
 			var getMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"ig"));
 			if(getMacroMatch == null)
 			{
