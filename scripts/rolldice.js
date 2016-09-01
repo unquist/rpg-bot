@@ -23,9 +23,6 @@
 		var util = require("util");
 		var hasProp = {}.hasOwnProperty;
 		
-		RegExp.escape = function(s) {
-			return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-		};
 		
 		var randint = function(sides) {
 			return Math.round(Math.random() * (sides - 1)) + 1;
@@ -277,7 +274,7 @@
 			
 			
 			//var execMacroMatch = macroCommandString.match(/(#*[\S]+)/i);
-			var execMacroMatch = macroCommandString.match(new RegExp(RegExp.escape('('+MACRO_CHAR+'*[\S]+)'),"i"));
+			var execMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"i"));
 			if(execMacroMatch != null)
 			{
 				if(execMacroMatch[1] == MACRO_CHAR)
@@ -300,7 +297,7 @@
 	*/
 		var setMacro = function(macroCommandString,realName,username){
 			//var setMacroMatch = macroCommandString.match(/setmacro (#[\S]+) (\S+.*)/i);
-			var setMacroMatch = macroCommandString.match(new RegExp(RegExp.escape('setmacro ('+MACRO_CHAR+'[\S]+) (\S+.*)'),"i"));
+			var setMacroMatch = macroCommandString.match(new RegExp('setmacro ('+MACRO_CHAR+'[\S]+) (\S+.*)',"i"));
 			if(setMacroMatch == null)
 			{
 				return getMsgData('*No valid setmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
@@ -375,7 +372,7 @@
 		var executeMacro = function(macroCommandString,realName,username){
 			
 			//var getMacroMatch = macroCommandString.match(/(#*[\S]+)/i);
-			var getMacroMatch = macroCommandString.match(new RegExp(RegExp.escape('('+MACRO_CHAR+'*[\S]+)'),"i"));
+			var getMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"i"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
