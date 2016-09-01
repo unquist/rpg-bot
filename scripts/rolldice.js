@@ -372,7 +372,7 @@
 		var executeMacro = function(macroCommandString,realName,username){
 			
 			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
-			var getMacroMatch = macroCommandString.match(new RegExp('('+MACRO_CHAR+'*[\S]+)',"ig"));
+			var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"ig"));
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
