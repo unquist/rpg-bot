@@ -79,7 +79,8 @@
 			helpText += "\n`/roll getmacro $[MACRO-NAME]` - Return the dice command for a particular macro. `$` is optional.";
 			helpText += "\n`/roll getmacro` - Return all currently set macros.";
 			helpText += "\n`/roll $[MACRO-NAME]` - Run the named macro. `$` is optional.";
-			helpText += "\n`/roll clearmymacros` - Clear any macros currently associated with your username.";
+			helpText += "\n`/roll deletemacro $[MACRO-NAME]` - Delete the named macro.";
+			helpText += "\n`/roll deleteallmymacros` - Delete all macros currently associated with your username.";
 			helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with `$` at creation, and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
 			helpText += "\n`/roll setmacro $fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage`";
 			helpText += "\n`/roll fists-of-fury`";
@@ -261,17 +262,25 @@
 
 		var processMacroCommand = function(macroCommandString,realName,username,channel_name){
 			
+		
+			
 			var clearAllMacrosMatch = macroCommandString.match(/clearallmacros/i);
 			if(clearAllMacrosMatch != null)
 			{
 				return clearAllMacros();
 			}
+
 			
-			
-			var clearMyMacrosMatch = macroCommandString.match(/clearmymacros/i);
+			var clearMyMacrosMatch = macroCommandString.match(/deleteallmymacros/i);
 			if(clearMyMacrosMatch != null)
 			{
 				return clearMyMacros(username);
+			}
+			
+			var clearMacroMatch = macroCommandString.match(/deletemacro/i);
+			if(clearMacroMatch != null)
+			{
+				return clearMacro(macroCommandString,username);
 			}
 			
 			var setMacroMatch = macroCommandString.match(/setmacro/i);
@@ -301,15 +310,7 @@
 			
 			return getMsgData("No valid macro command found. Use _/roll help_ to see options.");
 		};
-		/*
-		helpText += "\n/roll setmacro #[MACRO-NAME] [full dice command] - Setup a new macro";
-	helpText += "\n/roll getmacro #[MACRO-NAME] - Return the dice command for a particular macro";
-	helpText += "\n/roll getmacro - Return all currently set macros.";
-	helpText += "\n/roll #[MACRO-NAME] - Run the named macro.";
-	helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with a hash sign (#) and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
-	helpText += "\n/roll setmacro #fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage";
-	helpText += "\n/roll #fists-of-fury";
-	*/
+
 		var setMacro = function(macroCommandString,realName,username){
 			var setMacroMatch = macroCommandString.match(/setmacro (\$[\S]+) (\S+.*)/i);
 			//var setMacroMatch = macroCommandString.match(new RegExp('setmacro \('+MACRO_CHAR+'\[\\S\]\+\) \(\\S\+\.\*\)',"i"));
@@ -439,6 +440,46 @@
 			}
 			return getMsgData("All macros cleared.");
 		}
+		
+		var clearMacro = function(macroCommandString,username)
+		{
+			var getMacroMatch = macroCommandString.match(/deletemacro (\${0,1}[\S]+)/i);
+			//var getMacroMatch = macroCommandString.match(new RegExp('getmacro\\s\+\('+MACRO_CHAR+'\*\[\\S\]\+\)\*',"i"));
+			if(getMacroMatch == null)
+			{
+				return getSimpleMsgDataWitoutAttachment('*No valid deletemacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
+			}
+			robot.logger.debug("clearMacro-> found getMacroMatch ["+util.inspect(getMacroMatch)+"]");
+			var macroName = getMacroMatch[2] || "NA";
+			
+			//if a macro name was specified, we only need to return that
+			if(macroName != "NA")
+			{
+				robot.logger.debug("clearMacro-> found macroName ["+util.inspect(macroName)+"]");
+				var originalMacroName = macroName;
+				var indexOfMacroChar = macroName.indexOf("$");
+				if(indexOfMacroChar == -1 || indexOfMacroChar > 0)
+				{
+					macroName = "$" + macroName;
+				}
+			
+				var diceCommandString = getBrainValue(username+":"+macroName);
+				if(diceCommandString == null)
+				{
+					return getSimpleMsgDataWitoutAttachment("Found no macro command associated with name `"+originalMacroName+"`.");
+				}
+				
+				deleteBrainValue(username+":"+macroName);
+				
+				var message = "Deleted macro name `"+macroName+"` with command `"+diceCommandString+"`";
+				return getMsgData(message);
+			}
+			else
+			{
+				return getSimpleMsgDataWitoutAttachment('*Could not find named macro in deletemacro command ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
+			}
+	
+		};
 		
 		var clearMyMacros = function(username)
 		{
@@ -585,7 +626,7 @@
 				return res.json(getSimpleMsgDataWitoutAttachment(getHelpText()));
 			}
 
-			var macroMatch = data.text.match(/(clearmymacros|clearallmacros|getmacro|setmacro|\$)/i);
+			var macroMatch = data.text.match(/(deleteallmymacros|deletemacro|clearallmacros|getmacro|setmacro|\$)/i);
 			//var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
 			var diceMatch = data.text.match(/(\d+)(d)(\d+)/ig);
 			if(macroMatch != null)
