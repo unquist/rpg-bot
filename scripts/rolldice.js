@@ -338,8 +338,10 @@
 			//if a macro name was specified, we only need to return that
 			if(macroName != "NA")
 			{
+				robot.logger.debug("getMacro-> found macroName ["+util.inspect(macroName)+"]");
 				var originalMacroName = macroName;
-				if(!macroName.startsWith("$"))
+				var indexOfMacroChar = macroName.indexOf("$");
+				if(indexOfMacroChar == -1 || indexOfMacroChar > 0)
 				{
 					macroName = "$" + macroName;
 				}
