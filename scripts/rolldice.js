@@ -442,6 +442,8 @@
 		
 		var clearMyMacros = function(username)
 		{
+			var reply = "Deleted the following macros for user _"+username+"_:\n";
+			var countMacros = 0;
 			for (key in robot.brain.data._private) 
 			{
 				if(!hasProp.call(robot.brain.data._private, key)) continue;
@@ -449,11 +451,20 @@
 				if(key.indexOf(MACRO_REDIS_KEY_PREFIX+username) != -1)
 				{
 					robot.logger.debug("Deleting macro with name["+key+"].");
+					var diceCommand = robot.brain.data._private[key];
+					var macroName = key.split(":")[2]; 
 					delete robot.brain.data._private[key];
+					reply += "Deleted macro name `"+macroName+"` with command `"+diceCommand+"`.\n";
+					countMacros += 1;
 				}
 			}	
 			
-			return getMsgData("All macros for _"+username+"_cleared.");
+			if(countMacros == 0)
+			{
+				reply = "No macros found for user _"+username+"_.\n";
+			}
+			
+			return getMsgData(reply);
 		}
 		
 		var processDiceCommandString = function(diceCommandString,realName,channel_name)
