@@ -33,6 +33,8 @@ To use rpg-bot's /roll command, you will need to create a new "Slash Command" in
 ```
 export HUBOT_SLASH_ROLL_TOKEN=[your token here]
 ```
+Assuming you're deploying to Heroku, set the URL for the Slash Command to `https://[YOUR APP NAME HERE].herokuapp.com/hubot/roll`
+
 You can find instructions on how to use the /roll command with "/roll help" within slack.
 
 ## Campaign summarizer
