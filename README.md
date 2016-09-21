@@ -37,6 +37,12 @@ Assuming you're deploying to Heroku, set the URL for the Slash Command to `https
 
 You can find instructions on how to use the /roll command with "/roll help" within slack.
 
+## combat script
+
+To use the /combat script, you'll need to create another "Slash Command" integration.  Again, assuming you're deploying to Heroku, set the URL to `https://[YOUR APP NAME HERE].herokuapp.com/hubot/combat`.
+
+Run `/combat help` in Slack to see usage options.  
+
 ## Campaign summarizer
 
 rpg-bot can monitor a channel in which you're playing your campaign, stip out any meta conversation, and publish the results to a separate 'archive' channel.  The archive channel can then be read by the DM or players to get a summary of recent events (without the extraneous in-game chatter).
@@ -56,8 +62,5 @@ To use the summarizer, the following conventions must be followed:
 - The script strips out messages containing urls
 - The script will save any text with 1 or 3 backticks, italicized text, or with the `/me` command.
 - If you're also using rpg-bot's combat script, the script will save combat start and end messages (but nothing in between)
-- Anything that doesn't fit into one of the above situations is discarded by default.
+- Any message that doesn't fit into one of the above situations is discarded by default.
 
-
-
-- 
