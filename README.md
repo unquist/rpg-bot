@@ -29,13 +29,13 @@ rpg-bot is designed to run with Slack. Make sure to run through the [slack adapt
 
 ## Roll command
 
-To use rpg-bot's /roll command, you will need to create a new "Slash Command" integration at Slack.  The token defined there should be saved in an environment variable named "HUBOT_SLASH_ROLL_TOKEN".
+To use rpg-bot's `/roll` command, you will need to create a new "Slash Command" integration at Slack.  The token defined there should be saved in an environment variable named "HUBOT_SLASH_ROLL_TOKEN".
 ```
 export HUBOT_SLASH_ROLL_TOKEN=[your token here]
 ```
 Assuming you're deploying to Heroku, set the URL for the Slash Command to `https://[YOUR APP NAME HERE].herokuapp.com/hubot/roll`
 
-You can find instructions on how to use the /roll command with "/roll help" within slack.
+You can find instructions on how to use the `/roll` command by running `/roll help` within Slack.
 
 ## combat script
 
