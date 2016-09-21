@@ -48,3 +48,16 @@ You'll need to setup three environment variables:
 *RPGBOT_SUMMARY_CHANNEL_NAME*: Set this to the name of the channel you want the summaries posted to. Do not prefix the name with a "#" character.
 
 *RPGBOT_CAMPAIGN_CHANNEL_NAME*: Set this to the name of the channel you want summarized. Do not prefix the name with a "#" character.
+
+To use the summarizer, the following conventions must be followed:
+- The script will ignore any message starting with `>` We recommend using `>` in Slack for all meta-game conversations
+- The script ignores all files.
+- The script ignores all system messages
+- The script strips out messages containing urls
+- The script will save any text with 1 or 3 backticks, italicized text, or with the `/me` command.
+- If you're also using rpg-bot's combat script, the script will save combat start and end messages (but nothing in between)
+- Anything that doesn't fit into one of the above situations is discarded by default.
+
+
+
+- 
