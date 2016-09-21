@@ -193,7 +193,7 @@
 								var attachmentText = attachment['text'];
 								if(/(All Combatants accounted for)|(Ending combat and clearing combat data)/.test(attachmentText))
 								{
-									archivedMessage['real_name'] = "Conan-bot";
+									archivedMessage['real_name'] = "Combat-script";
 									archivedMessage['text'] = attachmentText;
 									filteredMessages.push(archivedMessage);
 									break;
