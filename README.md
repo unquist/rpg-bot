@@ -25,7 +25,7 @@ rpg-bot is designed to run with Slack. Make sure to run through the [slack adapt
 
 [slack adapter]: https://github.com/slackhq/hubot-slack/blob/master/README.md
 
-# rpg-bot specific functionality
+# rpg-bot specific configuration
 
 ## Roll command
 
@@ -33,3 +33,16 @@ To use rpg-bot's /roll command, you will need to create a new "Slash Command" in
 ```
 export HUBOT_SLASH_ROLL_TOKEN=[your token here]
 ```
+You can find instructions on how to use the /roll command with "/roll help" within slack.
+
+## Campaign summarizer
+
+rpg-bot can monitor a channel in which you're playing your campaign, stip out any meta conversation, and publish the results to a separate 'archive' channel.  The archive channel can then be read by the DM or players to get a summary of recent events (without the extraneous in-game chatter).
+
+You'll need to setup three environment variables:
+
+*RPGBOT_SUMMARIZE_INTERVAL*: The time in minutes between each run of the bot. Defaults to 0 which turns the summarizer off. We recommend setting this to a value of around 15.  That gives players a chance to edit any in-character messages, and shouldn't tax the system too much.
+
+*RPGBOT_SUMMARY_CHANNEL_NAME*: Set this to the name of the channel you want the summaries posted to. Do not prefix the name with a "#" character.
+
+*RPGBOT_CAMPAIGN_CHANNEL_NAME*: Set this to the name of the channel you want summarized. Do not prefix the name with a "#" character.
