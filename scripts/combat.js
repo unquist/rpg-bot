@@ -107,7 +107,7 @@
 			reply += "\n\n*_/combat next [REPEAT]_* - Signal to the bot that the current player's turn is over (and it's time for the next player). The optional [REPEAT} parameter allows you to move the turn order forward that many times. So if it's goblin A's turn, `/combat next 3` will complete A, B, and C's turns.";
 			reply += "\n\n*_/combat status_* - Broadcasts the current order and indicates whomever's turn it is.";
 			reply += "\n\n*_/combat kill [ID]_* - Remove combatant with [ID] from the combat. Can provide multiple IDs separated by a space.";
-			reply += "\n\n*_/combat dmg [IDs] hp [DMG]_* - Apply [DMG] worth of damage to [IDs]. Only useful if monster HP is activated. ";
+			reply += "\n\n*_/combat damage id [IDs] hp [DMG]_* - Apply [DMG] worth of damage to [IDs]. Only useful if monster HP is activated. ";
 			reply += "\n\n*_/combat end_* - End the combat. You can't start a new combat until you end the old one.";
 			reply += "\n\n*_/combat help_* - Prints this message.";
 			return reply;
@@ -2073,7 +2073,9 @@
 					var msgData = getFormattedJSONAttachment(reply,channel_name,true);
 					return res.json(msgData);
 					break;
+				case "hurt":
 				case "dmg":
+				case "damage":
 					if(parameters != "")
 					{
 						var parameters_string = parameters.toString();
