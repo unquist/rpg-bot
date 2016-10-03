@@ -62,7 +62,7 @@
 			spreadsheet_wrapper.getSpreadsheetValues('1Z9J9onWvwjS8bsXEfdz36jFdFSOHnvJVymFAt_2RUI0','Party Loot!A11:A17',function(err, data) {
 				if (err) {
 					robot.logger.debug("getSpreadsheetValues error:"+err);
-					return msg.reply(err);
+					return msg.reply(err.toString());
 				}
 				return msg.reply(data.values);
 			});
