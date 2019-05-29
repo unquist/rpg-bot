@@ -657,6 +657,7 @@
       {
         robot.logger.debug("Recieved madness request.");
         var msgData = getInteractiveMadnessMsg();
+        robot.logger.debug("msgData is:\n" + msgData);
         return res.json(msgData);
       }
 
@@ -671,7 +672,8 @@
 			else if(diceMatch != null)
 			{
 				var msgData = processDiceCommandString(data.text,realName,channel_name);
-				return res.json(msgData);	
+				robot.logger.debug("msgData is:\n" + msgData);
+        return res.json(msgData);	
 			}
 			else
 			{
