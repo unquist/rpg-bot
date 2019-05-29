@@ -208,16 +208,9 @@
     var getInteractiveMadnessMsg = function()
     {
       var msgData = {
-				attachments: [
-				{
-					"fallback": "Test",
-					"color": "#cc3300",
-					"text": "Test",
-					"mrkdwn_in": ["text"]
-				}
-				]
+				text:'Foo!'
 			};
-      
+      robot.logger.debug("returning a maddness message");
       return msgData;
     };
       
@@ -662,6 +655,7 @@
       var madnessMatch = data.text.match(/madness/i);
       if(madnessMatch != null)
       {
+        robot.logger.debug("Recieved madness request.");
         var msgData = getInteractiveMadnessMsg();
         return res.json(msgData);
       }
