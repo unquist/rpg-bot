@@ -657,7 +657,7 @@
       {
         robot.logger.debug("Recieved madness request.");
         var msgData = getInteractiveMadnessMsg();
-        robot.logger.debug("msgData is:\n" + msgData);
+        robot.logger.debug("msgData is:\n" + JSON.stringify(msgData));
         return res.json(msgData);
       }
 
