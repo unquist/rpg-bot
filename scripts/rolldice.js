@@ -672,7 +672,7 @@
 			else if(diceMatch != null)
 			{
 				var msgData = processDiceCommandString(data.text,realName,channel_name);
-				robot.logger.debug("msgData is:\n" + msgData);
+				robot.logger.debug("msgData is:\n" + JSON.stringify(msgData));
         return res.json(msgData);	
 			}
 			else
