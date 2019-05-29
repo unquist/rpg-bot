@@ -532,7 +532,23 @@
 			}
 			else
 			{
-				robot.logger.debug("No multiplier request. Proceed as normal");
+        
+        multiplierMatch = text.match(/\s{0,1}[x|X](\d+)\s/i);
+			  multiplier = 1;
+			  if(multiplierMatch != null)
+			  {
+				  robot.logger.debug("Found a multipler match: " +multiplierMatch);
+				  multiplier = Number(multiplierMatch[1]);
+				  var indexOfMultipler = text.indexOf(multiplierMatch[1]);
+				  robot.logger.debug("Found a multipler match; text before: " +text);
+				  text = text.replace(/(\d+)[x|X]/,"");
+				  robot.logger.debug("Found a multipler match; text after: " +text);
+			  }
+			  else
+			  {
+          robot.logger.debug("No multiplier request. Proceed as normal");
+        }
+		
 			}
 			
 			args = [];
