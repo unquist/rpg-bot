@@ -519,7 +519,7 @@
 			}
 
 			//first, check to see if there's a multiplier anywhere in the string
-			var multiplierMatch = text.match(/\s{0,1}(((\d+)[x|X])|([x|X](\d+)))\s/i);
+			var multiplierMatch = text.match(/\s{0,1}(\d+)[x|X]\s/i);
 			var multiplier = 1;
 			if(multiplierMatch != null)
 			{
