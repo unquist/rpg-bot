@@ -70,9 +70,10 @@
 			helpText += "\n`/roll 1d20+1 to hit with sword 2d8 slashing damage`    (Rolls a single d20, adds 1 to the result, and returns the outcome. Then roll two eight-side dice and return the result. The labels will be attached to each result.)";
 			helpText += "\n";
 			helpText += "\n_*Mulitple Rolls*_";
-			helpText += "\nYou may add (in any order) a parameter of the form `#x`, which will run # multiples of whatever the command is:";
+			helpText += "\nYou may add (in any order) a parameter of the form `#x` (or `x#`), which will run # multiples of whatever the command is:";
 			helpText += "\n`/roll 10x 1d20+1 to hit 1d6 damage`    (Rolls a 1d20+1 and a 1d6 couplet, 10 times in a row)";
-			helpText += "\n";
+			helpText += "\n`/roll x2 1d20-1 to hit 1d12+1 damage`    (Rolls a 1d20-1 and a 1d12+1 couplet, twice in a row)";
+      helpText += "\n";
 			helpText += "\n_*Macros*_";
 			helpText += "\n Per user macros allow you to set a long command once, associate it with a short command phrase, and then reuse the command phrase whenever necessary.";
 			helpText += "\n`/roll setmacro $[MACRO-NAME] [full dice command]` - Setup a new macro. `$` is required to identify the macro name at creation.";
