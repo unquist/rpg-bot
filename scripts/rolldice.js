@@ -205,6 +205,22 @@
 			return msgData;
 		};		
 
+    var getInteractiveMadnessMsg = function()
+    {
+      var msgData = {
+				attachments: [
+				{
+					"fallback": "Test",
+					"color": "#cc3300",
+					"text": "Test",
+					"mrkdwn_in": ["text"]
+				}
+				]
+			};
+      
+      return msgData;
+    };
+      
 		/*
 		robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
 			var callerName = msg.message.user.name;
@@ -642,6 +658,13 @@
 			{
 				return res.json(getSimpleMsgDataWitoutAttachment(getHelpText()));
 			}
+      
+      var madnessMatch = data.text.match(/madness/i);
+      if(madnessMatch != null)
+      {
+        var msgData = getInteractiveMadnessMsg();
+        return res.json(msgData);
+      }
 
 			var macroMatch = data.text.match(/(deleteallmymacros|deletemacro|clearallmacros|getmacro|setmacro|\$)/i);
 			//var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
