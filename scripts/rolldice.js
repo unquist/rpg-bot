@@ -205,9 +205,9 @@
 			return msgData;
 		};
 
-    var getInteractiveMadnessMsg = function()
+    var getInteractiveMadnessMsg = function(channel_name)
     {
-      
+
       var msgData = [
         {
           type: 'section',
@@ -261,7 +261,8 @@
           ]
         }
       ];
-      
+      msgData['channel']= channel_name;
+      msgData['response_type'] = 'in_channel';
       robot.logger.debug("returning a maddness message");
       return msgData;
     };
@@ -711,7 +712,7 @@
       if(madnessMatch != null)
       {
         robot.logger.debug("Recieved madness request.");
-        var msgData = getInteractiveMadnessMsg();
+        var msgData = getInteractiveMadnessMsg(channel_name);
         robot.logger.debug("msgData is:\n" + JSON.stringify(msgData));
         return res.json(msgData);
       }
