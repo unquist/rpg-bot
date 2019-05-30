@@ -692,8 +692,19 @@
 
 			//robot.logger.debug("received token:["+token+"]");
 			//robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
-
-			if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
+      var tokenString = process.env.HUBOT_SLASH_ROLL_TOKEN;
+      var tokenArray = tokenString.split(',');
+      var authenticated = false;
+      
+      for(var i = 0; i < tokenArray.length; i++)
+      {
+        if(tokenArray[i] == token)
+        {
+          authenticated = true;
+        }
+      }
+      
+			if(!authenticated)
 			{
 				return res.json(getSimpleMsgDataWitoutAttachment("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?"));
 			}
