@@ -210,7 +210,7 @@
 
       var msgData = {
         channel: channel_name,
-        response_type: 'in_channel',
+        response_type: 'ephemeral',
         text: 'Test madness message',  
         blocks: [
           {
