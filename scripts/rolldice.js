@@ -208,7 +208,59 @@
     var getInteractiveMadnessMsg = function()
     {
       
-      var msgData = JSON.parse('[ { "type": "section", "text": { "type": "mrkdwn", "text": "What kind of madness should I roll for?" } }, { "type": "section", "text": { "type": "mrkdwn", "text": "*Short-term* _(1d10 minutes)_\n*Long-term* _(1d10 x 10 hours)_\n*Indefinite* _(lasts until cured)_" }, "accessory": { "type": "image", "image_url": "https://i.etsystatic.com/7088875/r/il/c351f3/1108046803/il_794xN.1108046803_7zc5.jpg", "alt_text": "computer thumbnail" } }, { "type": "actions", "elements": [ { "type": "button", "text": { "type": "plain_text", "emoji": true, "text": "Short-term" }, "value": "short-term" }, { "type": "button", "text": { "type": "plain_text", "emoji": true, "text": "Long-term" }, "value": "long-term" }, { "type": "button", "text": { "type": "plain_text", "emoji": true, "text": "Indefinite" }, "value": "indefinite" } ] } ]');
+      var msgData = [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'What kind of madness should I roll for?'
+          }
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: '*Short-term* _(1d10 minutes)_\n*Long-term* _(1d10 x 10 hours)_\n*Indefinite* _(lasts until cured)_'
+          },
+          accessory: {
+            type: 'image',
+            image_url: 'https://i.etsystatic.com/7088875/r/il/c351f3/1108046803/il_794xN.1108046803_7zc5.jpg',
+            alt_text: 'computer thumbnail'
+          }
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Short-term'
+              },
+              value: 'short-term'
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Long-term'
+              },
+              value: 'long-term'
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                emoji: true,
+                text: 'Indefinite'
+              },
+              value: 'indefinite'
+            }
+          ]
+        }
+      ];
       
       robot.logger.debug("returning a maddness message");
       return msgData;
