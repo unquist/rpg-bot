@@ -210,6 +210,10 @@
 
       var msgData = [
         {
+          channel: channel_name,
+          response_type: 'in_channel'
+        },
+        {
           type: 'section',
           text: {
             type: 'mrkdwn',
@@ -261,8 +265,6 @@
           ]
         }
       ];
-      msgData['channel']= channel_name;
-      msgData['response_type'] = 'in_channel';
       robot.logger.debug("returning a maddness message");
       return msgData;
     };
