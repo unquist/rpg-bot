@@ -22,8 +22,8 @@
     module.exports = function(robot) {
 		var util = require("util");
 		var hasProp = {}.hasOwnProperty;
-		
-		
+
+
 		var randint = function(sides) {
 			return Math.round(Math.random() * (sides - 1)) + 1;
 		};
@@ -35,27 +35,27 @@
 			}
 			return results;
 		};
-		
-		
-		
+
+
+
 		const MACRO_REDIS_KEY_PREFIX = "diceroller-macro:";
-		
+
 		var setBrainValue = function(key,value)
 		{
 			robot.brain.set(MACRO_REDIS_KEY_PREFIX+key,value);
 		};
-		
+
 		var getBrainValue = function(key)
 		{
 			return robot.brain.get(MACRO_REDIS_KEY_PREFIX+key);
 		};
-		
+
 		var deleteBrainValue = function(key)
 		{
 			delete robot.brain.data._private[MACRO_REDIS_KEY_PREFIX+key];
 		};
-		
-		
+
+
 		var getHelpText = function()
 		{
 			var helpText = "Usage: _*/roll XdY([+|-]#) (adv|advantage|dis|disadvantage) (label)*_";
@@ -85,9 +85,9 @@
 			helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with `$` at creation, and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
 			helpText += "\n`/roll setmacro $fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage`";
 			helpText += "\n`/roll fists-of-fury`";
-			return helpText;    
+			return helpText;
 		};
-		
+
 		var getRollResults = function(sides, num) {
 			var result = {
 				rolls: rolldice(sides, num),
@@ -99,7 +99,7 @@
 			return result;
 		};
 
-		
+
 		var diceBot = function(name,num,sides,bonusType,bonus,advantage,label) {
 			var results = [];
 			var isCrit = false;
@@ -146,7 +146,7 @@
 
 			if(advantage) {
 				if(advantage.indexOf("dis") != -1) {
-					text += " with disadvantage";	
+					text += " with disadvantage";
 				} else if (advantage.indexOf("adv") != -1) {
 					text += " with advantage";
 				}
@@ -194,16 +194,16 @@
 				}
 				]
 			};
-			
+
 			if(isCrit) {
 				msgData.attachments.push({"image_url": "http://www.neverdrains.com/criticalhit/images/critical-hit.jpg", "text": "*CRITICAL!*","mrkdwn_in": ["text"]});
 			}
 			if(isFail) {
 				msgData.attachments.push({"image_url": "http://i.imgur.com/eVW7XtF.jpg", "text": "*FAIL!*","mrkdwn_in": ["text"]});
 			}
-			
+
 			return msgData;
-		};		
+		};
 
     var getInteractiveMadnessMsg = function()
     {
@@ -213,7 +213,7 @@
       robot.logger.debug("returning a maddness message");
       return msgData;
     };
-      
+
 		/*
 		robot.hear(/(\$roll\s+)(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(advantage|adv|disadvantage|dis){0,1}/i, function(msg) {
 			var callerName = msg.message.user.name;
@@ -222,20 +222,20 @@
 			var bonusType = msg.match[5] || "NAN";
 			var bonus = msg.match[6] || 0;
 			var advantage = msg.match[7] || "";
-			
+
 			var msgData = diceBot(callerName,num,sides,bonusType,bonus,advantage);
 			msgData['channel'] = msg.message.room;
 			try{
-			
+
 			robot.adapter.customMessage(msgData);
 			}
-			catch (err) 
+			catch (err)
 			{
 			robot.logger.debug("Caught error: " + err.message);
 			}
 			return;
 		});
-*/  
+*/
 
 		var getRealNameFromId = function(userId)
 		{
@@ -244,7 +244,7 @@
 			{
 				return "<Unknown User>"
 			}
-			
+
 			return user.real_name;
 		};
 
@@ -252,16 +252,16 @@
 	* returns a msgData object representing the slack response on success or null if it couldn't parse the input
 	*/
 		var doRoll = function(realName,text) {
-			
+
 			var match = text.match(/(\d+)(d)(\d+)(\+|-){0,1}(\d+){0,1}\s{0,1}(disadvantage|advantage|adv\b|dis\b){0,1}\s{0,1}([\s\S]+)?/i);
-			
+
 			if(match != null)
 			{
 				var num = match[1] || 1;
 				var sides = match[3] || 6;
 				var bonusType = match[4] || "";
 				var bonus = match[5] || 0;
-				var advantage = match[6] || "";  
+				var advantage = match[6] || "";
 				var label = match[7] || "";
 
 				var msgData = diceBot(realName,num,sides,bonusType,bonus,advantage,label);
@@ -271,40 +271,40 @@
 		};
 
 		var processMacroCommand = function(macroCommandString,realName,username,channel_name){
-			
-		
-			
+
+
+
 			var clearAllMacrosMatch = macroCommandString.match(/clearallmacros/i);
 			if(clearAllMacrosMatch != null)
 			{
 				return clearAllMacros();
 			}
 
-			
+
 			var clearMyMacrosMatch = macroCommandString.match(/deleteallmymacros/i);
 			if(clearMyMacrosMatch != null)
 			{
 				return clearMyMacros(username);
 			}
-			
+
 			var clearMacroMatch = macroCommandString.match(/deletemacro/i);
 			if(clearMacroMatch != null)
 			{
 				return clearMacro(macroCommandString,username);
 			}
-			
+
 			var setMacroMatch = macroCommandString.match(/setmacro/i);
 			if(setMacroMatch != null)
 			{
 				return setMacro(macroCommandString,realName,username);
 			}
-			
+
 			var getMacroMatch = macroCommandString.match(/getmacro/i);
 			if(getMacroMatch != null)
 			{
 				return getMacro(macroCommandString,realName,username);
 			}
-			
+
 
 			var execMacroMatch = macroCommandString.match(/(\${0,1}[\S]+)/i);
 			//var execMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
@@ -317,7 +317,7 @@
 				}
 				return executeMacro(macroCommandString,realName,username,channel_name);
 			}
-			
+
 			return getMsgData("No valid macro command found. Use _/roll help_ to see options.");
 		};
 
@@ -335,14 +335,14 @@
 			{
 				return getMsgData('*No valid setmacro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
-			
+
 			setBrainValue(username+":"+macroName,fullMacroCommand)
-			
+
 			return getMsgData("Setting new macro name `"+macroName+"` to command `"+fullMacroCommand+"`");
 		};
-		
+
 		var getMacro = function(macroCommandString,realName,username){
-			
+
 			var getMacroMatch = macroCommandString.match(/getmacro( ){0,1}(\${0,1}[\S]+){0,1}/i);
 			//var getMacroMatch = macroCommandString.match(new RegExp('getmacro\\s\+\('+MACRO_CHAR+'\*\[\\S\]\+\)\*',"i"));
 			if(getMacroMatch == null)
@@ -351,7 +351,7 @@
 			}
 			robot.logger.debug("getMacro-> found getMacroMatch ["+util.inspect(getMacroMatch)+"]");
 			var macroName = getMacroMatch[2] || "NA";
-			
+
 			//if a macro name was specified, we only need to return that
 			if(macroName != "NA")
 			{
@@ -362,7 +362,7 @@
 				{
 					macroName = "$" + macroName;
 				}
-			
+
 				var diceCommandString = getBrainValue(username+":"+macroName);
 				if(diceCommandString == null)
 				{
@@ -371,19 +371,19 @@
 				var message = "Macro name `"+macroName+"` runs command `"+diceCommandString+"`";
 				return getMsgData(message);
 			}
-			
+
 			//if no macro name was specified, we need to return all macros set for this user
 			var key;
 			var message = "You have the following macros set:\n";
 			var macroCount = 0;
-			for (key in robot.brain.data._private) 
+			for (key in robot.brain.data._private)
 			{
 				if(!hasProp.call(robot.brain.data._private, key)) continue;
 				robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
 				if(key.indexOf(MACRO_REDIS_KEY_PREFIX+username) != -1)
 				{
 					robot.logger.debug("Found a macro for this user.");
-					macroName = key.split(":")[2]; 
+					macroName = key.split(":")[2];
 					robot.logger.debug("macroName=["+macroName+"]");
 					message += "Macro name `"+macroName+"` runs command `"+getBrainValue(username+":"+macroName)+"` \n";
 					macroCount += 1;
@@ -393,23 +393,23 @@
 			{
 				message = "You have no macros currently set.";
 			}
-			
+
 			return getMsgData(message);
 		};
-		
+
 		var executeMacro = function(macroCommandString,realName,username,channel_name){
-			
+
 			robot.logger.debug("Found macroCommandString="+util.inspect(macroCommandString));
 			//var getMacroMatch = macroCommandString.match(new RegExp('\('+MACRO_CHAR+'\*\[\\S\]\+\)',"i"));
 			var getMacroMatch = macroCommandString.match(/(\${0,1}[\S]+)/i);
-			
+
 			if(getMacroMatch == null)
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
 			robot.logger.debug("Found getMacroMatch="+util.inspect(getMacroMatch));
 			var macroName = getMacroMatch[1] || "NA";
-			
+
 			if(macroName == "NA")
 			{
 				return getMsgData('*No valid macro command recognized in ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
@@ -421,24 +421,24 @@
 			{
 				macroName = "$" + macroName;
 			}
-		
+
 			var diceCommandString = getBrainValue(username+":"+macroName);
-			
+
 			if(diceCommandString == null)
 			{
 				return getMsgData("Found no macro command associated with name `"+originalMacroName+"`.");
 			}
-			
+
 			var msgData = processDiceCommandString(diceCommandString,realName,channel_name);
-			
-			msgData['text'] = "Running macro `"+macroName+"`";		
-			
+
+			msgData['text'] = "Running macro `"+macroName+"`";
+
 			return msgData;
 		};
-		
+
 		var clearAllMacros = function()
 		{
-			for (key in robot.brain.data._private) 
+			for (key in robot.brain.data._private)
 			{
 				if(!hasProp.call(robot.brain.data._private, key)) continue;
 				robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
@@ -450,7 +450,7 @@
 			}
 			return getMsgData("All macros cleared.");
 		}
-		
+
 		var clearMacro = function(macroCommandString,username)
 		{
 			var getMacroMatch = macroCommandString.match(/deletemacro (\${0,1}[\S]+)/i);
@@ -461,7 +461,7 @@
 			}
 			robot.logger.debug("clearMacro-> found getMacroMatch ["+util.inspect(getMacroMatch)+"]");
 			var macroName = getMacroMatch[1] || "NA";
-			
+
 			//if a macro name was specified, we only need to return that
 			if(macroName != "NA")
 			{
@@ -472,15 +472,15 @@
 				{
 					macroName = "$" + macroName;
 				}
-			
+
 				var diceCommandString = getBrainValue(username+":"+macroName);
 				if(diceCommandString == null)
 				{
 					return getSimpleMsgDataWitoutAttachment("Found no macro command associated with name `"+originalMacroName+"`.");
 				}
-				
+
 				deleteBrainValue(username+":"+macroName);
-				
+
 				var message = "Deleted macro name `"+macroName+"` with command `"+diceCommandString+"`";
 				return getMsgData(message);
 			}
@@ -488,14 +488,14 @@
 			{
 				return getSimpleMsgDataWitoutAttachment('*Could not find named macro in deletemacro command ['+macroCommandString+']!*\nUse _/roll help_ to get usage.');
 			}
-	
+
 		};
-		
+
 		var clearMyMacros = function(username)
 		{
 			var reply = "Deleted the following macros for user _"+username+"_:\n";
 			var countMacros = 0;
-			for (key in robot.brain.data._private) 
+			for (key in robot.brain.data._private)
 			{
 				if(!hasProp.call(robot.brain.data._private, key)) continue;
 				robot.logger.debug("key["+key+"]:value["+robot.brain.data._private[key]+"]");
@@ -503,21 +503,21 @@
 				{
 					robot.logger.debug("Deleting macro with name["+key+"].");
 					var diceCommand = robot.brain.data._private[key];
-					var macroName = key.split(":")[2]; 
+					var macroName = key.split(":")[2];
 					delete robot.brain.data._private[key];
 					reply += "Deleted macro name `"+macroName+"` with command `"+diceCommand+"`.\n";
 					countMacros += 1;
 				}
-			}	
-			
+			}
+
 			if(countMacros == 0)
 			{
 				reply = "No macros found for user _"+username+"_.\n";
 			}
-			
+
 			return getMsgData(reply);
 		}
-		
+
 		var processDiceCommandString = function(diceCommandString,realName,channel_name)
 		{
 			var text = diceCommandString; //create a copy since we will be modifying this
@@ -542,7 +542,7 @@
 			}
 			else
 			{
-        
+
         multiplierMatch = text.match(/\s{0,1}[x|X](\d+)\s/i);
 			  multiplier = 1;
 			  if(multiplierMatch != null)
@@ -558,9 +558,9 @@
 			  {
           robot.logger.debug("No multiplier request. Proceed as normal");
         }
-		
+
 			}
-			
+
 			args = [];
 			var match = text.match(/(\d+)(d)(\d+)/ig);
 			for (var i = match.length-1 ; i >= 0; i--) {
@@ -573,7 +573,7 @@
 			}
 
 			//arg = 1d20+1 adv foo foo foo
-			
+
 			var msgData = null;
 			for(var k = 0; k < multiplier; k++)
 			{
@@ -590,14 +590,14 @@
 
 						return getMsgData('*No valid dice roll recognized in ['+diceCommandString+']!*\nUse _/roll help_ to get usage.');
 					}
-					
+
 				}
 			}
 			msgData['channel'] = channel_name;
 			msgData['response_type'] = 'in_channel';
 			return msgData;
 		};
-		
+
 		var getMsgData = function(messageText){
 			var msgData = {
 				attachments: [
@@ -609,31 +609,34 @@
 				}
 				]
 			};
-			return msgData;		
+			return msgData;
 		};
-		
-		var getSimpleMsgDataWitoutAttachment = function(messageText)
+
+		var getSimpleMsgDataWitoutAttachment = function(messageText, channel_name)
 		{
 			var msgData = {
-				text:messageText
+				text:messageText,
+        channel:channel_name,
+        response_type:'in_channel'
 			};
-			return msgData;		
+      
+			return msgData;
 		}
-		
+
 		robot.router.post('/hubot/roll', function(req, res) {
 			robot.logger.debug("Received a POST request to /hubot/roll");
-			
+
 			var data, channel_name, response_url, command, text, token,username, realName;
-			
+
 			data = req.body.payload != null ? JSON.parse(req.body.payload) : req.body;
 			//robot.logger.debug("data:"+util.inspect(data));
 			command = data.command;
-			//text = data.text;     
+			//text = data.text;
 			token = data.token;
-			
+
 			//robot.logger.debug("received token:["+token+"]");
 			//robot.logger.debug("stored token is:["+process.env.HUBOT_SLASH_ROLL_TOKEN+"]");
-			
+
 			if(token != process.env.HUBOT_SLASH_ROLL_TOKEN)
 			{
 				return res.json(getSimpleMsgDataWitoutAttachment("Incorrect authentication token. Did you remember to set the HUBOT_SLASH_ROLL_TOKEN to the token for your Slack slash command?"));
@@ -649,9 +652,9 @@
 			var helpMatch = data.text.match(/help/i);
 			if(helpMatch != null)
 			{
-				return res.json(getSimpleMsgDataWitoutAttachment(getHelpText()));
+				return res.json(getSimpleMsgDataWitoutAttachment(getHelpText(),channel_name));
 			}
-      
+
       var madnessMatch = data.text.match(/madness/i);
       if(madnessMatch != null)
       {
@@ -673,13 +676,13 @@
 			{
 				var msgData = processDiceCommandString(data.text,realName,channel_name);
 				robot.logger.debug("msgData is:\n" + JSON.stringify(msgData));
-        return res.json(msgData);	
+        return res.json(msgData);
 			}
 			else
 			{
 				//no explicit macro command, and no dice roll command.
 				//check if it's a macro request without the #
-				macroMatch = data.text.match(/([\S]+)/i); 
+				macroMatch = data.text.match(/([\S]+)/i);
 				if(macroMatch == null)
 				{
 					return res.json(getMsgData("No valid dice roll or macro command. Use _/roll help_ to see command options."));
@@ -689,10 +692,10 @@
 			}
 		});
 
-		module.exports.rolldice = rolldice;	
+		module.exports.rolldice = rolldice;
 		module.exports.getRollResults = getRollResults;
-		
+
 	};
 
-	
+
 })();
