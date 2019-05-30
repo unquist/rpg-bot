@@ -208,7 +208,7 @@
     var getInteractiveMadnessMsg = function(channel_name)
     {
 
-      var msgData = {
+      var msgData = [
         payload: {
           channel: channel_name,
           attachments: [
@@ -269,7 +269,7 @@
             }
           ]
         }
-      };
+      ];
       robot.logger.debug("returning a maddness message");
       return msgData;
     };
