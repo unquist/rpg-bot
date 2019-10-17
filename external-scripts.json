@@ -3,6 +3,5 @@
   "hubot-heroku-keepalive",
   "hubot-redis-brain",
   "hubot-brain-inspect",
-  "google-spreadsheet",
   "hubot-slack-api"
 ]
