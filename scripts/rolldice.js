@@ -698,6 +698,10 @@
 			return msgData;
 		};
 
+	robot.router.post('/hubot/keepalive', function(req, res) {
+		setBrainValue("keepalive","Last keepalive was: " + Date.now());
+	};
+
 	robot.router.post('/hubot/roll', function(req, res) {
 			robot.logger.debug("Received a POST request to /hubot/roll");
 
