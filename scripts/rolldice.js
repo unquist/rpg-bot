@@ -328,6 +328,10 @@
 
 		var processOrderCommand = function(orderCommandString,realName,username,channel_name){
 			
+			robot.logger.debug("processOrderCommand-> recieved command ["+orderCommandString+"]");
+			//var match = text.match(/+d/i);
+			
+			//build slack command
 			var text = "Order command triggered";
 			var msgData = {
 				attachments: [
