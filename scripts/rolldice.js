@@ -326,6 +326,25 @@
 			return null;
 		};
 
+		var processOrderCommand = function(orderCommandString,realName,username,channel_name){
+			
+			var text = "Order command triggered";
+			var msgData = {
+				attachments: [
+				{
+					"fallback": text,
+					"color": "#cc3300",
+					"text": text,
+					"mrkdwn_in": ["text"]
+				}
+				]
+			};
+
+			msgData['channel'] = channel_name;
+			msgData['response_type'] = 'in_channel';
+			return msgData;
+		};
+
 		var processMacroCommand = function(macroCommandString,realName,username,channel_name){
 
 
@@ -730,6 +749,14 @@
         robot.logger.debug("msgData is:\n" + JSON.stringify(msgData));
         return res.json(msgData);
       }
+	  
+	  
+	  var orderMatch = data.text.match(/order/i);
+	  if(orderMatch != null)
+	  {
+		var msgData = processOrderCommand(data.text,realName,username,channel_name);
+		return res.json(msgData);
+	  }
 
 			var macroMatch = data.text.match(/(deleteallmymacros|deletemacro|clearallmacros|getmacro|setmacro|\$)/i);
 			//var macroMatch = data.text.match(new RegExp('clearallmacros\|getmacro\|setmacro\|'+MACRO_CHAR,"i"));
