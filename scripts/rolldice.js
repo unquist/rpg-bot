@@ -36,7 +36,15 @@
 			return results;
 		};
 
-
+		var shuffleArray = function(array) {
+			for (var i = array.length - 1; i > 0; i--) {
+				var j = Math.floor(Math.random() * (i + 1));
+				var temp = array[i];
+				array[i] = array[j];
+				array[j] = temp;
+			}
+			return array;
+		};
 
 		const MACRO_REDIS_KEY_PREFIX = "diceroller-macro:";
 
@@ -329,10 +337,14 @@
 		var processOrderCommand = function(orderCommandString,realName,username,channel_name){
 			
 			robot.logger.debug("processOrderCommand-> recieved command ["+orderCommandString+"]");
-			//var match = text.match(/+d/i);
+			var results = orderCommandString.split(" ");
+			//remove the "order" string from the results
+			results.shift();
+			results = shuffleArray(results);
+			
 			
 			//build slack command
-			var text = "Order command triggered";
+			var text = "Random order is:";
 			var msgData = {
 				attachments: [
 				{
@@ -343,6 +355,19 @@
 				}
 				]
 			};
+
+			for(var i = 0; i < results.length; i++)
+			{
+				var order = i + 1;
+				var randomOrderTxt = "[" + order + "] " + results[i];
+				var attachment = 	{
+					"fallback": randomOrderTxt,
+					"color": "#cc3300",
+					"text": randomOrderTxt,
+					"mrkdwn_in": ["text"]
+				}
+				msgData.attachments.push(attachment);
+			}
 
 			msgData['channel'] = channel_name;
 			msgData['response_type'] = 'in_channel';
