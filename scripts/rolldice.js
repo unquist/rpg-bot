@@ -696,9 +696,9 @@
 			};
       
 			return msgData;
-		}
+		};
 
-		robot.router.post('/hubot/roll', function(req, res) {
+	robot.router.post('/hubot/roll', function(req, res) {
 			robot.logger.debug("Received a POST request to /hubot/roll");
 
 			var data, channel_name, response_url, command, text, token,username, realName;
