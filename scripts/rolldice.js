@@ -300,6 +300,14 @@
 			return;
 		});
 */
+		var getAllUsers = function()
+		{
+			var users = robot.brain.data.users;
+			for(var i = 0; i < users.length; i++)
+			{
+				robot.logger.debug("getAllUsers-> found user ["+users[i]+"]");
+			}
+		};
 
 		var getRealNameFromId = function(userId)
 		{
