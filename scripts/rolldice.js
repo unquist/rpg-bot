@@ -339,11 +339,13 @@
 			robot.logger.debug("processOrderCommand-> recieved command ["+orderCommandString+"]");
 			var results = orderCommandString.split(" ");
 			//remove the "order" string from the results
+			robot.logger.debug("processOrderCommand-> results ["+results+"]");
 			results.shift();
+			robot.logger.debug("processOrderCommand-> results shifted ["+results+"]");
 			results = shuffleArray(results);
 			
-			
-			//build slack command
+			robot.logger.debug("processOrderCommand-> results shuffled ["+results+"]");
+			//build slack 
 			var text = "Random order is:";
 			var msgData = {
 				attachments: [
@@ -355,7 +357,7 @@
 				}
 				]
 			};
-
+			robot.logger.debug("processOrderCommand-> msg created, looping through attachments");
 			for(var i = 0; i < results.length; i++)
 			{
 				var order = i + 1;
@@ -371,6 +373,9 @@
 
 			msgData['channel'] = channel_name;
 			msgData['response_type'] = 'in_channel';
+			
+			robot.logger.debug("processOrderCommand-> returned msgData ["+msgData+"]");
+			
 			return msgData;
 		};
 
