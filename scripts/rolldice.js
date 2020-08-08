@@ -344,6 +344,7 @@
 
 		var processOrderCommand = function(orderCommandString,realName,username,channel_name){
 			
+			getAllUsers();
 			robot.logger.debug("processOrderCommand-> recieved command ["+orderCommandString+"]");
 			var results = orderCommandString.split(" ");
 			//remove the "order" string from the results
