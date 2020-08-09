@@ -303,6 +303,7 @@
 		var getAllUsers = function()
 		{
 			var users = robot.brain.data.users;
+			robot.logger.debug("getAllUsers-> found uses ["+users+"]");
 			for(var i = 0; i < users.length; i++)
 			{
 				robot.logger.debug("getAllUsers-> found user ["+users[i]+"]");
