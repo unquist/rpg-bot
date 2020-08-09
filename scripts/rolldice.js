@@ -317,7 +317,8 @@
 			{
 				return "<Unknown User>"
 			}
-
+			robot.logger.debug("getRealNameFromId-> found user ["+user+"]");
+			robot.logger.debug("getRealNameFromId-> found user.real_name ["+user.real_name+"]");
 			return user.real_name;
 		};
 
