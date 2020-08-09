@@ -304,9 +304,22 @@
 		{
 			var usersInBrain = robot.brain.data.users;
 			robot.logger.debug("getAllUsers-> found usersInBrain ["+util.inspect(usersInBrain)+"]");
-			Object.entries(usersInBrain).forEach((entry) => {
-				robot.logger.debug("getAllUsers-> entry is ["+util.inspect(entry)+"]");
-			});
+
+			for (var key in usersInBrain) {
+				// skip loop if the property is from prototype
+				if (!usersInBrain.hasOwnProperty(key)) continue;
+
+				var obj = usersInBrain[key];
+				for (var prop in obj) {
+					// skip loop if the property is from prototype
+					if (!obj.hasOwnProperty(prop)) continue;
+
+					// your code
+					robot.logger.debug("getAllUsers-> prop ["+prop+"]");
+					robot.logger.debug("getAllUsers-> obj[prop] ["+obj[prop]+"]");
+				}
+			}
+
 			for(var i = 0; i < usersInBrain.length; i++)
 			{
 				robot.logger.debug("getAllUsers-> found user ["+usersInBrain[i]+"]");
