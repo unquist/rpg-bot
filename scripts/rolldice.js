@@ -304,9 +304,9 @@
 		{
 			var usersInBrain = robot.brain.data.users;
 			robot.logger.debug("getAllUsers-> found usersInBrain ["+util.inspect(usersInBrain)+"]");
-			for (const [key, value] of Object.entries(usersInBrain)) {
-				console.log(`${key}: ${value}`);
-			}
+			Object.entries(usersInBrain).forEach((entry) => {
+				robot.logger.debug("getAllUsers-> entry is ["+util.inspect(entry)+"]");
+			});
 			for(var i = 0; i < usersInBrain.length; i++)
 			{
 				robot.logger.debug("getAllUsers-> found user ["+usersInBrain[i]+"]");
