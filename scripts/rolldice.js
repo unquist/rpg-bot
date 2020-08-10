@@ -81,7 +81,7 @@
 			helpText += "\nYou may add (in any order) a parameter of the form `#x` (or `x#`), which will run # multiples of whatever the command is:";
 			helpText += "\n`/roll 10x 1d20+1 to hit 1d6 damage`    (Rolls a 1d20+1 and a 1d6 couplet, 10 times in a row)";
 			helpText += "\n`/roll x2 1d20-1 to hit 1d12+1 damage`    (Rolls a 1d20-1 and a 1d12+1 couplet, twice in a row)";
-      helpText += "\n";
+			helpText += "\n";
 			helpText += "\n_*Macros*_";
 			helpText += "\n Per user macros allow you to set a long command once, associate it with a short command phrase, and then reuse the command phrase whenever necessary.";
 			helpText += "\n`/roll setmacro $[MACRO-NAME] [full dice command]` - Setup a new macro. `$` is required to identify the macro name at creation.";
@@ -93,6 +93,9 @@
 			helpText += "\nYou can set a dice macro with the `setmacro` command. Macro names must be prefixed with `$` at creation, and use alphanumeric characters (no spaces). Whatever follows the macro name will be the command set to that macro:";
 			helpText += "\n`/roll setmacro $fists-of-fury 2x 1d20+5 to hit with fists of fury to hit 1d6 damage`";
 			helpText += "\n`/roll fists-of-fury`";
+			helpText += "\n";
+			helpText += "\n_*Ordering*_";
+			helpText += "\n`/roll order [item 1] [item 2] [item 3] ... [item n]` - Returns a randomized list of items 1 through n. Useful for quickly determing a random marching order or deciding randomly how enemies target PCs.";
 			return helpText;
 		};
 
@@ -343,7 +346,7 @@
 			//remove the "order" string from the results
 			if(results.length < 3)
 			{
-				return getSimpleMsgDataWitoutAttachment("*Error*: need to provide at least two items after 'order' command.\n`Example: `/roll order apple banana`");
+				return getSimpleMsgDataWitoutAttachment("*Error*: need to provide at least two items after 'order' command.\nExample: `/roll order apple banana`");
 			}
 			robot.logger.debug("processOrderCommand-> results ["+results+"]");
 			results.shift();
