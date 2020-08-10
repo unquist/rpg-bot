@@ -300,31 +300,7 @@
 			return;
 		});
 */
-		var getAllUsers = function()
-		{
-			var usersInBrain = robot.brain.data.users;
-			robot.logger.debug("getAllUsers-> found usersInBrain ["+util.inspect(usersInBrain)+"]");
 
-			for (var key in usersInBrain) {
-				// skip loop if the property is from prototype
-				if (!usersInBrain.hasOwnProperty(key)) continue;
-
-				var obj = usersInBrain[key];
-				for (var prop in obj) {
-					// skip loop if the property is from prototype
-					if (!obj.hasOwnProperty(prop)) continue;
-
-					// your code
-					robot.logger.debug("getAllUsers-> prop ["+prop+"]");
-					robot.logger.debug("getAllUsers-> obj[prop] ["+obj[prop]+"]");
-				}
-			}
-
-			for(var i = 0; i < usersInBrain.length; i++)
-			{
-				robot.logger.debug("getAllUsers-> found user ["+usersInBrain[i]+"]");
-			}
-		};
 
 		var getRealNameFromId = function(userId)
 		{
@@ -362,10 +338,13 @@
 
 		var processOrderCommand = function(orderCommandString,realName,username,channel_name){
 			
-			getAllUsers();
 			robot.logger.debug("processOrderCommand-> recieved command ["+orderCommandString+"]");
 			var results = orderCommandString.split(" ");
 			//remove the "order" string from the results
+			if(results.length < 3)
+			{
+				return getSimpleMsgDataWitoutAttachment("Error: need to provide at least two items after 'order' command.\n`Example: '/roll order apple banana'");
+			}
 			robot.logger.debug("processOrderCommand-> results ["+results+"]");
 			results.shift();
 			robot.logger.debug("processOrderCommand-> results shifted ["+results+"]");
