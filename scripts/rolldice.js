@@ -343,7 +343,7 @@
 			//remove the "order" string from the results
 			if(results.length < 3)
 			{
-				return getSimpleMsgDataWitoutAttachment("Error: need to provide at least two items after 'order' command.\n`Example: '/roll order apple banana'");
+				return getSimpleMsgDataWitoutAttachment("*Error*: need to provide at least two items after 'order' command.\n`Example: `/roll order apple banana`");
 			}
 			robot.logger.debug("processOrderCommand-> results ["+results+"]");
 			results.shift();
