@@ -370,7 +370,7 @@
 			for(var i = 0; i < results.length; i++)
 			{
 				var order = i + 1;
-				var randomOrderTxt = "[" + order + "] " + results[i];
+				var randomOrderTxt = "`[" + order + "]` " + results[i];
 				var attachment = 	{
 					"fallback": randomOrderTxt,
 					"color": "#cc3300",
